@@ -205,6 +205,13 @@
       "decision": "accepted_supplier_local_item",
       "confidence": "very_high",
       "rationale": "8 apariciones coherentes como cobre desnudo 35 mm², expresado en kg con factor 0,315 kg/m."
+    },
+    {
+      "supplier": "EFLUX",
+      "reference": "8313950059984",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "8 apariciones idénticas como fuente DALI2 24V 80W con PVP estable; referencia local de EFLUX."
     }
   ]
 }
