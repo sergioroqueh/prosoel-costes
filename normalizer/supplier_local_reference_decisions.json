@@ -184,6 +184,27 @@
       "decision": "accepted_supplier_local_item",
       "confidence": "very_high",
       "rationale": "10 líneas coherentes como cable paralelo audio 2x1 mm² rojo-negro libre de halógenos."
+    },
+    {
+      "supplier": "RIAS",
+      "reference": "UURZ3",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "9 apariciones coherentes como unión universal cincada Z3 con patrón de precio estable."
+    },
+    {
+      "supplier": "RIAS",
+      "reference": "3316C305",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "8 apariciones coherentes como cable Cat.6 U/UTP AWG23 CCA FRLSZH+UV blanco."
+    },
+    {
+      "supplier": "RIAS",
+      "reference": "CU35",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "8 apariciones coherentes como cobre desnudo 35 mm², expresado en kg con factor 0,315 kg/m."
     }
   ]
 }
