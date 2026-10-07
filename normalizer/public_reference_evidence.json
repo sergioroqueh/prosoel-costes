@@ -2002,6 +2002,86 @@
       "sources": [
         "https://www.legrand.es/es/productos/niloe-step-mecanismos-para-toldos-y-persianas-e-interruptores-por-tarjeta?current_tab=tab-A"
       ]
+    },
+    {
+      "observed": [
+        "08460003",
+        "8460003"
+      ],
+      "canonical": "08460003",
+      "relation": "format_alias",
+      "confidence": "very_high",
+      "note": "Tecsoled publica 08460003 para el perfil empotrable TSL-E15. La forma 8460003 es la misma secuencia sin el cero inicial.",
+      "sources": [
+        "https://tecsoled.com/en/producto/perfileria/e15/",
+        "https://tecsoled.com/wp-content/uploads/2018/04/CatalogoTecsoled.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "NU310118",
+        "NICU310118"
+      ],
+      "canonical": "NU310118",
+      "relation": "supplier_or_capture_alias",
+      "confidence": "very_high",
+      "note": "Schneider publica NU310118 como New Unica, interruptor 1 módulo polar. NICU310118 no es la referencia oficial del fabricante.",
+      "sources": [
+        "https://www.se.com/es/es/product/NU310118/new-unica-interruptor-basculante-10ax-1-m%C3%B3dulo-ip4x-polar/"
+      ]
+    },
+    {
+      "observed": [
+        "82010-33",
+        "82010‐33"
+      ],
+      "canonical": "82010-33",
+      "relation": "typographic_alias",
+      "confidence": "very_high",
+      "note": "Misma referencia Simon 82; solo cambia el carácter Unicode del guion.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/82010-33-tecla-individual-mecanismos-mando-aluminio-simon-82"
+      ]
+    },
+    {
+      "observed": [
+        "33CPPBC0095R25",
+        "33CPPBC0120R25"
+      ],
+      "canonical": null,
+      "relation": "distinct_products",
+      "confidence": "very_high",
+      "note": "GESCABLE 33CPPBC0095R25 es cable paralelo altavoz 2x1,00 mm² rojo-negro LH; 33CPPBC0120R25 es 2x1,50 mm². Una descripción 2x1,00 asociada a 0120 es incompatible.",
+      "sources": [
+        "https://www.matmax.es/hilos-y-cables/productos/gescable/33cppbc0095r25-cable-paralelo-altavoz-2x100mm-libre-de-halogenos-rojo-negro-rollo-100m-dca-1227000075",
+        "https://sonepar.es/catalog/es-es/products/gescable-cable-paralelo-altavoz-2x1-50mm-libre-de-halogenos-rojo-negro-rollo-100m-dca-GESCCPPBC0120R25"
+      ]
+    },
+    {
+      "observed": [
+        "35CPCTR0093R25",
+        "38CPTFP0175R25"
+      ],
+      "canonical": null,
+      "relation": "distinct_products",
+      "confidence": "very_high",
+      "note": "35CPCTR0093R25 es cable trenzado 2x1,5 rojo-negro LH; 38CPTFP0175R25 es cable detector de incendios apantallado 2x1,5 LH. No son la misma variante.",
+      "sources": [
+        "https://sonepar.es/catalog/es-es/products/gescable-cable-trenzado-2x1-50-libre-de-halogenos-rojo-negro-rollo-100m-dca-416007",
+        "https://sonepar.es/catalog/es-es/products/gescable-cable-detector-incendios-apantallado-2x1-5-libre-de-halogenos-rollo-100m-dca-316843"
+      ]
+    },
+    {
+      "observed": [
+        "33CPPBL0090R25"
+      ],
+      "canonical": "33CPPBL0090R25",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "GESCABLE cable paralelo altavoz 2x1,00 mm² blanco, rollo 100 m.",
+      "sources": [
+        "https://sonepar.es/catalog/es-es/products/gescable-cable-paralelo-altavoz-2x1-00mm-blanco-rollo-100m-eca-442932"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
