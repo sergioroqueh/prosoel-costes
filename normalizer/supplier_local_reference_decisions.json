@@ -58,6 +58,27 @@
         "https://pinazo.com/en/pnz-m-1t-li-nhc-entrada-inferior---salida-superior-1",
         "https://www.chint.eu/content/download/7224/file/Homologaci%C3%83%C2%B3n%20Iberdrola_Ex9UE1%202%2025.pdf"
       ]
+    },
+    {
+      "supplier": "TODO EXTINTOR",
+      "reference": "CO25KG",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "18 compras coherentes 2024-2026, siempre como extintor CO2 de 5 kg y precio neto estable de 43 €/ud."
+    },
+    {
+      "supplier": "TODO EXTINTOR",
+      "reference": "PROSOEL6C",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "18 apariciones coherentes como adhesivo personalizado PROSOEL para extintor de polvo 6 kg. Referencia interna del proveedor."
+    },
+    {
+      "supplier": "EFLUX",
+      "reference": "8313950041880",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "17 compras coherentes del mismo set de perfil de aluminio de superficie 17,1x7,83 mm, 2 m, con difusor opal, tapas y grapas."
     }
   ]
 }
