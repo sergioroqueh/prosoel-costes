@@ -575,6 +575,128 @@
       "sources": [
         "https://ferreteriasindustriales.es/es/anclajes-plasticos/39228-taco-nilon-sx-plus-6-x-30-100-uds-4048962480825.html"
       ]
+    },
+    {
+      "observed": [
+        "51010103-030"
+      ],
+      "canonical": "51010103-030",
+      "relation": "confirmed_exact_with_description_conflicts",
+      "confidence": "very_high",
+      "note": "Simon confirma 51010103-030 como marco de pared de empotrar con bastidores para 3 elementos dobles/6 elementos. Descripciones históricas que lo llaman base Schuko o cajetín son incompatibles.",
+      "sources": [
+        "https://www.simonelectric.com/es-ad/51010103-030-marco-pared-empotrar-bastidores-3-elementos-dobles-blanco-simon-500-cima",
+        "https://dimae.com/series-de-mecanismos/puestos-de-trabajo/marcas/simon.html"
+      ]
+    },
+    {
+      "observed": [
+        "403585"
+      ],
+      "canonical": "403585",
+      "relation": "confirmed_exact_with_description_conflicts",
+      "confidence": "very_high",
+      "note": "Legrand confirma 403585 como magnetotérmico TX3 1P+N 10A curva C 6kA. Descripciones de conducto de chapa o accesorio de cofret asociadas a este código son errores de arrastre.",
+      "sources": [
+        "https://www.legrand.com/ecatalogue/en/catalog/products/mcb-tx3-6000a-1-pole-neutral-10a-curve-403585",
+        "https://www.legrand.es/es/rohs/pdf/rohs-certificate-of-compliance/175686"
+      ]
+    },
+    {
+      "observed": [
+        "180064",
+        "LGY412548"
+      ],
+      "canonical": null,
+      "relation": "distinct_products",
+      "confidence": "very_high",
+      "note": "180064=peine QRB bipolar 63A 54P 1000mm. LGY412548=Schneider Linergy repartidor modular 4P 125A 4x12 conexiones. Si aparecen bajo la misma referencia/descripción, hay conflicto de línea.",
+      "sources": [
+        "https://qrb.es/wp-content/uploads/2020/04/Catalogo-Marzo-2020-web..pdf",
+        "https://www.se.com/es/es/product/LGY412548/repartidor-modular-linergy-4p-125-a-4x12-conexiones/"
+      ]
+    },
+    {
+      "observed": [
+        "50010432-037",
+        "50010472-037"
+      ],
+      "canonical": null,
+      "relation": "same_family_distinct_variants",
+      "confidence": "very_high",
+      "note": "50010432-037=Schuko doble roja con LED y embornamiento 1Click por corte; 50010472-037=misma familia con embornamiento a tornillo. No fusionar.",
+      "sources": [
+        "https://www.simonelectric.com/es-ad/mecanismos-electricos/espacios-trabajo/funciones?Serie=Simon+500+Cima",
+        "https://www.simonelectric.com/es-es/electrical-mechanisms/simon-500-cima?page=14"
+      ]
+    },
+    {
+      "observed": [
+        "479712020P0000",
+        "GG404040"
+      ],
+      "canonical": null,
+      "relation": "distinct_products",
+      "confidence": "very_high",
+      "note": "479712020P0000=Pinazo arqueta toma de tierra 200mm poliéster RAL7035. GG404040=Gaestopas arqueta 400x400x400mm 4 salidas. Para una descripción 400x400x400, GG404040 es coherente y la referencia Pinazo 200mm no.",
+      "sources": [
+        "https://pinazo.com/arquetas-de-registro-de-toma-de-tierra",
+        "https://adajusa.com/es/arquetas-para-tomas-electricas-y-de-tierra/6803-arqueta-toma-de-tierra-400x400-8435532868033.html"
+      ]
+    },
+    {
+      "observed": [
+        "555529",
+        "A14-M10"
+      ],
+      "canonical": null,
+      "relation": "distinct_products",
+      "confidence": "very_high",
+      "note": "555529=Legrand P17 Tempra Pro clavija recta IP66/67 63A 380/415V 3P+N+T. A14-M10=Cembre terminal de cobre para 70mm2 con taladro M10. A14-M10 no puede ser referencia de una clavija P17.",
+      "sources": [
+        "https://www.legrand.com/ecatalogue/en/legrand-ecat/generatepdf/153006",
+        "https://products.cembre.com/es/sarl/family/1739-a-m"
+      ]
+    },
+    {
+      "observed": [
+        "VCN-400",
+        "VCN-400 KO-CRI"
+      ],
+      "canonical": "VCN-400",
+      "relation": "composite_bundle_not_single_reference",
+      "confidence": "very_high",
+      "note": "VCN-400 es la central convencional Komttech de 4 zonas. KO-CRI es un módulo de comunicaciones independiente GSM/GPRS/Ethernet. 'VCN-400 KO-CRI' describe central + módulo, no una referencia única de fabricante.",
+      "sources": [
+        "https://grupojlvdistribuciones.com/producto/central-convencional-4-zonas/",
+        "https://www.komtesdeteccion.com/productos/sistema-de-deteccion-convencional-komttech/item/interface-de-comunicaciones-wifi-para-central-vcn-3"
+      ]
+    },
+    {
+      "observed": [
+        "52050003-035",
+        "52050003‐035"
+      ],
+      "canonical": "52050003-035",
+      "relation": "typographic_alias",
+      "confidence": "very_high",
+      "note": "Misma referencia Simon; la segunda variante usa un guion Unicode distinto. Debe normalizarse solo para búsqueda/comparación, preservando el texto original histórico.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/52050003-035-caja-suelo-regulable-6-elementos-instalacion-suelo-pavimento-gris-simon-500-cima"
+      ]
+    },
+    {
+      "observed": [
+        "82914-33",
+        "82914‐33"
+      ],
+      "canonical": "82914-33",
+      "relation": "typographic_alias",
+      "confidence": "very_high",
+      "note": "Misma referencia Simon 82; únicamente cambia el carácter de guion.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/82914-33-marco-1-elemento-aluminio-mate-interior-aluminio-simon-82"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
