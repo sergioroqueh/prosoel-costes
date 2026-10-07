@@ -12,6 +12,7 @@ class OrderLine(BaseModel):
     description_original: str
     pvp: Decimal | None = None
     discount_raw: str | None = None
+    discount_components_raw: list[str] = Field(default_factory=list)
     net_unit_price: Decimal | None = None
     total_price: Decimal | None = None
 
@@ -29,5 +30,7 @@ class ParsedOrder(BaseModel):
     project_address: str | None = None
     project_contact: str | None = None
     declared_total: Decimal | None = None
+    unit_header: str | None = None
+    template_variant: str | None = None
     warnings: list[str] = Field(default_factory=list)
     lines: list[OrderLine] = Field(default_factory=list)
