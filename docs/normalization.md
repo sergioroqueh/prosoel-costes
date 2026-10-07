@@ -130,3 +130,30 @@ Estas comprobaciones **no corrigen ni normalizan** la línea. Solo generan una
 incidencia de alta prioridad para revisión humana. Esto permite localizar
 errores aislados de copia/pega dentro de referencias muy repetidas sin
 sobreajustar el normalizador.
+
+
+## Tipos de línea
+
+No todas las líneas de pedido representan materiales físicos.
+
+Antes de normalizar productos, el importador puede proponer estos tipos:
+
+- `environmental_fee`: RAEE, ecotasa y conceptos equivalentes;
+- `freight`: portes, envío y transporte;
+- `service`: proyectos, inspecciones, puesta en marcha y servicios explícitos;
+- `service_candidate`: trabajos que parecen servicio pero requieren revisión;
+- `unknown`: no se decide nada todavía.
+
+Solo los tres primeros pueden excluirse de la cola de materiales cuando la
+señal sea explícita y la confianza sea alta. `unknown` **no significa
+material**: significa que no hay información suficiente para decidir.
+
+## Variantes comerciales con una misma referencia de proveedor
+
+La auditoría ha demostrado que una misma referencia de proveedor puede aparecer
+con configuraciones u opciones diferentes. Por tanto, `supplier_reference`
+deja de ser una clave única de `commercial_items`.
+
+La identidad de una variante comercial usa `commercial_variant_key`, generado
+a partir de los datos revisados de la variante. La referencia original sigue
+indexada y se conserva para búsqueda y trazabilidad.
