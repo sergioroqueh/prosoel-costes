@@ -1305,6 +1305,20 @@
       "sources": [
         "https://www.simonelectric.com/es-es/27000640-090-marco-4-elementos-blanco-simon-270"
       ]
+    },
+    {
+      "observed": [
+        "CR20",
+        "CR25"
+      ],
+      "canonical": null,
+      "relation": "distinct_products",
+      "confidence": "very_high",
+      "note": "AISCAN publica CR20 como Ø20 mm y CR25 como Ø25 mm. Una línea CR20 descrita como Ø25 es una contradicción inequívoca.",
+      "sources": [
+        "https://www.aiscan.com/producto/cr/",
+        "https://www.aiscan.com/producto/cr/tubo-aiscan-cr-cr20/"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
