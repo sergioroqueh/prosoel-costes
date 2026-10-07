@@ -2888,6 +2888,402 @@
       "sources": [
         "https://www.simonelectric.com/es-es/82610-30-marco-1-elemento-blanco-simon-82"
       ]
+    },
+    {
+      "observed": [
+        "LS984WW"
+      ],
+      "canonical": "LS984WW",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "JUNG LS990 marco 4 elementos blanco, 81x294 mm.",
+      "sources": [
+        "https://www.jung-group.com/en-UK/p/Frame-4-gang-white/LS-984-WW"
+      ]
+    },
+    {
+      "observed": [
+        "509VU"
+      ],
+      "canonical": "509 VU",
+      "relation": "confirmed_exact_format_alias",
+      "confidence": "very_high",
+      "note": "JUNG interruptor de persianas unipolar 1 motor, 10AX 250V. El histórico elimina el espacio del código oficial.",
+      "sources": [
+        "https://www.jung-group.com/es-ES/p/Interruptor-de-persianas-Unipolar-1-motor-10-AX-250-V/509-VU"
+      ]
+    },
+    {
+      "observed": [
+        "LS1969-1WEWW"
+      ],
+      "canonical": "LS1969-1WEWW",
+      "relation": "confirmed_exact",
+      "confidence": "high",
+      "note": "JUNG LS990 placa/cubierta de 1 puerto para módulos de datos, blanco alpino.",
+      "sources": [
+        "https://www.jung-group.com/"
+      ]
+    },
+    {
+      "observed": [
+        "LS994BWW"
+      ],
+      "canonical": "LS994BWW",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "JUNG LS990 placa ciega de fijación a presión, blanco.",
+      "sources": [
+        "https://www.jung-group.com/en-UK/p/Blank-centre-plate-snap-on-fixing-white/LS-994-B-WW"
+      ]
+    },
+    {
+      "observed": [
+        "5625GW"
+      ],
+      "canonical": "5625GW",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Solera caja de mecanismos empotrable en tabique hueco para 1 elemento, fijación mediante bridas.",
+      "sources": [
+        "https://www.psolera.com/es/documentacion/documentacion-tecnica?category=1628&family=1640&format=1717"
+      ]
+    },
+    {
+      "observed": [
+        "BGE25"
+      ],
+      "canonical": "BGE25",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "AISCAN-B tubo rígido gris enchufable DN25.",
+      "sources": [
+        "https://www.aiscan.com/producto/bge/"
+      ]
+    },
+    {
+      "observed": [
+        "BGE32"
+      ],
+      "canonical": "BGE32",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "AISCAN-B tubo rígido gris enchufable DN32.",
+      "sources": [
+        "https://www.aiscan.com/producto/bge/"
+      ]
+    },
+    {
+      "observed": [
+        "864021"
+      ],
+      "canonical": "864021B",
+      "relation": "legacy_current",
+      "confidence": "high",
+      "note": "Niloé Step base 2P+T 16A 250V con bornes a tornillo. Legrand publica actualmente 864021B; el histórico conserva 864021.",
+      "sources": [
+        "https://www.legrand.es/es/productos/base-corriente-niloe-step-2pt-borne-con-tornillos-16a-250v-864021b"
+      ]
+    },
+    {
+      "observed": [
+        "20302808"
+      ],
+      "canonical": "20302808",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable Exzhellent H07Z1-K 1x1,5 mm² amarillo/verde, caja 200 m.",
+      "sources": [
+        "https://sonepar.es/catalog/es-es/products/general-cable-cable-exzhellent-class-750v-as-h07z1-k-1x1-5-amarillo-verde-caja-GENC1S23106AVP"
+      ]
+    },
+    {
+      "observed": [
+        "CA35YR03"
+      ],
+      "canonical": "CA35YR03",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Hisense Brissa split inverter, set CA35YR03, capacidad frigorífica nominal 3400 W.",
+      "sources": [
+        "https://www.hisense.es/aire-acondicionado-domestico/split/brissa/aire-acondicionado-brissa-ca35yr03/"
+      ]
+    },
+    {
+      "observed": [
+        "069681L"
+      ],
+      "canonical": "069681L",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo marco de empotrar gris para 1 elemento.",
+      "sources": [
+        "https://www.ilumitec.es/marco-empotrar-legrand-plexo-gris"
+      ]
+    },
+    {
+      "observed": [
+        "0767811"
+      ],
+      "canonical": "0767811",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Temper KDP21 360FP detector PIR de movimiento, montaje empotrado en techo, 360°.",
+      "sources": [
+        "https://www.grupotemper.com/producto/kdp21-360fp"
+      ]
+    },
+    {
+      "observed": [
+        "CIR48H"
+      ],
+      "canonical": "CIR48H",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Cablecel cable interior riser 48 fibras holgadas G657/A2B2, Dca-s2,d2,a2.",
+      "sources": [
+        "https://www.cablecel.com/productos/ftth-ict2/fibra-riser-ftth/cable-de-interior-riser-48-fibras-holgada/"
+      ]
+    },
+    {
+      "observed": [
+        "40CPRF90921R25"
+      ],
+      "canonical": "40CPRF90921R25",
+      "relation": "confirmed_exact",
+      "confidence": "high",
+      "note": "GESCABLE cable resistente al fuego para detección/PCI 2x1,5 mm², PH90/RF120 según especificación de producto.",
+      "sources": [
+        "https://sonepar.es/catalog/es-es/products/gescable"
+      ]
+    },
+    {
+      "observed": [
+        "5506"
+      ],
+      "canonical": "5506",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Solera Deribox caja de conexión empotrada 300x500x60 mm, tapa con tornillos, dos tabiques.",
+      "sources": [
+        "https://www.psolera.com/es/catalogo/envolventes/deribox/cajas-de-empotrar-de-deribox-cierre-por-tornillo/314/5506"
+      ]
+    },
+    {
+      "observed": [
+        "DRN63"
+      ],
+      "canonical": "DRN63",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "AISCAN DP-N-450 tubo doble pared corrugado para canalización subterránea Ø63. El catálogo actual lo publica en rojo; no se usa el color para corregir históricos antiguos.",
+      "sources": [
+        "https://www.aiscan.com/producto/drn/"
+      ]
+    },
+    {
+      "observed": [
+        "419925"
+      ],
+      "canonical": "419925",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand RX³ magnetotérmico 1P+N 10A curva C, 6kA.",
+      "sources": [
+        "https://www.legrand.es/es/productos/magnetotermico-rx3-1pn-230v-10a-curva-419925"
+      ]
+    },
+    {
+      "observed": [
+        "069742L"
+      ],
+      "canonical": "069742L",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo monobloc superficie horizontal IP55, doble 2x2P+T, 16A, gris.",
+      "sources": [
+        "https://www.legrand.es/es/productos/base-corriente-plexo-monobloc-superficie-horizontal-ip55-16a-2x2pt-embornamiento-automatico-gris-069742l"
+      ]
+    },
+    {
+      "observed": [
+        "20302936"
+      ],
+      "canonical": "20302936",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable Exzhellent Compact/RZ1-K 0,6/1kV 3G1,5 mm².",
+      "sources": [
+        "https://sonepar.es/catalog/es-es/products/general-cable"
+      ]
+    },
+    {
+      "observed": [
+        "50012088-030"
+      ],
+      "canonical": "50012088-030",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 500 Cima placa adaptadora para mecanismos Simon K45 de 1 elemento, blanco.",
+      "sources": [
+        "https://www.simonelectric.com/es-ad/50012088-030-placa-adaptadora-mecanismos-simon-k45-1-elemento-blanco-simon-500-cima"
+      ]
+    },
+    {
+      "observed": [
+        "505U"
+      ],
+      "canonical": "505 U",
+      "relation": "confirmed_exact_format_alias",
+      "confidence": "very_high",
+      "note": "JUNG doble interruptor 10AX 250V; el histórico compacta el código oficial 505 U.",
+      "sources": [
+        "https://www.jung-group.com/es-ES/Catalogo/Mecanismos-empotrados/Productos/"
+      ]
+    },
+    {
+      "observed": [
+        "20302882"
+      ],
+      "canonical": "20302882",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable Exzhellent RZ1-K 0,6/1kV 1x25 mm².",
+      "sources": [
+        "https://sonepar.es/catalog/es-es/products/general-cable"
+      ]
+    },
+    {
+      "observed": [
+        "10040225"
+      ],
+      "canonical": "10040225",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "PEMSA tubo CLH libre de halógenos DN25 gris RAL7035, IP65, 320N.",
+      "sources": [
+        "https://www.pemsa-rejiband.com/catalog/es/n/W_CLH/10040225"
+      ]
+    },
+    {
+      "observed": [
+        "3257"
+      ],
+      "canonical": "3257",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Famatel caja de derivación/mecanismos para tabiquería hueca, empotrable.",
+      "sources": [
+        "https://famatel.com/wp-content/uploads/3257.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "20000910-039"
+      ],
+      "canonical": "20000910-039",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 270 bastidor para 1 elemento.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/20000910-039-bastidor-1-elemento-simon-270"
+      ]
+    },
+    {
+      "observed": [
+        "LS1520KIPLWW"
+      ],
+      "canonical": "LS1520KIPLWW",
+      "relation": "confirmed_exact",
+      "confidence": "high",
+      "note": "JUNG LS990 placa/tapa central para base Schuko con protección infantil, blanco alpino.",
+      "sources": [
+        "https://www.jung-group.com/"
+      ]
+    },
+    {
+      "observed": [
+        "214210"
+      ],
+      "canonical": "214210",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Televés cable coaxial CXT 18C Dca, blanco, rollo 100 m.",
+      "sources": [
+        "https://www.televes.com/es/2142xx-coaxial-cxt-cable-coaxial-cxt-18c-euroclase-dca.html"
+      ]
+    },
+    {
+      "observed": [
+        "1521EINS"
+      ],
+      "canonical": "1521EINS",
+      "relation": "confirmed_exact",
+      "confidence": "high",
+      "note": "JUNG mecanismo Schuko 16A sin tapa central.",
+      "sources": [
+        "https://www.jung-group.com/"
+      ]
+    },
+    {
+      "observed": [
+        "5725GW"
+      ],
+      "canonical": "5725GW",
+      "relation": "confirmed_exact",
+      "confidence": "high",
+      "note": "Solera caja de mecanismos empotrable en tabique hueco para 2 elementos, gama Mecabox.",
+      "sources": [
+        "https://www.psolera.com/es/documentacion/documentacion-tecnica?category=1628&family=1640&format=1717"
+      ]
+    },
+    {
+      "observed": [
+        "5725"
+      ],
+      "canonical": "5725",
+      "relation": "confirmed_exact",
+      "confidence": "high",
+      "note": "Solera caja de mecanismos para 2 elementos; referencia histórica de la familia Mecabox.",
+      "sources": [
+        "https://www.psolera.com/es/documentacion/documentacion-tecnica?category=1628&family=1640&format=1717"
+      ]
+    },
+    {
+      "observed": [
+        "20302812"
+      ],
+      "canonical": "20302812",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable Exzhellent H07Z1-K 1x1,5 mm² marrón, caja 200 m.",
+      "sources": [
+        "https://sonepar.es/catalog/es-es/products/general-cable"
+      ]
+    },
+    {
+      "observed": [
+        "27000620-090"
+      ],
+      "canonical": "27000620-090",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 270 marco para 2 elementos, blanco.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/mecanismos-electricos/interruptores-y-enchufes/marcos"
+      ]
+    },
+    {
+      "observed": [
+        "82620-30"
+      ],
+      "canonical": "82620-30",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 82 marco para 2 elementos, blanco.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/82620-30-marco-2-elementos-blanco-simon-82"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
