@@ -149,6 +149,41 @@
       "decision": "accepted_supplier_local_item",
       "confidence": "high",
       "rationale": "10 líneas coherentes como módulo LED 7W 3000K, familia Leds Home; diferencias menores de óptica/redacción quedan como variante textual."
+    },
+    {
+      "supplier": "FANDUCT",
+      "reference": "CHAPA06M20CE",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "10 líneas coherentes como conducto de chapa 0,6 mm con METU 20 integral; referencia interna estable del proveedor."
+    },
+    {
+      "supplier": "RELUZ",
+      "reference": "02440529R",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "10 líneas coherentes como tira flexible DRAC 17, 8,5W/m, 24VDC, 3000K, IP20/N, rollo 5m."
+    },
+    {
+      "supplier": "KOMTTECH",
+      "reference": "GFE-ZEOS-DETECT-BAS",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "10 líneas coherentes como base de detector ZEOS OPTIMAX; código comercial estable en el proveedor."
+    },
+    {
+      "supplier": "RIAS",
+      "reference": "SOZ1K2X1,5",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "10 líneas coherentes como cable de seguridad/contra incendios SOZ1-K 2x1,5 AS+."
+    },
+    {
+      "supplier": "RIAS",
+      "reference": "CP2X1RNLH",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "10 líneas coherentes como cable paralelo audio 2x1 mm² rojo-negro libre de halógenos."
     }
   ]
 }
