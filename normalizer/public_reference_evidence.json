@@ -1782,6 +1782,226 @@
       "sources": [
         "https://www.televes.com/es/catalogsearch/result/?q=148920"
       ]
+    },
+    {
+      "observed": [
+        "20200048"
+      ],
+      "canonical": "20200048",
+      "relation": "confirmed_exact_with_packaging_conflict",
+      "confidence": "very_high",
+      "note": "DESA 20200048 es taco de latón M4 para carga ligera, caja de 200 unidades. La descripción histórica que indica 300 unidades queda como incidencia de embalaje/cantidad, no como referencia distinta.",
+      "sources": [
+        "https://rodavigo.net/es/p/taco-de-laton-para-carga-ligera-rosca-conica-interna-m4-200-unidades-ref-desa-20200048/41420200048N"
+      ]
+    },
+    {
+      "observed": [
+        "T80109.01"
+      ],
+      "canonical": "T80109.01",
+      "relation": "confirmed_exact_spec_revision_review",
+      "confidence": "high",
+      "note": "Solarbloc/Durán T80109.01 está publicado como tornillo DIN 912 8.8 M8x70 y aparece públicamente con especificación 1500 h C.N.S. La variante histórica 2000 h puede ser revisión de tratamiento/acabado; no corregir automáticamente.",
+      "sources": [
+        "https://dimae.com/renovables-y-movilidad-electrica/solar-fotovoltaica/estructuras-fijas.html",
+        "https://segui.com/ca/cable-interface-mk3-usb-victron-fotvicamk3usb-ca"
+      ]
+    },
+    {
+      "observed": [
+        "LVSXG624"
+      ],
+      "canonical": "LVSXG624",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider PrismaSeT XS empotrar, 6 filas x 24 módulos, puerta blanca, bloque de tierra.",
+      "sources": [
+        "https://www.se.com/es/es/product/LVSXG624/envolvente-modular-prismaset-xs-6-filas-24-m%C3%B3dulos-empotrar-puerta-blanca/"
+      ]
+    },
+    {
+      "observed": [
+        "A30B-M10/19"
+      ],
+      "canonical": "A30B-M10/19",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Cembre terminal de pala estrecha para 150 mm², taladro M10, ancho de pala 19 mm.",
+      "sources": [
+        "https://products.cembre.com/es/spain/family/1768",
+        "https://www.expresselectrical.co.uk/Catalogue/Terminate-Connect/Copper-Tube-Terminals/Cembre-A-M-Narrow-Palm-Terminals/Narrow-Palm-Terminal-150mm-M10-Stud-A30B-M1019"
+      ]
+    },
+    {
+      "observed": [
+        "R9R51225"
+      ],
+      "canonical": "R9R51225",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Resi9 interruptor diferencial 2P 25A 30mA tipo AC.",
+      "sources": [
+        "https://www.se.com/es/es/product/R9R51225/interruptor-diferencial-resi9-2p-25-a-30-ma-ac/"
+      ]
+    },
+    {
+      "observed": [
+        "N4141"
+      ],
+      "canonical": "N4141",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "BTicino Livinglight base 2P+T 16A 250V estándar Schuko, blanca, 2 módulos, conexión por tornillos.",
+      "sources": [
+        "https://www.legrand.es/es/productos/base-2pt-livinglight-16a230v-conexion-por-tornillos-blanco-2-modulos-n4141"
+      ]
+    },
+    {
+      "observed": [
+        "519325"
+      ],
+      "canonical": "519325",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Televés derivador F 2D 5-2400MHz 24dB.",
+      "sources": [
+        "https://www.televes.com/lm/519325-derivador-f-2d-5-2400mhz-24db.html"
+      ]
+    },
+    {
+      "observed": [
+        "519344"
+      ],
+      "canonical": "519344",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Televés derivador F 4D 5-2400MHz 20dB.",
+      "sources": [
+        "https://www.televes.com/lm/519344-derivador-f-4d-5-2400mhz-20db.html"
+      ]
+    },
+    {
+      "observed": [
+        "519533"
+      ],
+      "canonical": "519533",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Televés repartidor con PAU F 3D 5-2400MHz 8/7dB.",
+      "sources": [
+        "https://www.televes.com/es/519533-repartidor-con-pau-f-3d-5-2400mhz-8-7db.html"
+      ]
+    },
+    {
+      "observed": [
+        "20302945"
+      ],
+      "canonical": "20302945",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable Exzhellent Compact RZ1-K (AS) 0,6/1kV 5G2,5, rollo 100 m.",
+      "sources": [
+        "https://www.clientes.grupoelektra.es/catalogo/producto/622844/1",
+        "https://sonepar.es/catalog/es-es/products/general-cable-cable-exzhellent-compact-1kv-rz1-k-5g2-5-verde-r100-GENC1S53507VDP"
+      ]
+    },
+    {
+      "observed": [
+        "555159"
+      ],
+      "canonical": "555159",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand P17 Tempra base mural de superficie 16A 3P+N+T 380/415V IP44 roja.",
+      "sources": [
+        "https://www.legrand.com/ecatalogue/en/catalog/products/surface-mounting-socket-p17-ip44-380415-v-16-3pne-555159"
+      ]
+    },
+    {
+      "observed": [
+        "410551IE31302V"
+      ],
+      "canonical": "410551IE31302V",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Pinazo PNZ-CMT-300E-MF IB (PNZ-2), armario de medida indirecta con protección, hasta 300A, código 301471.",
+      "sources": [
+        "https://pinazo.com/410551ie31302v---301471---pnz-cmt-300e-mf-ib-pnz-2-plet.-traf."
+      ]
+    },
+    {
+      "observed": [
+        "22944016"
+      ],
+      "canonical": "22944016",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Socomec cubrebornes superior e inferior 4P para SIRCO MV / ATyS M 100-160A.",
+      "sources": [
+        "https://emea.socomec.com/en/reference/22944016"
+      ]
+    },
+    {
+      "observed": [
+        "70323030-483"
+      ],
+      "canonical": "70323030-483",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 703.23 downlight redondo orientable, WW 3000K, óptica wide flood, blanco.",
+      "sources": [
+        "https://www.simonelectric.com/en-es/lighting/simon-703"
+      ]
+    },
+    {
+      "observed": [
+        "069790L"
+      ],
+      "canonical": "069790L",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo pulsador NA de superficie 10A antracita, IP55 IK08.",
+      "sources": [
+        "https://www.legrand.fr/pro/catalogue/poussoir-no-etanche-plexo-10a-ip55-ik08-livre-complet-pour-fixation-saillie-anthracite"
+      ]
+    },
+    {
+      "observed": [
+        "069805L"
+      ],
+      "canonical": "069805L",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo mando doble antracita, configurable como doble conmutador/pulsador, 10A, IP55 IK08.",
+      "sources": [
+        "https://www.legrand.fr/pro/catalogue/commande-double-etanche-pour-realiser-3-fonctions-plexo-ip55-ik08-avec-enjoliveur-finition-anthracite"
+      ]
+    },
+    {
+      "observed": [
+        "148920"
+      ],
+      "canonical": "148920",
+      "relation": "confirmed_exact_supply_variant",
+      "confidence": "very_high",
+      "note": "Televés Ellipse UHF LTE700 C21-48, BOSS, embalaje colectivo y sin fuente incluida. Forma parte de la familia 148920/148921/148922 con diferencias de suministro.",
+      "sources": [
+        "https://www.televes.com/es/catalog/product/view/id/2478/s/14892x_Ellipse700-Antena%20Ellipse/",
+        "https://global.televes.com/product-sheet/es/148920.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "864130"
+      ],
+      "canonical": "864130",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Niloé Step tecla blanca mate para mecanismo doble de toldos/persianas.",
+      "sources": [
+        "https://www.legrand.es/es/productos/niloe-step-mecanismos-para-toldos-y-persianas-e-interruptores-por-tarjeta?current_tab=tab-A"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
