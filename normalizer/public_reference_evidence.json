@@ -2351,6 +2351,202 @@
       "sources": [
         "https://bjc.es/product/style-tapa-conector-2-rj45-blanco-polar/"
       ]
+    },
+    {
+      "observed": [
+        "46015000"
+      ],
+      "canonical": "46015000",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "ESTIARE/ANGUILA DUPLOGEL INTRODUCIR, gel lubricante para instalación de cables, 500 cc.",
+      "sources": [
+        "https://peralba.com/es/productos/estiare-duplogel-gel-lubricant-500cc",
+        "https://www.estiare.com/wp-content/uploads/2024/07/Catalogo_Anguila_2024_1a-Edicion_A4_Baja-42.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "403587"
+      ],
+      "canonical": "403587",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand TX3 magnetotérmico 1P+N 20A curva C, 6kA.",
+      "sources": [
+        "https://www.legrand.com/ecatalogue/en/catalog/products/mcb-tx3-6000a-1-pole-neutral-20a-curve-403587"
+      ]
+    },
+    {
+      "observed": [
+        "403588"
+      ],
+      "canonical": "403588",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand TX3 magnetotérmico 1P+N 25A curva C, 6kA.",
+      "sources": [
+        "https://assets.legrand.com/general/mediagrp/certif/lgshezvlko.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "403589"
+      ],
+      "canonical": "403589",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand TX3 magnetotérmico 1P+N 32A curva C, 6kA.",
+      "sources": [
+        "https://www.legrand.com.mm/en/catalog/products/mcb-tx3-6000a-1-pole-neutral-32a-curve-403589"
+      ]
+    },
+    {
+      "observed": [
+        "BGE20"
+      ],
+      "canonical": "BGE20",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "AISCAN-B tubo rígido gris enchufable Ø20, PVC, 1250N, IP54.",
+      "sources": [
+        "https://www.aiscan.com/producto/bge/",
+        "https://www.aiscan.com/en/producto/bge/tubo-aiscan-bgris-ench-bge20/"
+      ]
+    },
+    {
+      "observed": [
+        "6625"
+      ],
+      "canonical": "6625",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Solera caja de mecanismos empotrar universal enlazable 1 elemento, 65x65x40 mm.",
+      "sources": [
+        "https://www.psolera.com/es/catalogo/envolventes/mecabox/cajas-para-empotrar-mecanismos-mecabox/6625/6625"
+      ]
+    },
+    {
+      "observed": [
+        "501U"
+      ],
+      "canonical": "501U",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "JUNG mecanismo interruptor unipolar 10AX 250V.",
+      "sources": [
+        "https://www.gruposinelec.com/web_sinelec/es/p/501u_jung"
+      ]
+    },
+    {
+      "observed": [
+        "506U"
+      ],
+      "canonical": "506U",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "JUNG mecanismo conmutador 10AX 250V.",
+      "sources": [
+        "https://www.gruposinelec.com/web_sinelec/es/p/506u_jung"
+      ]
+    },
+    {
+      "observed": [
+        "PKE612"
+      ],
+      "canonical": "PKE612",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Cembre puntera hueca preaislada 6 mm², verde, longitud de puntera 12 mm.",
+      "sources": [
+        "https://products.cembre.com/es/row/family/1790-pke"
+      ]
+    },
+    {
+      "observed": [
+        "3011"
+      ],
+      "canonical": "3011",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Famatel caja estanca 7 conos IP55, referencia 3011.",
+      "sources": [
+        "https://famatel.com/productos/cajas-estancas-ip55-ip65/"
+      ]
+    },
+    {
+      "observed": [
+        "A9R61240"
+      ],
+      "canonical": "A9R61240",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Acti9 iID 2P 40A 30mA A-SI.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9R61240/interruptor-diferencial-acti9-iid-2p-40a-30ma-asi/"
+      ]
+    },
+    {
+      "observed": [
+        "LS981WW"
+      ],
+      "canonical": "LS981WW",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "JUNG LS990 marco 1 elemento blanco alpino 81x81 mm.",
+      "sources": [
+        "https://www.gruposinelec.com/web_sinelec/es/p/ls981ww_jung"
+      ]
+    },
+    {
+      "observed": [
+        "LS982WW"
+      ],
+      "canonical": "LS982WW",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "JUNG LS990 marco 2 elementos blanco alpino 81x152 mm.",
+      "sources": [
+        "https://knx24.com/upload/iblock/d98/ytjvf7wpf6y1ll4enra57yl0lph92zvw.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "LS983WW"
+      ],
+      "canonical": "LS983WW",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "JUNG LS990 marco 3 elementos blanco alpino 81x223 mm.",
+      "sources": [
+        "https://www.gruposinelec.com/web_sinelec/es/p/ls983ww_jung"
+      ]
+    },
+    {
+      "observed": [
+        "LS990WW"
+      ],
+      "canonical": "LS990WW",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "JUNG LS990 tecla para interruptor/conmutador blanco alpino.",
+      "sources": [
+        "https://www.gruposinelec.com/web_sinelec/es/p/ls990ww_jung"
+      ]
+    },
+    {
+      "observed": [
+        "5226",
+        "5276"
+      ],
+      "canonical": null,
+      "relation": "same_technical_family_distinct_mounting_variant",
+      "confidence": "very_high",
+      "note": "Televés toma terminal TV/FM-SAT: 5226 con garras y 5276 sin garras. Misma familia técnica, variante de fijación.",
+      "sources": [
+        "https://www.televes.com/downloadfile/PSH01230729_0_Espanol_1559886.pdf/5226_es_ES_product_sheet_PSH01230729.pdf",
+        "https://www.televes.com/downloadfile/PSH01230743_0_Espanol_734206.pdf/5276_es_ES_product_sheet_PSH01230743.pdf"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
