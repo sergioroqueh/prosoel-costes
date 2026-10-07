@@ -216,3 +216,27 @@ trabaja con 160A, 250A, 400A y 630A. No se ha localizado 600A.
 
 La variante "600A" se considera probable error de descripción; la composición
 exacta del conjunto permanece pendiente de una ficha o tarifa del proveedor.
+
+
+## Sexta pasada: cola bloqueante cerrada
+
+La última referencia bloqueante de la cola, `2TE+I160A+PSTIB`, puede
+conservarse de forma segura como referencia local de RIAS sin conocer todavía
+la referencia de catálogo Pinazo exacta.
+
+Evidencia:
+
+- el código contiene explícitamente `I160A`;
+- las dos compras tienen el mismo proveedor y precio;
+- una descripción dice 160A y la otra 600A;
+- Pinazo publica centralizaciones PNZ-M-8ME;
+- para centralizaciones directas publica interruptores generales de 160A/250A;
+- para medida indirecta publica escalones 160/250/400/630A, no 600A.
+
+Por tanto, la línea de 600A queda como **probable error textual**. El histórico
+no se reescribe y el dato original permanece trazable.
+
+Con esta decisión la auditoría actual queda con **cero referencias bloqueantes
+que requieran decisión humana inmediata**. Esto no significa que todos los
+atributos estén demostrados: los detalles no verificables pueden permanecer
+como variantes locales, alias o incidencias no bloqueantes.
