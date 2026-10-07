@@ -1,4 +1,4 @@
-from normalizer.service import propose_material, requires_human_review
+from normalizer.service import propose_material, suggested_review_state
 
 
 def test_rias_h07z1k_blue_15_is_normalized() -> None:
@@ -12,7 +12,7 @@ def test_rias_h07z1k_blue_15_is_normalized() -> None:
     assert candidate.canonical_name == "H07Z1-K 1x1,5 mm² azul"
     assert candidate.attributes["section_mm2"] == "1,5"
     assert candidate.attributes["color"] == "AZUL"
-    assert not requires_human_review(candidate)
+    assert suggested_review_state(candidate) == "high_confidence"
 
 
 def test_same_technical_material_with_other_description_gets_same_key() -> None:
