@@ -1,92 +1,88 @@
 # Simulación histórica de clasificación 2024-2026
 
-Ejecución conservadora sobre los **2.863 pedidos** y **11.538 líneas** del
-histórico 2024-2026.
+Simulación conservadora sobre **2.863 pedidos** y **11.538 líneas**.
 
-La simulación no modifica pedidos, referencias, descripciones ni precios. Solo
-aplica la evidencia pública aprobada, decisiones de referencia local de
-proveedor, clasificación de líneas no-materiales y comprobaciones técnicas
-deterministas.
+No modifica el histórico. Aplica evidencia pública, referencias locales de
+proveedor, variantes comerciales, reglas técnicas deterministas y detección de
+conflictos.
 
-## Resultado global
+## Alcance activo
 
-| Categoría | Líneas | % |
-| --- | ---: | ---: |
-| Material conocido | 3.322 | 28,79 % |
-| Variante comercial | 148 | 1,28 % |
-| Alias / referencia normalizable | 51 | 0,44 % |
-| Servicio / portes / RAEE | 238 | 2,06 % |
-| Conflicto detectado | 47 | 0,41 % |
-| Pendiente | 7.732 | 67,01 % |
-| **Total** | **11.538** | **100 %** |
+Por decisión de PROSOEL, **RAEE/ecotasas y portes/transporte quedan fuera del
+trabajo de normalización de materiales y fuera del KPI de avance**.
 
-Se consideran ya clasificadas **3.806 líneas (32,99 %)** si incluimos los
-conflictos detectados. De ellas, **3.759 líneas (32,58 %)** están resueltas sin
-conflicto.
+Se siguen detectando únicamente para apartarlos del catálogo y preservar la
+trazabilidad del pedido. Los servicios explícitos también se mantienen en una
+cola separada del catálogo de materiales.
 
-En el subconjunto material:
+En la carga actual:
 
-- material conocido + variante + alias: **3.521 líneas**;
-- de ellas, **3.500** tienen precio neto/total aritméticamente válido;
-- 17 tienen precio incompleto;
-- 2 tienen valor cero/no positivo;
-- 2 presentan discrepancia aritmética.
+- 143 líneas son RAEE/ecotasa;
+- 70 son portes/transporte;
+- 55 son servicios explícitos.
 
-## Por año
+El universo activo de materiales queda en **11.270 líneas**.
 
-| Año | Conocido | Variante | Alias | No material | Conflicto | Pendiente |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 2024 | 1.084 | 80 | 26 | 125 | 20 | 3.105 |
-| 2025 | 1.139 | 34 | 15 | 70 | 16 | 2.450 |
-| 2026 | 1.099 | 34 | 10 | 43 | 11 | 2.177 |
+## Resultado actual - iteración V7
 
-## Líneas no-materiales
+| Categoría material | Líneas |
+| --- | ---: |
+| Material conocido | 4.908 |
+| Variante comercial | 148 |
+| Alias / referencia normalizable | 94 |
+| Conflicto detectado | 49 |
+| Pendiente | 6.071 |
+| **Total material** | **11.270** |
 
-La clasificación explícita ha detectado:
+Material resuelto sin conflicto:
 
-- 143 líneas de RAEE/ecotasa;
-- 70 líneas de portes/transporte;
-- 25 líneas de servicio explícito.
+- **5.150 líneas**
+- **45,70 % del universo material**
 
-El clasificador sigue siendo deliberadamente conservador. Una línea dudosa no
-se excluye del catálogo por similitud de texto.
+Incluyendo conflictos ya identificados:
 
-## Conflictos
+- **5.199 líneas**
+- **46,13 % del universo material**
 
-Se han marcado **47 líneas** con contradicción suficientemente demostrada.
+La simulación anterior estaba en 4.597 líneas resueltas sin conflicto. Esta
+ronda ha liberado otras **553 líneas**.
 
-Incluyen, entre otros:
+## Calidad de precio en material resuelto
 
-- diámetros AISCAN CR incompatibles con la referencia;
-- secciones/colores H07Z1-K incompatibles;
-- referencias Simon/Legrand/Pinazo arrastradas a descripciones de otro producto;
-- variantes de cable con número de conductores o sección incompatible;
-- embalajes o atributos explícitos contradictorios.
+Sobre las 5.150 líneas ya resueltas como material/alias/variante:
 
-La simulación no corrige ninguna de ellas.
+- 5.096 tienen precio aritméticamente válido;
+- 41 tienen precio incompleto;
+- 10 tienen valor cero/no positivo;
+- 3 presentan discrepancia aritmética.
+
+La identificación técnica no convierte automáticamente una línea con precio
+problemático en referencia válida de coste.
 
 ## Pendientes
 
-Quedan **7.732 líneas** pendientes, correspondientes a unas **3.153 referencias
-observadas**. Pendiente significa únicamente "todavía no autoaprobado".
+Quedan **6.071 líneas materiales pendientes**.
 
-La siguiente prioridad debe ser por frecuencia, ya que unas pocas referencias
-pueden resolver cientos de líneas.
+La prioridad sigue siendo frecuencia x fiabilidad. Después de resolver los
+bloques de 10-25 apariciones, la cabecera de pendientes ya ha bajado a familias
+de unas 8-9 apariciones por referencia, además de 133 líneas sin referencia.
 
-Tras la primera iteración de simulación se verificaron públicamente varios de
-los mayores pendientes (DUPLOGEL 46015000, Legrand 403587/403588/403589,
-AISCAN BGE20, Solera 6625, JUNG 501U/506U y LS990, Cembre PKE612,
-Famatel 3011, Schneider A9R61240 y Televés 5226/5276) y se repitió la
-simulación. Los números de esta página corresponden a esa segunda ejecución.
+Ejemplos del siguiente bloque:
+
+`82005-30`, `6618`, `27432-65`, `20302926`, `411524`,
+`411664`, `CCBFO24SCAS`, `403606`, `3251`,
+`20000930-039`, `27000610-090`, `864007`, `50000089-030`,
+`5825`, `2247-3`, `A9C20732`, `BT1438`, `09250083`,
+`NSYS2535` y `EHF25`.
 
 ## Política
 
-Una línea solo sale de `pending` si existe una de estas bases:
+Una línea sale de pendiente solo cuando existe evidencia suficiente:
 
-1. referencia pública suficientemente confirmada;
+1. referencia pública confirmada;
 2. referencia local de proveedor con histórico estable;
-3. regla técnica determinista que no contradice la descripción;
-4. clasificación explícita de servicio/portes/RAEE;
-5. conflicto concreto respaldado por evidencia.
+3. variante comercial demostrada;
+4. regla técnica determinista sin contradicción;
+5. conflicto respaldado por evidencia.
 
-No se usa similitud textual por sí sola para aprobar materiales.
+No se aprueba un material únicamente por similitud textual.
