@@ -16,8 +16,8 @@ class UnsupportedOrderTemplate(ValueError):
     pass
 
 
-EXPECTED_SHEETS = {"HOJA PEDIDO", "OBRAS", "MATERIALES"}
-LINE_HEADERS = ("UDS.", "REFERENCIA", "MATERIAL")
+REQUIRED_SHEET = "HOJA PEDIDO"
+OPTIONAL_SHEETS = {"OBRAS", "MATERIALES"}
 ORDER_YEAR_RE = re.compile(r"([0-9]{2})[ ]*/")
 
 
@@ -63,11 +63,19 @@ def _date(value: Any) -> date | None:
 
 
 def _find_header_row(ws) -> int:
+    """Localiza la tabla sin asumir el nombre de la unidad de la columna A.
+
+    En el histórico aparecen UDS., METRO, METROS y otras unidades. La identidad
+    de la tabla se determina por las columnas técnicas B:G.
+    """
+    expected = ("REFERENCIA", "MATERIAL", "PVP", "DTO.", "PRECIO NETO", "PRECIO TOTAL")
+
     for row in range(1, min(ws.max_row, 100) + 1):
-        current = tuple(ws.cell(row, col).value for col in range(1, 4))
-        if current == LINE_HEADERS:
+        current = tuple(_text(ws.cell(row, col).value) or "" for col in range(2, 8))
+        if tuple(value.upper() for value in current) == expected:
             return row
-    raise UnsupportedOrderTemplate("No se encontró la cabecera UDS./REFERENCIA/MATERIAL")
+
+    raise UnsupportedOrderTemplate("No se encontró la cabecera de líneas REFERENCIA..PRECIO TOTAL")
 
 
 def _value_for_label(ws, *needles: str) -> Any:
@@ -96,6 +104,9 @@ def _order_reference(ws) -> str | None:
 def read_order(path: str | Path) -> ParsedOrder:
     """Extrae un pedido PROSOEL manteniendo sus valores históricos.
 
+    Solo HOJA PEDIDO es obligatoria. OBRAS y MATERIALES son auxiliares de la
+    plantilla y algunos pedidos históricos ya no las conservan.
+
     El libro se abre con data_only=True para recuperar los valores cacheados de
     fórmulas como totales o búsquedas. Las líneas todavía no valoradas también
     se conservan y quedan marcadas mediante warnings.
@@ -103,23 +114,27 @@ def read_order(path: str | Path) -> ParsedOrder:
     path = Path(path)
     workbook = load_workbook(path, data_only=True, read_only=True)
 
-    if not EXPECTED_SHEETS.issubset(set(workbook.sheetnames)):
+    if REQUIRED_SHEET not in workbook.sheetnames:
         raise UnsupportedOrderTemplate(
             f"Plantilla no reconocida. Hojas encontradas: {workbook.sheetnames}"
         )
 
-    ws = workbook["HOJA PEDIDO"]
+    ws = workbook[REQUIRED_SHEET]
     header_row = _find_header_row(ws)
 
     lines: list[OrderLine] = []
     warnings: list[str] = []
 
+    missing_optional = sorted(OPTIONAL_SHEETS.difference(set(workbook.sheetnames)))
+    if missing_optional:
+        warnings.append(
+            "Hojas auxiliares ausentes: " + ", ".join(missing_optional)
+        )
+
     for row in range(header_row + 1, ws.max_row + 1):
         quantity = _decimal(ws.cell(row, 1).value)
         description = _text(ws.cell(row, 3).value)
 
-        # H:J contiene el directorio auxiliar de proveedores de la plantilla.
-        # Una línea de pedido exige como mínimo cantidad y descripción.
         if quantity is None or description is None:
             continue
 
