@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "policy": {
+    "auto_apply": false,
+    "note": "Referencias de proveedor suficientemente consistentes para conservarse como variantes comerciales aunque no exista referencia pública de fabricante. No se fuerzan equivalencias con otros códigos."
+  },
+  "entries": [
+    {
+      "supplier": "SALTOKI",
+      "reference": "2184030029",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "high",
+      "observed_descriptions": [
+        "CARGA NITROGENO B11 SIN MANORREDUCTOR (2,1 M3)",
+        "Carga nitrógeno 8,91kg B11 sin manorreductor"
+      ],
+      "historical_evidence": "Mismo proveedor, mismo PVP 38 € en 2025 y 2026.",
+      "rationale": "Fuentes públicas confirman B11 de nitrógeno con capacidad 2,1 m³ y existe contratación pública con la descripción literal 'Carga nitrógeno 8,91kg B11 sin manorreductor'. Se conserva como un único artículo local de SALTOKI; 8,91 kg no se usa como equivalencia física automática.",
+      "sources": [
+        "https://baleardesuministros.com/wp-content/uploads/2024/04/TARIFAGSF_2024.pdf",
+        "https://contractaciopublica.cat/portal-api/descarrega-document/300875122/1CA4CC6CC00CF2B403F8BCF3C3B12B32"
+      ]
+    },
+    {
+      "supplier": "GUARCONSA",
+      "reference": "CABLH25BOB",
+      "decision": "accepted_generic_supplier_family_reference",
+      "confidence": "very_high",
+      "observed_descriptions": [
+        "CBL.LIBRE HALOG. CPR 1x25mm2 MR.BOB.",
+        "CBL.LIBRE HALOG. CPR 1x25mm2 GR.BOB."
+      ],
+      "historical_evidence": "La misma referencia aparece en el mismo pedido para marrón y gris; el proveedor usa en otros pedidos CABLH25MBOB y CABLH25GBOB como variantes explícitas por color.",
+      "rationale": "CABLH25BOB no identifica de forma suficiente el color. Se conserva como referencia comercial genérica del proveedor y la variante debe discriminarse por descripción/color."
+    },
+    {
+      "supplier": "RIAS",
+      "reference": "CLP160APMB4C",
+      "decision": "accepted_supplier_family_reference_multiple_variants",
+      "confidence": "very_high",
+      "observed_descriptions": [
+        "LUM. LIN. MED 160 SPF BL 38W 4000K MP 1685mm",
+        "LUM. LIN. MED 160 SPF BL 44W 4000K MP / 1965mm"
+      ],
+      "historical_evidence": "Ambas líneas aparecen en el mismo pedido, con PVP distintos (233 € y 262 €), por lo que son variantes comerciales distintas aunque compartan referencia.",
+      "rationale": "No se debe elegir una descripción como 'correcta' para toda la referencia. La huella de variante comercial mantiene ambas separadas."
+    },
+    {
+      "supplier": "AMARA",
+      "reference": "5826630",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "observed_descriptions": [
+        "GRAPA PICA 14MM 2TORN.CABLE 16-50 LIGERA",
+        "GRAPA PICA 14MM 2TOR.1C 16-50 M-8 GALV"
+      ],
+      "historical_evidence": "Tres compras 2024-2025, siempre AMARA, mismo PVP 0,80 €, mismo alcance funcional.",
+      "rationale": "Es suficientemente consistente como referencia local de AMARA. No se fusiona con KLK 06378 porque la especificación textual no es idéntica y no hay prueba pública de equivalencia."
+    },
+    {
+      "supplier": "RIAS",
+      "reference": "CP2X1BL",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "high",
+      "observed_descriptions": [
+        "CABLE PLO.ALTAVOZ 2x1,00mm2 BL.(RO.100m) PBL210"
+      ],
+      "historical_evidence": "Una compra 2026 a 0,425 €/m; el mismo proveedor usa otras referencias internas CP2X1RNLH y CP2X1,5RNLH para otras variantes de cable de audio.",
+      "rationale": "El código es coherente como referencia interna de proveedor para la variante blanca 2x1 mm². Se mantiene separada de GESCABLE 33CPPBL0090R25 hasta disponer de evidencia de equivalencia."
+    }
+  ]
+}
