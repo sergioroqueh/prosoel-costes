@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "policy": {
+    "auto_apply": false,
+    "note": "Referencias sin evidencia pública suficiente o con resultados web ambiguos. Requieren contexto de proveedor, factura, catálogo privado o revisión humana."
+  },
+  "entries": [
+    {
+      "reference": "2184030029",
+      "reason": "Búsqueda pública devuelve colisiones irrelevantes (p.ej. identificadores no relacionados). No hay evidencia fiable para asociar el código al material histórico.",
+      "next_step": "Revisar proveedor original o documento de compra."
+    },
+    {
+      "reference": "2TE+I160A+PSTIB",
+      "reason": "Código compuesto/interno con descripciones históricas incompatibles. No se ha localizado ficha pública inequívoca.",
+      "next_step": "Cruzar con catálogo o presupuesto Pinazo/proveedor de la época."
+    },
+    {
+      "reference": "CABLH25BOB",
+      "reason": "Parece código interno/genérico de cable 1x25 mm²; existen variantes de color separadas en el histórico, pero no hay referencia pública fiable.",
+      "next_step": "Resolver por proveedor + descripción + variante de color; no tratar el código solo como material canónico."
+    },
+    {
+      "reference": "CLP160APMB4C",
+      "reason": "Descripción histórica muestra potencia discordante; no se ha localizado documentación pública suficiente para decidir si es revisión de producto o error.",
+      "next_step": "Buscar catálogo/ficha del fabricante de la fecha del pedido."
+    }
+  ]
+}
