@@ -2139,6 +2139,19 @@
         "https://pinazo.com/pnz-m-1t-li-nhc-entrada-inferior---salida-superior-zona-sevillana",
         "https://pinazo.com/en/equipos-tipo--emv"
       ]
+    },
+    {
+      "observed": [
+        "2184030029"
+      ],
+      "canonical": null,
+      "relation": "supplier_local_same_item_description_variation",
+      "confidence": "high",
+      "note": "SALTOKI usa 2184030029 en 2025 y 2026 con PVP 38 € para carga de nitrógeno B11 sin manorreductor. Una descripción indica 2,1 m³ y otra 8,91 kg. Fuentes públicas confirman B11=2,1 m³ y existe contratación pública con la descripción literal de 8,91 kg B11. Se conserva como un mismo artículo local sin convertir kg↔m³.",
+      "sources": [
+        "https://baleardesuministros.com/wp-content/uploads/2024/04/TARIFAGSF_2024.pdf",
+        "https://contractaciopublica.cat/portal-api/descarrega-document/300875122/1CA4CC6CC00CF2B403F8BCF3C3B12B32"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
