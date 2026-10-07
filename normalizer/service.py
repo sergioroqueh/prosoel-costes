@@ -12,7 +12,15 @@ RULES: tuple[Rule, ...] = (
 )
 
 
-def propose_material(description: str, supplier_reference: str | None = None) -> NormalizationCandidate | None:
+def propose_material(
+    description: str,
+    supplier_reference: str | None = None,
+) -> NormalizationCandidate | None:
+    """Genera una propuesta técnica, nunca una decisión definitiva.
+
+    La salida sirve para ayudar a revisión humana. Ninguna regla nueva debe
+    asignar automáticamente un material canónico solo por similitud textual.
+    """
     for rule in RULES:
         candidate = rule(description, supplier_reference)
         if candidate is not None:
@@ -20,5 +28,14 @@ def propose_material(description: str, supplier_reference: str | None = None) ->
     return None
 
 
-def requires_human_review(candidate: NormalizationCandidate, threshold: float = 0.95) -> bool:
-    return candidate.confidence < threshold
+def suggested_review_state(candidate: NormalizationCandidate) -> str:
+    """Clasifica la propuesta para revisión sin autoaprobarla.
+
+    high_confidence sigue requiriendo validación humana mientras la familia no
+    esté suficientemente consolidada con histórico real.
+    """
+    if candidate.confidence >= 0.95:
+        return "high_confidence"
+    if candidate.confidence >= 0.80:
+        return "review"
+    return "low_confidence"
