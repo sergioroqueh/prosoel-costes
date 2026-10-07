@@ -178,3 +178,20 @@ Ejemplos actuales:
 
 La identidad final sigue siendo la variante comercial observada; estas decisiones
 no crean equivalencias técnicas automáticas.
+
+
+## Conceptos fuera del catálogo de materiales
+
+RAEE, ecotasas, portes y transporte no forman parte del catálogo técnico ni del
+KPI de normalización solicitado por PROSOEL.
+
+El importador puede reconocerlos para:
+
+- conservar la trazabilidad económica del pedido;
+- impedir que contaminen precios de materiales;
+- excluirlos de búsquedas y estadísticas del catálogo.
+
+No se dedicarán rondas de normalización ni búsqueda pública a estos conceptos.
+
+Los servicios explícitos se conservan igualmente en una capa separada para no
+mezclarlos con materiales físicos.
