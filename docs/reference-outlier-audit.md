@@ -179,3 +179,40 @@ de alta prioridad, sin corrección automática.
 LEGRAND `410545` aparece en catálogos históricos como 4P 40A 300mA HPI y en
 documentación actual como tipo F. Se conserva como el mismo producto/referencia,
 registrando la evolución de nomenclatura.
+
+
+## Quinta pasada: el precio y el proveedor como evidencia
+
+### BJC 610-B frente a Legrand 864107
+
+La referencia `610-B` no es un alias de la tecla Niloé Step. BJC la publica
+como zumbador de superficie antiparásito regulable 230V y su tarifa 2024 la
+sitúa en 21,52 € PVP.
+
+La línea histórica conflictiva usa `610-B`, PVP 20,28 €, pero arrastra la
+descripción "Tecla Niloé Step para cruzamiento". El histórico de `864107`
+muestra precios y proveedores propios de la tecla. Se considera error de
+descripción/asociación de alta confianza.
+
+### Serie Real EDECOR: probable cambio de códigos
+
+Dos pares de referencias aparecen en el mismo proveedor EDECOR:
+
+- `30130` -> `56130`: CONMUTADOR SERIE REAL;
+- `30420` -> `56400`: PULSADOR SERIE REAL.
+
+Entre julio y septiembre de 2026 se mantienen exactamente descripción, PVP,
+descuento y neto en cada producto. EDECOR confirma públicamente la Serie Real,
+aunque el catálogo accesible por buscador no expone esos códigos.
+
+Se registra como probable revisión de referencia comercial, no como dos
+materiales distintos y tampoco como equivalencia autoaprobada.
+
+### Conjunto Pinazo I160A / descripción 600A
+
+La referencia interna `2TE+I160A+PSTIB` aparece dos veces con el mismo precio.
+Una descripción dice I.160A y otra I.600A. La gama pública Pinazo encontrada
+trabaja con 160A, 250A, 400A y 630A. No se ha localizado 600A.
+
+La variante "600A" se considera probable error de descripción; la composición
+exacta del conjunto permanece pendiente de una ficha o tarifa del proveedor.
