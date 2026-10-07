@@ -4244,6 +4244,174 @@
       "sources": [
         "https://www.gruponovelec.com/p/ais_mtme25"
       ]
+    },
+    {
+      "observed": [
+        "52052103-035"
+      ],
+      "canonical": "52052103-035",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 500 Cima cubeta plástica para caja de suelo regulable de 6 elementos, gris.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/52052103-035-cubeta-plastico-caja-suelo-regulable-6-elementos-instalacion-suelo-pavimento-simon-500-cima"
+      ]
+    },
+    {
+      "observed": [
+        "092186"
+      ],
+      "canonical": "092186",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo caja de derivación rectangular IP55, 220x170x92 mm, 14 entradas, gris.",
+      "sources": [
+        "https://www.legrand.es/es/productos/220-x-170-x-86-mm?current_tab=tab-A"
+      ]
+    },
+    {
+      "observed": [
+        "A40"
+      ],
+      "canonical": "A40",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "AISCAN-A tubo rígido negro para acometidas individuales, Ø40.",
+      "sources": [
+        "https://www.aiscan.com/producto/a/"
+      ]
+    },
+    {
+      "observed": [
+        "75398-39"
+      ],
+      "canonical": "75398-39",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 75 grupo de 2 interruptores 10AX 250V, embornamiento rápido.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/75398-39-grupo-2-interruptores-10-ax-250v-sistema-embornamiento-rapido-simon-75"
+      ]
+    },
+    {
+      "observed": [
+        "HYJ0900000"
+      ],
+      "canonical": "HYJ0900000",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Daisalux HYDRA LD N5 A, emergencia LED AutoTest, no permanente, 1h, 200 lm, IP42 IK04.",
+      "sources": [
+        "https://www.daisalux.com/es-es/pages/productos/fichas/frefunica.aspx?CodProd=360416&CodsAcaPro=58&DB=DaisaluxProEs"
+      ]
+    },
+    {
+      "observed": [
+        "EHF20"
+      ],
+      "canonical": "EHF20",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "AISCAN-EHF tubo rígido enchufable libre de halógenos Ø20.",
+      "sources": [
+        "https://www.aiscan.com/producto/ehf/aiscan-ehflibre-de-halogenos-ehf20/"
+      ]
+    },
+    {
+      "observed": [
+        "GFE-ZEOS-DEEP-BASE"
+      ],
+      "canonical": "GFE-ZEOS-DEEP-BASE",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Komttech/GFE base alta de detector ZEOS para tubo visto.",
+      "sources": [
+        "https://www.komtesdeteccion.com/productos/sistema-de-deteccion-analogico-komttech/item/base-alta-detector-zeos"
+      ]
+    },
+    {
+      "observed": [
+        "411665"
+      ],
+      "canonical": "411665",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand DX³ diferencial 4P 40A 300mA tipo AC.",
+      "sources": [
+        "https://www.legrand.com/ecatalogue/en/catalog/products/rccb-dx3-4p-40a-300ma-ac-411665"
+      ]
+    },
+    {
+      "observed": [
+        "CIR02A"
+      ],
+      "canonical": "CIR02A",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Cablecel cable interior riser 2 fibras G657A2 ajustada, Dca-s2,d2,a2.",
+      "sources": [
+        "https://www.cablecel.com/wp-content/uploads/2018/07/RISER-2-FIBRAS-3.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "MUR36135"
+      ],
+      "canonical": "MUR36135",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Mureva Styl base Schuko estanca gris para superficie o empotrar, IP55.",
+      "sources": [
+        "https://www.se.com/es/es/product/MUR36135/mureva-styl-base-schuko-estanco-para-instalacion-de-superficie-o-empotrar-gris/"
+      ]
+    },
+    {
+      "observed": [
+        "18505"
+      ],
+      "canonical": "18505",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "BJC Iris interruptor unipolar 16A 250V.",
+      "sources": [
+        "https://www.gruposinelec.com/web_sinelec/es/p/18505_bjc"
+      ]
+    },
+    {
+      "observed": [
+        "18507"
+      ],
+      "canonical": "18507",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "BJC Iris cruzamiento 10A 250V.",
+      "sources": [
+        "https://bjc.es/product/cruzamiento-10-a-250-v-2/"
+      ]
+    },
+    {
+      "observed": [
+        "19582-1"
+      ],
+      "canonical": "19582-1",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "BJC Iris adaptador para 1 conector RJ45/RJ11.",
+      "sources": [
+        "https://www.gruponovelec.com/p/bjc_19582-1"
+      ]
+    },
+    {
+      "observed": [
+        "MNF4015"
+      ],
+      "canonical": "MNF4015",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Interflex Sondaflex nylon Ø4 mm, 15 m, amarilla, con cabezal guía y terminal fijo.",
+      "sources": [
+        "https://www.matmax.es/hilos-y-cables/productos/interflex/mnf4015-sondaflex-mnf-nylon-cabezal-terminal-diametro-4-amarillo-15m-0059126681"
+      ]
     }
   ],
   "updated_at": "2026-10-08"
