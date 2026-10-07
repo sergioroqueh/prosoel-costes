@@ -35,6 +35,7 @@ CREATE TABLE commercial_items (
     id BIGSERIAL PRIMARY KEY,
     supplier_id BIGINT NOT NULL REFERENCES suppliers(id),
     supplier_reference TEXT,
+    commercial_variant_key TEXT NOT NULL,
     manufacturer TEXT,
     manufacturer_reference TEXT,
     preferred_description TEXT,
@@ -46,7 +47,7 @@ CREATE TABLE commercial_items (
     reviewed_by TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE(supplier_id, supplier_reference)
+    UNIQUE(supplier_id, commercial_variant_key)
 );
 
 CREATE TABLE material_match_proposals (
@@ -121,6 +122,10 @@ CREATE TABLE order_lines (
     total_price NUMERIC(14, 4),
     price_validation_status TEXT NOT NULL DEFAULT 'pending',
     price_validation_detail JSONB NOT NULL DEFAULT '{}'::jsonb,
+    line_kind TEXT NOT NULL DEFAULT 'unknown',
+    line_kind_confidence NUMERIC(5, 4),
+    line_kind_reasons JSONB NOT NULL DEFAULT '[]'::jsonb,
+    line_kind_review_status TEXT NOT NULL DEFAULT 'pending',
     UNIQUE(order_id, line_number)
 );
 
@@ -230,3 +235,10 @@ CREATE INDEX idx_reference_resolutions_lookup
 
 CREATE INDEX idx_reference_evidence_resolution
     ON reference_resolution_evidence(resolution_id);
+
+
+CREATE INDEX idx_commercial_items_supplier_reference
+    ON commercial_items(supplier_id, supplier_reference);
+
+CREATE INDEX idx_order_lines_line_kind
+    ON order_lines(line_kind, line_kind_review_status);
