@@ -77,3 +77,56 @@ Esto demuestra que incluso **proveedor + referencia** puede no identificar de
 forma única un artículo histórico. La base necesita una huella de variante
 comercial basada en referencia observada + descripción normalizada, conservando
 después la posibilidad de fusionar variantes mediante revisión.
+
+
+## Tercera pasada: evitar falsos positivos
+
+La revisión pública también ha permitido descartar varios aparentes errores.
+
+### Colisión real de referencia entre fabricantes
+
+La referencia corta `5363` no identifica un producto único:
+
+- TELEVES 5363 = central amplificadora MiniKom "F" VHF/UHF-FI;
+- SOLERA 5363 = caja empotrable para tabique hueco 164x106 mm.
+
+Las dos descripciones históricas son compatibles con productos reales. Este caso
+no debe entrar en la bandeja de "referencia mal asociada"; debe resolverse por
+namespace fabricante/proveedor.
+
+### Una referencia, varias descripciones públicas válidas
+
+FAMATEL `3015` aparece en fuentes públicas con descripciones de dimensiones
+diferentes: la nomenclatura comercial 310x240 PG29-36 y la ficha/tarifa
+250x320x135 con tapa de 1/4 de vuelta IP55. Por tanto, no se separan
+automáticamente en dos materiales.
+
+TELEVES `215501` también aparece como "T100 CU/CU polietileno clase A" y como
+"T100plus 16PRtC Fca clase A"; ambas expresiones describen el mismo cable.
+
+### Terminología histórica
+
+FERMAX `3305` figura oficialmente como monitor LOFT VDS color 3,5", pero
+también existe uso histórico/comercial de la denominación ADS y el soporte de
+FERMAX trata VDS/ADS como terminología relacionada en sistemas heredados.
+No se crea un material distinto solo por ADS frente a VDS.
+
+### Outliers confirmados
+
+ROBLAN `ECOSKYC100` y `ECOSKYF100` están documentados en fichas de distintas
+fechas como lámparas ECO SKY GU10 de 5 W. Las líneas históricas que indican 7 W
+se mantienen como incidencias de descripción.
+
+### Especificaciones que pueden cambiar con revisiones
+
+`LHMO15740` está publicado actualmente como módulo LED 7 W, 4000 K, 600 lm,
+CRI95, 60° e IP54. El histórico contiene 650 lm y otra ficha textual con CRI90.
+Estas diferencias se tratarán como posibles revisiones de especificación:
+no se dividen ni corrigen automáticamente hasta revisar fecha/documentación.
+
+### No inferir especificaciones a partir del nombre del modelo
+
+`LRS-100-24` entrega 24 V, 4,5 A y 108 W máximos. El "100" del nombre de la
+serie no equivale necesariamente a 100 W exactos. Las comprobaciones de
+consistencia no deben deducir potencia a partir del nombre del modelo salvo que
+el fabricante documente expresamente esa codificación.
