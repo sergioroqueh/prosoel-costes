@@ -1475,6 +1475,83 @@
       "sources": [
         "https://tecsoled.com/wp-content/uploads/Catalogo/Tecsoled-GetReady-22-23-ONLINE-ESP-ENG-V1.pdf"
       ]
+    },
+    {
+      "observed": [
+        "30413540"
+      ],
+      "canonical": "30413540",
+      "relation": "confirmed_exact_with_description_conflicts",
+      "confidence": "very_high",
+      "note": "DELUXE publica 30413540 como luminaria estanca LED SLE-T ECO 35W 4000K 1200mm, 4900 lm. En el histórico hay dos líneas coherentes con esta luminaria y una línea aislada que la describe como caja de derivación; esa descripción es incompatible.",
+      "sources": [
+        "https://deluxeiluminacion.com/wp-content/uploads/2024/08/Tarifa_2024-08-21.pdf",
+        "https://www.comparalux.es/www/pdf/fichaPDF8.php?Descarga=Si&IdArticulo=218275&ServicioWeb=Si"
+      ]
+    },
+    {
+      "observed": [
+        "5270"
+      ],
+      "canonical": null,
+      "relation": "namespace_collision",
+      "confidence": "very_high",
+      "note": "La referencia 5270 existe legítimamente en al menos dos fabricantes: TELEVES 5270=toma de paso puenteada FM/TV-SAT; SOLERA 5270=caja de distribución empotrable de 56 elementos 320x670x75. No resolver sin fabricante/proveedor/contexto.",
+      "sources": [
+        "https://www.televes.com/es/5270-4335-toma-paso-puenteada-toma-de-paso-puenteada-2-conectores-fm-tv-sat.html",
+        "https://www.psolera.com/es/catalogo/envolventes/arelos/cajas-de-distribucion-de-empotrar-arelos/8692/5270"
+      ]
+    },
+    {
+      "observed": [
+        "31801272"
+      ],
+      "canonical": "31801272",
+      "relation": "confirmed_exact_with_description_conflicts",
+      "confidence": "very_high",
+      "note": "FONTINI GARBY identifica 31801272 como marco de 1 elemento en porcelana negra. Una línea histórica que lo describe como marco de madera/haya es incompatible; las referencias de haya pertenecen a otra serie de códigos.",
+      "sources": [
+        "https://fontini.com/wp-content/uploads/2025/10/tarifa-catalogada_fontini_2025_es-1.pdf",
+        "https://fontini.com/wp-content/uploads/2025/10/catalogo-fontini-es-2024_low.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "3314"
+      ],
+      "canonical": "3314",
+      "relation": "legacy_terminology_alias",
+      "confidence": "very_high",
+      "note": "FERMAX publica 3314 como conector para monitor LOFT VDS. Existen distribuidores que todavía lo comercializan como ADS con el mismo EAN 8424299033143; ADS/VDS se trata aquí como terminología histórica/comercial, no como dos referencias distintas.",
+      "sources": [
+        "https://fermax.com/spain/single-products/pvt03314-conector-monitor-loft-vds-repuesto",
+        "https://www.latiendadeelectricidad.com/es/accesorios/252736-conector-ads-monitor-loft-8424299033143.html"
+      ]
+    },
+    {
+      "observed": [
+        "410545"
+      ],
+      "canonical": "410545",
+      "relation": "confirmed_exact_legacy_terminology",
+      "confidence": "very_high",
+      "note": "LEGRAND 410545 es el bloque diferencial adaptable DX3 4P 40A 300mA. Catálogos históricos lo denominan HPI; documentación actual lo clasifica como tipo F. Es el mismo código/EAN, por lo que HPI/F se conserva como evolución de terminología, no como materiales distintos.",
+      "sources": [
+        "https://www.legrand.com.gh/en/catalog/products/dx%C2%B3-add-on-module-dx%C2%B3-4p-400-v-40-300-ma-hpi-type-for-1-mod-dx%C2%B3-mcb-410545",
+        "https://www.legrand.es/es/productos/tipo-f-0"
+      ]
+    },
+    {
+      "observed": [
+        "411675"
+      ],
+      "canonical": "411675",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "LEGRAND DX3 4P 400V 40A tipo A 30mA. Las descripciones históricas DX3 4/40/30A son coherentes con la referencia.",
+      "sources": [
+        "https://www.legrand.es/es/productos/tipo-5?current_tab=tab-A"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
