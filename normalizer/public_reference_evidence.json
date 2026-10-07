@@ -2547,6 +2547,347 @@
         "https://www.televes.com/downloadfile/PSH01230729_0_Espanol_1559886.pdf/5226_es_ES_product_sheet_PSH01230729.pdf",
         "https://www.televes.com/downloadfile/PSH01230743_0_Espanol_734206.pdf/5276_es_ES_product_sheet_PSH01230743.pdf"
       ]
+    },
+    {
+      "observed": [
+        "8002"
+      ],
+      "canonical": "8002",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Solera base múltiple 2 tomas 16A blanca, serie 8000.",
+      "sources": [
+        "https://www.psolera.com/es/catalogo/pequeno-material/serie-8000/bases-multiples-sin-cable-serie-8000/8002/8002"
+      ]
+    },
+    {
+      "observed": [
+        "LS1521KIWW"
+      ],
+      "canonical": "LS1521KIWW",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "JUNG LS990 base Schuko blanca con protección contra contacto infantil.",
+      "sources": [
+        "https://www.gruposinelec.com/web_sinelec/es/p/ls1521kiww_jung",
+        "https://www.grupoelectrostocks.com/downloads/cat-ges-vivienda-2022-on-line.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "PKE2508-Q100"
+      ],
+      "canonical": "PKE2508-Q100",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Cembre puntera PKE 2,5 mm², gris, longitud de puntera 8 mm, envase mínimo 100.",
+      "sources": [
+        "https://products.cembre.com/es/spain/family/1790"
+      ]
+    },
+    {
+      "observed": [
+        "5502"
+      ],
+      "canonical": "5502",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Solera Deribox caja TLCA+RTV empotrable 300x200x60 mm con tabique de separación.",
+      "sources": [
+        "https://www.cotocontigo.pro/producto/3406423-caja-tlca-rtv-300x200x60"
+      ]
+    },
+    {
+      "observed": [
+        "3014"
+      ],
+      "canonical": "3014",
+      "relation": "confirmed_exact_with_description_conflicts",
+      "confidence": "very_high",
+      "note": "Famatel 3014 es caja estanca IP55 220x170x85 mm con conos. La línea histórica que la describe como torreta 180SE superior 1,25m es un outlier de descripción.",
+      "sources": [
+        "https://famatel.com/wp-content/uploads/3014.pdf",
+        "https://www.alkain.com/es/catalogo/caja-estanca-famatel-superfecie-cuadrada-con-tapa-tornillos-ip55-4-conos-dim-32-6-conos-dim-40-220x170mm-exterior"
+      ]
+    },
+    {
+      "observed": [
+        "20302809"
+      ],
+      "canonical": "20302809",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable Exzhellent H07Z1-K 1x1,5 mm² azul, caja 200 m.",
+      "sources": [
+        "https://sonepar.es/catalog/es-es/products/general-cable-cable-exzhellent-class-750v-as-h07z1-k-1x1-5-azul-caja-GENC1S23106AZP"
+      ]
+    },
+    {
+      "observed": [
+        "1802-4500"
+      ],
+      "canonical": "1802-4500",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Zimaklima soporte soldado para unidad exterior de aire acondicionado 450x450 mm.",
+      "sources": [
+        "https://www.gruponovelec.com/p/zim_1802-4500",
+        "https://groupsumi.es/climatizacion/aire-acondicionado/accesorios-aire-acondicionado/soportes-soldados-para-unidad-exterior-aire-acondicionado-450x450mm-1802-4500"
+      ]
+    },
+    {
+      "observed": [
+        "1901-4500"
+      ],
+      "canonical": "1901-4500",
+      "relation": "confirmed_exact",
+      "confidence": "high",
+      "note": "Zimaklima kit de amortiguadores para soportes A45; catálogo público identifica 1901-4500 como kit A45.",
+      "sources": [
+        "https://www.bellacer.com/wp-content/uploads/2023/11/081005_2022-zimaklima-pvp-general.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "LS995WW"
+      ],
+      "canonical": "LS995WW",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "JUNG LS990 tecla doble blanco alpino.",
+      "sources": [
+        "https://www.grupoelectrostocks.com/downloads/cat-ges-vivienda-2022-on-line.pdf",
+        "https://www.leroymerlin.es/productos/tecla-doble-blanco-alpino-jung-86760607.html"
+      ]
+    },
+    {
+      "observed": [
+        "AC50"
+      ],
+      "canonical": "AC50",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "AISCAN Acoplast doble pared gris Ø50 mm.",
+      "sources": [
+        "https://www.aiscan.com/producto/ac/"
+      ]
+    },
+    {
+      "observed": [
+        "20302924"
+      ],
+      "canonical": "20302924",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable Exzhellent RZ1-K (AS) 0,6/1kV 5G6 mm².",
+      "sources": [
+        "https://www.ilumitec.es/cable-unipolar-libre-halogenos-5x6-mm2-rz1k"
+      ]
+    },
+    {
+      "observed": [
+        "507U"
+      ],
+      "canonical": "507U",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "JUNG mecanismo de cruzamiento 10AX 250V.",
+      "sources": [
+        "https://www.gruponovelec.com/p/jun_507u"
+      ]
+    },
+    {
+      "observed": [
+        "82041-30"
+      ],
+      "canonical": "82041-30",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 82 tapa con dispositivo de seguridad para base Schuko, blanco.",
+      "sources": [
+        "https://static.simonelectric.com/sites/default/files/pimberly_product_pdf/82041-30-datasheet-es.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "20302814"
+      ],
+      "canonical": "20302814",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable Exzhellent H07Z1-K 1x1,5 mm² negro, caja 200 m.",
+      "sources": [
+        "https://www.ilumitec.es/unipolar-flexible-1-5-750v-h07z1-k-libre-halogenos"
+      ]
+    },
+    {
+      "observed": [
+        "3256"
+      ],
+      "canonical": "3256",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Famatel caja de mecanismo doble para pared hueca.",
+      "sources": [
+        "https://tienda.hortons.es/productos/famatel-caja-mecanismo-doble-p-pared-hueca/"
+      ]
+    },
+    {
+      "observed": [
+        "LS990TVWW"
+      ],
+      "canonical": "LS990TVWW",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "JUNG LS990 placa central para toma de antena TV/FM, blanco alpino.",
+      "sources": [
+        "https://jung-kz.kz/en/products/ls990/white/LS990TVWW",
+        "https://www.cotocontigo.pro/producto/3405989-placa-tv-fm-blanco-alpino"
+      ]
+    },
+    {
+      "observed": [
+        "LS995PWW"
+      ],
+      "canonical": "LS995PWW",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "JUNG LS990 tecla doble de persiana blanco alpino.",
+      "sources": [
+        "https://www.gruposinelec.com/web_sinelec/es/p/ls995pww_jung"
+      ]
+    },
+    {
+      "observed": [
+        "A9K17610"
+      ],
+      "canonical": "A9K17610",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Acti9 iK60 1P+N 10A curva C 6kA.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9K17610/acti9-ik60-interruptor-magnetot%C3%A9rmico-1p%2Bn-10a-curva-c-6ka/"
+      ]
+    },
+    {
+      "observed": [
+        "A9R60240"
+      ],
+      "canonical": "A9R60240",
+      "relation": "confirmed_exact_with_description_conflicts",
+      "confidence": "very_high",
+      "note": "Schneider Acti9 iID 2P 40A 30mA tipo AC. Una línea histórica que lo describe como ID-K 4P 25A 300mA queda como outlier.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9R60240/acti9-iid-interruptor-diferencial-2p-40a-30ma-clase-ac/"
+      ]
+    },
+    {
+      "observed": [
+        "51020103-039"
+      ],
+      "canonical": "51020103-039",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 500 Cima caja de pared de empotrar para 3 elementos dobles.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/51020103-039-caja-pared-empotrar-3-elementos-dobles-simon-500-cima"
+      ]
+    },
+    {
+      "observed": [
+        "411591"
+      ],
+      "canonical": "411591",
+      "relation": "confirmed_exact_legacy_terminology",
+      "confidence": "very_high",
+      "note": "Legrand DX³ diferencial 2P 40A 30mA tipo F. Históricamente puede aparecer descrito como HPI/inmunizado.",
+      "sources": [
+        "https://www.legrand.es/es/productos/interruptor-diferencial-dx3-2p-230v-40a-tipo-f-30ma-2-modulos-411591"
+      ]
+    },
+    {
+      "observed": [
+        "403032"
+      ],
+      "canonical": "403032",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand TX³ diferencial 2P 25A 30mA tipo AC.",
+      "sources": [
+        "https://www.legrand.es/es/productos/proteccion-modular-magnetotermica-y-diferencial"
+      ]
+    },
+    {
+      "observed": [
+        "0767807"
+      ],
+      "canonical": "0767807",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Temper KDP19 360S detector PIR de movimiento para techo en superficie, 360°.",
+      "sources": [
+        "https://grupotemper.com/producto/kdp19-360s"
+      ]
+    },
+    {
+      "observed": [
+        "20302937"
+      ],
+      "canonical": "20302937",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable Exzhellent Compact RZ1-K (AS) 0,6/1kV 3G2,5, rollo 100 m.",
+      "sources": [
+        "https://b2b.diselectric.com/producto/212197-cbl-exzhellent-1000v-rz1-k-as-3g2-5-vd"
+      ]
+    },
+    {
+      "observed": [
+        "PKE1508-Q100"
+      ],
+      "canonical": "PKE1508-Q100",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Cembre puntera PKE 1,5 mm², negra, longitud 8 mm, envase mínimo 100.",
+      "sources": [
+        "https://products.cembre.com/es/spain/family/1790"
+      ]
+    },
+    {
+      "observed": [
+        "LS967ESWW"
+      ],
+      "canonical": "LS967ESWW",
+      "relation": "confirmed_exact",
+      "confidence": "high",
+      "note": "JUNG LS990 timbre 230V blanco alpino.",
+      "sources": [
+        "https://www.ilumitec.es/timbre-230v-jung-ls990"
+      ]
+    },
+    {
+      "observed": [
+        "LS990KWW"
+      ],
+      "canonical": "LS990KWW",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "JUNG LS990 tecla con símbolo timbre, blanco alpino.",
+      "sources": [
+        "https://jung-kz.kz/en/products/ls990/white/LS990KWW"
+      ]
+    },
+    {
+      "observed": [
+        "82610-30"
+      ],
+      "canonical": "82610-30",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 82 marco de 1 elemento blanco.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/82610-30-marco-1-elemento-blanco-simon-82"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
