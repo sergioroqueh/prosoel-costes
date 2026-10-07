@@ -3764,7 +3764,235 @@
       "sources": [
         "https://www.komtesdeteccion.com/productos/sistema-de-deteccion-convencional-komttech/category/suplemento-tubo-vista-universal"
       ]
+    },
+    {
+      "observed": [
+        "82005-30"
+      ],
+      "canonical": "82005-30",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 82 placa plana voz/datos con guardapolvo para 1 RJ45, blanco.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/82005-30-placa-voz-datos-plana-guardapolvo-1-conector-rj45-blanco-simon-82"
+      ]
+    },
+    {
+      "observed": [
+        "6618"
+      ],
+      "canonical": "6618",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Solera portalámparas E27 de obra, blanco, conexión por tornillos, 4A 250V, 40W máx.",
+      "sources": [
+        "https://www.psolera.com/es/catalogo/pequeno-material/material-para-iluminacion/portalamparas-termoplasticos-e-27/6618/6618"
+      ]
+    },
+    {
+      "observed": [
+        "27432-65"
+      ],
+      "canonical": "27432-65",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 27 Play base Schuko 16A 250V blanca con dispositivo de seguridad y embornamiento rápido.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/27821-35-caja-superficie-2-elementos-blanco-simon-27"
+      ]
+    },
+    {
+      "observed": [
+        "20302926"
+      ],
+      "canonical": "20302926",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable Exzhellent RZ1-K (AS) 0,6/1kV 5G16 mm².",
+      "sources": [
+        "https://www.ilumitec.es/cable-unipolar-libre-halogenos-5x16-mm2-rz1k"
+      ]
+    },
+    {
+      "observed": [
+        "411524"
+      ],
+      "canonical": "411524",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand DX³ diferencial 2P 25A 300mA tipo AC.",
+      "sources": [
+        "https://www.legrand.es/es/productos/interruptor-diferencial-dx3-2p-230v-25a-tipo-ac-300ma-2-modulos-411524"
+      ]
+    },
+    {
+      "observed": [
+        "411664"
+      ],
+      "canonical": "411664",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand DX³ diferencial 4P 25A 300mA tipo AC.",
+      "sources": [
+        "https://www.legrand.com/ecatalogue/en/catalog/products/rccb-dx3-4p-25a-300ma-ac-411664"
+      ]
+    },
+    {
+      "observed": [
+        "CCBFO24SCAS"
+      ],
+      "canonical": "CCBFO24SCAS",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Cablecel bandeja 19 pulgadas con 24 adaptadores SC/APC simplex monomodo.",
+      "sources": [
+        "https://www.cablecel.com/productos/ftth-ict2/bandejas-19-y-adapadores-sc-apc/bandeja-19-24-adaptadores-sc-apc-simplex-sm/"
+      ]
+    },
+    {
+      "observed": [
+        "403606"
+      ],
+      "canonical": "403606",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand TX³ magnetotérmico 2P 16A curva C, 6kA.",
+      "sources": [
+        "https://www.legrand.es/es/productos/magnetotermico-tx3-2p-230400v-16a-curva-2-modulos-403606"
+      ]
+    },
+    {
+      "observed": [
+        "3251"
+      ],
+      "canonical": "3251",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Famatel caja de derivación para tabiquería hueca 115x115x45 mm, tapa con tornillos.",
+      "sources": [
+        "https://famatel.com/productos/cajas-para-tabiqueria-hueca/caja-derivacion-115x115x45/"
+      ]
+    },
+    {
+      "observed": [
+        "20000930-039"
+      ],
+      "canonical": "20000930-039",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 270 bastidor para 3 elementos.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/20000930-039-bastidor-3-elementos-simon-270"
+      ]
+    },
+    {
+      "observed": [
+        "27000610-090"
+      ],
+      "canonical": "27000610-090",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 270 marco para 1 elemento blanco.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/27000610-090-marco-1-elemento-blanco-simon-270"
+      ]
+    },
+    {
+      "observed": [
+        "864007"
+      ],
+      "canonical": "864007",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Niloé Step cruzamiento 10AX 250V, bornes de tornillo.",
+      "sources": [
+        "https://www.legrand.es/es/productos/niloe-step"
+      ]
+    },
+    {
+      "observed": [
+        "50000089-030"
+      ],
+      "canonical": "50000089-030",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 500 Cima placa plana voz/datos con guardapolvo para 2 RJ45, blanco.",
+      "sources": [
+        "https://www.simonelectric.com/ma/50000089-030-plaque-plate-voix-et-donnees-avec-cache-anti-poussiere-1-element-pour-2-connecteurs-rj45-compatible-avec-dautres-fabricants-blanche-simon-500-cima.html"
+      ]
+    },
+    {
+      "observed": [
+        "5825"
+      ],
+      "canonical": "5825",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Solera caja de mecanismos empotrable en tabique hueco para 3 elementos.",
+      "sources": [
+        "https://www.psolera.com/es/catalogo/envolventes/cajas-para-tabique-hueco-serie-blue/cajas-para-mecanismos-serie-blue/5625gw/5825"
+      ]
+    },
+    {
+      "observed": [
+        "2247-3"
+      ],
+      "canonical": "2247-3",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "UNEX brida de uso interior U60X 4,8x287 mm gris.",
+      "sources": [
+        "https://www.unex.net/es/brida-de-uso-interior-48x287-mm-en-u60x/2247-3"
+      ]
+    },
+    {
+      "observed": [
+        "BT1438"
+      ],
+      "canonical": "BT1438",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Fanair rollo de cobre aislado bitubo 1/4 x 3/8 pulgadas, 20 m.",
+      "sources": [
+        "https://www.fanairsl.com/productos/cobre/"
+      ]
+    },
+    {
+      "observed": [
+        "09250083"
+      ],
+      "canonical": "09250083",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Tecsoled/Mean Well LPV 150-24, 24V, 6,3A, 150W, IP67.",
+      "sources": [
+        "https://tecsoled.com/en/producto/fuentes/decoracion/lpv/lpv-150-24/"
+      ]
+    },
+    {
+      "observed": [
+        "NSYS2535"
+      ],
+      "canonical": "NSYS2535",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Sigma borne de seguridad 1x35 mm².",
+      "sources": [
+        "https://www.se.com/es/es/product/NSYS2535/bornes-de-seguridad-sigma-1x35mm%C2%B2-suministro-20/"
+      ]
+    },
+    {
+      "observed": [
+        "EHF25"
+      ],
+      "canonical": "EHF25",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "AISCAN-EHF tubo rígido enchufable libre de halógenos Ø25, gris.",
+      "sources": [
+        "https://www.aiscan.com/producto/ehf/"
+      ]
     }
   ],
-  "updated_at": "2026-10-07"
+  "updated_at": "2026-10-08"
 }
