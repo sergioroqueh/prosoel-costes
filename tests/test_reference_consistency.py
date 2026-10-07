@@ -54,3 +54,19 @@ def test_matching_reference_and_description_are_clean() -> None:
         "CR25",
         "Tubo Aiscan-CR corrugado doble capa diámetro 25 negro",
     )
+
+
+def test_accepts_rz1_hyphen_g_reference() -> None:
+    assert not check_reference_description(
+        "RZ1-K3G4",
+        "CABLE RZ1-K 0,6/1KV 3G4",
+    )
+
+
+def test_detects_rz1_hyphen_g_conflict() -> None:
+    result = check_reference_description(
+        "RZ1-K3G4",
+        "CABLE RZ1-K 0,6/1KV 5G4",
+    )
+
+    assert "conductors_mismatch" in {item.issue_type for item in result}
