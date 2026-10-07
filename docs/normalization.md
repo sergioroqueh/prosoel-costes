@@ -1,59 +1,95 @@
 # Estrategia de normalización de materiales
 
-## Objetivo
+## Principio rector
 
-Separar el hecho histórico de compra de la identidad técnica del material.
+La normalización debe ser conservadora.
 
-Una línea de pedido conserva siempre exactamente la referencia y descripción con
-la que fue comprada. Esa línea puede apuntar después a un material canónico.
+La muestra inicial no representa todo el histórico de PROSOEL, así que las
+primeras reglas se consideran **asistentes de clasificación**, no autoridad.
 
-Ejemplo:
+Durante la carga histórica masiva, ninguna familia nueva debe quedar
+auto-normalizada solo porque una descripción "parezca" coincidir.
 
-- RIAS / H07Z1K1,5AZR
-- otro proveedor / otra referencia comercial
-- otro fabricante / otra descripción
+## Flujo recomendado
 
-pueden apuntar a:
+1. Importar el pedido sin tocar el dato original.
+2. Detectar si existe una equivalencia previamente aprobada.
+3. Si no existe, generar una propuesta técnica.
+4. Mostrar al revisor:
+   - descripción original;
+   - referencia;
+   - proveedor;
+   - precio;
+   - material canónico propuesto;
+   - atributos detectados;
+   - nivel de confianza;
+   - motivos de la propuesta.
+5. El revisor decide:
+   - aprobar;
+   - corregir;
+   - crear un material nuevo;
+   - dejar pendiente.
+6. La decisión aprobada se reutiliza en futuras importaciones.
 
-H07Z1-K 1x1,5 mm² azul
+## Qué puede automatizarse con seguridad
 
-si sus atributos técnicos demuestran que son equivalentes para nuestro uso.
+### Asociación ya aprobada
 
-## Jerarquía de resolución
+Si una combinación proveedor + referencia ya fue revisada y aprobada, se puede
+resolver automáticamente en importaciones futuras.
 
-1. Asociación aprobada existente por proveedor + referencia.
-2. Referencia de fabricante inequívoca ya conocida.
-3. Regla técnica estructurada sobre descripción y referencia.
-4. Búsqueda de candidatos compatibles.
-5. Revisión humana si no se supera el umbral de confianza.
+### Referencia inequívoca conocida
 
-Nunca se agrupan materiales únicamente por similitud textual.
+Si existe una referencia de fabricante previamente validada, también puede
+reutilizarse.
 
-## Tres conceptos distintos
+### Regla técnica
 
-### Material canónico
+Las reglas pueden extraer atributos y proponer equivalencias, pero no deben
+convertirse en verdad por sí solas durante la fase inicial del proyecto.
 
-Identidad técnica usada para histórico de precios y costes.
+## Separación de conceptos
+
+### Línea histórica
+
+Dato original de compra. Nunca se reescribe para "limpiarlo".
 
 ### Variante comercial
 
-La forma concreta en que un proveedor o fabricante vende ese material. Conserva
-marca, referencia y descripción comercial.
+Forma concreta de compra: proveedor, referencia, fabricante y descripción.
+
+### Material canónico
+
+Identidad técnica aprobada para consolidar histórico de precios.
 
 ### Familia presupuestaria
 
-Agrupación más amplia que podrá usarse en presupuestos cuando varios productos
-no son idénticos pero sí válidos para cumplir una partida.
+Agrupación más amplia para construir partidas. Se definirá más adelante y no
+debe confundirse con identidad técnica.
 
-La familia presupuestaria se implementará en una fase posterior.
+## Regla inicial H07Z1-K
 
-## Regla inicial: H07Z1-K
+La regla actual solo demuestra el mecanismo de extracción:
 
-La primera regla extrae designación, número de conductores, sección, color,
-condición libre de halógenos y tensión nominal.
+- designación;
+- sección;
+- color;
+- tensión nominal;
+- condición libre de halógenos.
 
-Ejemplo de clave canónica:
+Ejemplo de propuesta:
 
 CABLE|H07Z1-K|1X|1,5|AZUL
 
-La marca y la referencia de proveedor no forman parte de esta clave.
+Esa clave no implica aprobación automática. Sirve para agrupar candidatos y
+acelerar la revisión humana.
+
+## Política anti-sobreajuste
+
+- No crear reglas demasiado específicas a partir de pocos ejemplos.
+- No usar nombres de proveedor como señal técnica salvo para resolver una
+  equivalencia previamente aprobada.
+- No suponer fabricante si no está demostrado.
+- No inferir atributos ausentes.
+- No fusionar materiales por similitud textual.
+- Mantener categoría "pendiente" cuando haya duda.
