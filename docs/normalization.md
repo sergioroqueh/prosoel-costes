@@ -157,3 +157,24 @@ deja de ser una clave única de `commercial_items`.
 La identidad de una variante comercial usa `commercial_variant_key`, generado
 a partir de los datos revisados de la variante. La referencia original sigue
 indexada y se conserva para búsqueda y trazabilidad.
+
+
+## Referencias locales de proveedor suficientemente consistentes
+
+No toda referencia necesita una equivalencia pública de fabricante para ser útil.
+
+Si un código de proveedor se repite con contexto estable, puede conservarse como
+`supplier_local_item` o `supplier_family_reference` aunque no exista en Internet.
+
+Esto evita obligar al usuario a resolver códigos internos que ya son trazables y,
+al mismo tiempo, evita fusionarlos con referencias parecidas sin evidencia.
+
+Ejemplos actuales:
+
+- AMARA `5826630`: grapa de pica 14 mm, tres compras coherentes;
+- RIAS `CP2X1BL`: cable de altavoz blanco 2x1 mm², referencia local;
+- GUARCONSA `CABLH25BOB`: referencia genérica 1x25 mm² que no codifica color;
+- RIAS `CLP160APMB4C`: referencia reutilizada para dos variantes de longitud y potencia.
+
+La identidad final sigue siendo la variante comercial observada; estas decisiones
+no crean equivalencias técnicas automáticas.
