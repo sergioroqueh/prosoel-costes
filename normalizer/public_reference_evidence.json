@@ -1552,6 +1552,32 @@
       "sources": [
         "https://www.legrand.es/es/productos/tipo-5?current_tab=tab-A"
       ]
+    },
+    {
+      "observed": [
+        "3074"
+      ],
+      "canonical": "3074",
+      "relation": "public_description_variation",
+      "confidence": "high",
+      "note": "FAMATEL 3074 es una caja estanca ciega IP55. Distribuidores públicos la describen como 220x170x85 mm interiores y también como aprox. 175x225x85 mm exteriores. Las dos descripciones históricas pueden referirse al mismo producto; no dividir por dimensiones sin revisar el criterio de medida.",
+      "sources": [
+        "https://www.gruposinelec.com/web_sinelec/es/p/3074_famatel",
+        "https://www.webmatel.es/cajas-estancas-electricas/caja-estanca-famatel-3074-no-halogenos-175x225x85-tapa-presion-ip55"
+      ]
+    },
+    {
+      "observed": [
+        "421016"
+      ],
+      "canonical": "421016",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "LEGRAND 421016 es bobina/disparador de emisión para DPX3 160/250, tensión de mando 200-277 Vac. Las descripciones históricas 'BOBINA EMISION DPX3 200-277VAC' y 'bobina de disparo DPX3 160/250 230Vac' son compatibles.",
+      "sources": [
+        "https://www.legrand.es/es/productos/bobina-disparo-emision-tension",
+        "https://www.legrand.com/ecatalogue/en/catalog/products/shunt-release-200v-277v-for-dpx3160250-dpx3-i-160250-and-dpx3dpx3-i-160hp250hp-421016"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
