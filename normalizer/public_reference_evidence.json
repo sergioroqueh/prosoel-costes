@@ -1319,6 +1319,44 @@
         "https://www.aiscan.com/producto/cr/",
         "https://www.aiscan.com/producto/cr/tubo-aiscan-cr-cr20/"
       ]
+    },
+    {
+      "observed": [
+        "60087919"
+      ],
+      "canonical": "60087919",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable/JETLAN U/UTP Cat.6, 4 pares, 24 AWG, LSZH, CPR Dca, blanco, caja 305 m.",
+      "sources": [
+        "https://www.cablecel.com/productos/redes-voz-y-datos/cable-de-datos/catergoria-6/cable-utp-cat6/cable-u-utp-lshz-jetlan6-blanco-dca-c-305-2/",
+        "https://www.cotocontigo.pro/producto/212461-cable-u-utp-4x2-lszh-cat-6-bl-cj-305m"
+      ]
+    },
+    {
+      "observed": [
+        "LYA3100X"
+      ],
+      "canonical": "LYA3100X",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Zemper ALYA AutoTest, 95 lm, no permanente, 1 h, blanco.",
+      "sources": [
+        "https://zemper.com/es-es/alumbrado-de-emergencia-1/alya-1/",
+        "https://zemper.com/download/Zemper-Alya-Familia.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "20302922"
+      ],
+      "canonical": "20302922",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable Exzhellent XXI RZ1-K (AS) 0,6/1kV 5G2,5 mm².",
+      "sources": [
+        "https://www.ilumitec.es/cable-unipolar-libre-halogenos-5x2-5-mm2-rz1k"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
