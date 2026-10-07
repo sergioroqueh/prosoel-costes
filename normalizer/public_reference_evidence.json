@@ -1578,6 +1578,210 @@
         "https://www.legrand.es/es/productos/bobina-disparo-emision-tension",
         "https://www.legrand.com/ecatalogue/en/catalog/products/shunt-release-200v-277v-for-dpx3160250-dpx3-i-160250-and-dpx3dpx3-i-160hp250hp-421016"
       ]
+    },
+    {
+      "observed": [
+        "K01/6"
+      ],
+      "canonical": "K01/6",
+      "relation": "confirmed_exact_with_description_conflicts",
+      "confidence": "very_high",
+      "note": "Simon K45 K01/6 es base Schuko 16A 250V roja, protección infantil y embornamiento a tornillo. La descripción histórica 'Marco empotrar 500 CIMA con 2 módulos blanco' asociada a K01/6 es incompatible.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/mecanismos-electricos/espacios-trabajo/funciones?page=6"
+      ]
+    },
+    {
+      "observed": [
+        "49082"
+      ],
+      "canonical": "49082",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "FERMAX KIT CITY DESFIRE VEO-XS WIFI DUOX PLUS 1L, con placa Cityline DESFire y monitor VEO-XS WiFi 4,3 pulgadas.",
+      "sources": [
+        "https://fermax.com/intl-es/productos/videoportero-2-hilos/kits/kits-control-de-accesos/f49082-kit-city-desfire-veo-xs-wifi-1l/"
+      ]
+    },
+    {
+      "observed": [
+        "412090"
+      ],
+      "canonical": "412090",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand EMDX3 contador de energía trifásico, conexión directa hasta 63A, 230/400V y salida de impulsos.",
+      "sources": [
+        "https://www.legrand.com/ecatalogue/en/catalog/products/emdx3-energy-meter-tri-direct-63a-230400v-pulse-412090"
+      ]
+    },
+    {
+      "observed": [
+        "93544004"
+      ],
+      "canonical": "93544004",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Socomec ATyS g M, conmutador automático de redes 4P 40A 230/400Vac.",
+      "sources": [
+        "https://emea.socomec.com/en/reference/93544004"
+      ]
+    },
+    {
+      "observed": [
+        "A9DE3725"
+      ],
+      "canonical": "A9DE3725",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Acti9 iCV40N RCBO 3P+N, curva C, 25A, 30mA AC.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9DE3725/a9-icv40n-3pn-c-25a-30ma-ac-rcbo/"
+      ]
+    },
+    {
+      "observed": [
+        "A9R84225"
+      ],
+      "canonical": "A9R84225",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Acti9 iID 2P 25A 300mA tipo AC.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9R84225/interruptor-diferencial-acti9-iid-2p-25a-300ma-ac/"
+      ]
+    },
+    {
+      "observed": [
+        "A9R35240"
+      ],
+      "canonical": "A9R35240",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Acti9 iID 2P 40A 300mA selectivo tipo A-SI.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9R35240/interruptor-diferencial-acti9-iid-2p-40a-300mas-asi/"
+      ]
+    },
+    {
+      "observed": [
+        "A9F79240"
+      ],
+      "canonical": "A9F79240",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Acti9 iC60N magnetotérmico 2P 40A curva C, 6kA/10kA.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9F79240/interruptor-magnetot%C3%A9rmico-acti9-ic60n-2p-40-a-curva-c-6000-a-10-ka/"
+      ]
+    },
+    {
+      "observed": [
+        "LVSXE418"
+      ],
+      "canonical": "LVSXE418",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider PrismaSeT XS, envolvente empotrable, 18 módulos por fila, 4 filas (72 módulos), puerta blanca.",
+      "sources": [
+        "https://www.se.com/es/es/product/LVSXE418/envolvente-modular-prismaset-xs-18-m%C3%B3dulos-4-filas-empotrar-puerta-blanca/"
+      ]
+    },
+    {
+      "observed": [
+        "421071"
+      ],
+      "canonical": "421071",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand adaptador/fijación para montar DPX3 160 3P/4P sin mando motorizado lateral sobre perfil simétrico.",
+      "sources": [
+        "https://www.legrand.es/es/productos/adaptador-para-montar-dpx3-160-perfil-simetrico-421071"
+      ]
+    },
+    {
+      "observed": [
+        "509012"
+      ],
+      "canonical": "509012",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Televés amplificador monocanal T12 FM/DAB 88-108 / 174-230MHz.",
+      "sources": [
+        "https://www.televes.com/es/509012-amplificador-monocanal-t12-fm-dab-88-108-174-230mhz.html"
+      ]
+    },
+    {
+      "observed": [
+        "519536"
+      ],
+      "canonical": "519536",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Televés repartidor con PAU F de 6 salidas, 5-2400MHz, pérdidas 12/11dB.",
+      "sources": [
+        "https://www.televes.com/es/519536-repartidor-con-pau-f-6d-5-2400mhz-12-11db.html"
+      ]
+    },
+    {
+      "observed": [
+        "532202"
+      ],
+      "canonical": "532202",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Televés AVANT 12 SAT para terrestre/satélite, 32 filtros digitales y programación ASuite por Bluetooth.",
+      "sources": [
+        "https://www.televes.com/es/532202-central-programable-avant-12-sat-para-terrestre-satelite-32-filtros-digitales-y-programacion-mediante-asuite-bluetoothr.html"
+      ]
+    },
+    {
+      "observed": [
+        "DFF54PO"
+      ],
+      "canonical": "DFF54PO",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "IDE Diamant caja de distribución empotrable IP40 3x18 (54) módulos, 532x408x105mm, puerta opaca blanca.",
+      "sources": [
+        "https://ide.es/esp/productos/cajas-de-distribucion/cajas-de-distribucion-ip40-con-y-sin-icp/ref_DFF54PO"
+      ]
+    },
+    {
+      "observed": [
+        "864305"
+      ],
+      "canonical": "864305",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Niloé Step tecla doble para interruptor/conmutador, acabado aluminio.",
+      "sources": [
+        "https://www.legrand.es/es/productos/teclas-para-mecanismos-mando"
+      ]
+    },
+    {
+      "observed": [
+        "864142"
+      ],
+      "canonical": "864142",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Niloé Step centro/frontal para una salida RJ45, blanco mate; se usa con las bases RJ45 correspondientes.",
+      "sources": [
+        "https://www.legrand.pt/e-catalogo/864142-niloe-step-centro-para-rj-45-com-1-saida-branco-mate.html"
+      ]
+    },
+    {
+      "observed": [
+        "148920"
+      ],
+      "canonical": "148920",
+      "relation": "confirmed_exact_family",
+      "confidence": "high",
+      "note": "Televés 148920 pertenece a la familia de antenas inteligentes Ellipse UHF C21-48 LTE700. La ficha de familia agrupa 148920/148921/148922 y diferencia variantes de suministro/alimentación.",
+      "sources": [
+        "https://www.televes.com/es/catalogsearch/result/?q=148920"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
