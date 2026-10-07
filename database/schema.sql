@@ -25,6 +25,8 @@ CREATE TABLE materials (
     canonical_key TEXT UNIQUE,
     attributes JSONB NOT NULL DEFAULT '{}'::jsonb,
     review_status TEXT NOT NULL DEFAULT 'pending',
+    reviewed_at TIMESTAMPTZ,
+    reviewed_by TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -40,9 +42,28 @@ CREATE TABLE commercial_items (
     match_status TEXT NOT NULL DEFAULT 'pending',
     match_confidence NUMERIC(5, 4),
     match_rule TEXT,
+    reviewed_at TIMESTAMPTZ,
+    reviewed_by TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE(supplier_id, supplier_reference)
+);
+
+CREATE TABLE material_match_proposals (
+    id BIGSERIAL PRIMARY KEY,
+    commercial_item_id BIGINT NOT NULL REFERENCES commercial_items(id) ON DELETE CASCADE,
+    proposed_material_id BIGINT REFERENCES materials(id),
+    proposed_canonical_key TEXT,
+    proposed_canonical_name TEXT,
+    proposed_attributes JSONB NOT NULL DEFAULT '{}'::jsonb,
+    confidence NUMERIC(5, 4),
+    rule_id TEXT,
+    reasons JSONB NOT NULL DEFAULT '[]'::jsonb,
+    status TEXT NOT NULL DEFAULT 'pending',
+    reviewed_at TIMESTAMPTZ,
+    reviewed_by TEXT,
+    review_note TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE orders (
@@ -89,6 +110,8 @@ CREATE INDEX idx_order_lines_material
 CREATE INDEX idx_orders_order_date
     ON orders(order_date);
 
-
 CREATE INDEX idx_commercial_items_material
     ON commercial_items(material_id);
+
+CREATE INDEX idx_match_proposals_status
+    ON material_match_proposals(status);
