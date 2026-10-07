@@ -12,8 +12,8 @@
     },
     {
       "reference": "2TE+I160A+PSTIB",
-      "reason": "Código compuesto/interno con descripciones históricas incompatibles. No se ha localizado ficha pública inequívoca.",
-      "next_step": "Cruzar con catálogo o presupuesto Pinazo/proveedor de la época."
+      "reason": "La contradicción 160A/600A está casi resuelta: el código contiene I160A, las dos compras tienen el mismo precio y la gama pública Pinazo usa 160/250/400/630A, no 600A. Falta únicamente identificar públicamente la composición exacta del conjunto.",
+      "next_step": "No requiere decisión de usuario todavía; buscar catálogo Pinazo/proveedor con la composición exacta."
     },
     {
       "reference": "CABLH25BOB",
@@ -26,29 +26,14 @@
       "next_step": "Buscar catálogo/ficha del fabricante de la fecha del pedido."
     },
     {
-      "reference": "30130 / 56130",
-      "reason": "Ambas aparecen en el histórico para 'CONMUTADOR SERIE REAL'. La referencia pública 56130 pertenece también a un relé diferencial Schneider RH10M, por lo que existe al menos una colisión de namespace. No se ha localizado fuente pública fiable que identifique 30130 o 56130 con la Serie Real.",
-      "next_step": "Revisar proveedor/fabricante del pedido original antes de decidir cuál referencia corresponde al mecanismo."
-    },
-    {
-      "reference": "30420 / 56400",
-      "reason": "Ambas aparecen para 'PULSADOR SERIE REAL' y no se ha localizado catálogo público fiable que las vincule a esa serie.",
-      "next_step": "Resolver con catálogo privado, proveedor o pedido original."
-    },
-    {
-      "reference": "610-B",
-      "reason": "Aparece asociado a la tecla Niloé Step de cruzamiento junto a la referencia fabricante confirmada 864107, pero 610-B no se ha podido validar públicamente.",
-      "next_step": "Mantener como posible alias interno/proveedor hasta revisar origen."
-    },
-    {
       "reference": "5826630",
-      "reason": "Aparece como grapa de pica 14 mm junto a KLK 06378, pero la búsqueda pública no permite identificar 5826630 de forma fiable.",
-      "next_step": "Revisar proveedor original; no fusionar automáticamente con KLK 06378."
+      "reason": "Aparece repetidamente en AMARA como grapa de pica 14 mm, a 0,80 €, mientras KLK 06378 aparece en otros proveedores con función y precio próximos pero especificaciones textuales no idénticas (16-50 frente a 16-35).",
+      "next_step": "Mantener separado de KLK 06378 hasta identificar el código de AMARA; no fusionar por similitud ni precio."
     },
     {
       "reference": "CP2X1BL",
-      "reason": "Aparece con la misma descripción que GESCABLE 33CPPBL0090R25 (cable altavoz 2x1 blanco), pero CP2X1BL no se ha localizado como referencia pública inequívoca.",
-      "next_step": "Tratar como posible alias de proveedor solo tras revisar proveedor de origen."
+      "reason": "Solo aparece en GRUPO RIAS en 2026 con la misma descripción que GESCABLE 33CPPBL0090R25. RIAS también compró antes la referencia GESCABLE exacta. Es compatible con alias/referencia interna de proveedor, pero no existe prueba pública del código CP2X1BL.",
+      "next_step": "Mantener como variante comercial RIAS separada hasta localizar tarifa/ficha del proveedor; no pedir decisión humana aún."
     }
   ]
 }
