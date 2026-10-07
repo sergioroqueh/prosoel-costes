@@ -18,7 +18,7 @@ class UnsupportedOrderTemplate(ValueError):
 
 EXPECTED_SHEETS = {"HOJA PEDIDO", "OBRAS", "MATERIALES"}
 LINE_HEADERS = ("UDS.", "REFERENCIA", "MATERIAL")
-ORDER_YEAR_RE = re.compile(r"(\\d{2})\\s*/")
+ORDER_YEAR_RE = re.compile(r"([0-9]{2})[ ]*/")
 
 
 def sha256_file(path: str | Path) -> str:
