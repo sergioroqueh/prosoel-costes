@@ -2152,6 +2152,72 @@
         "https://baleardesuministros.com/wp-content/uploads/2024/04/TARIFAGSF_2024.pdf",
         "https://contractaciopublica.cat/portal-api/descarrega-document/300875122/1CA4CC6CC00CF2B403F8BCF3C3B12B32"
       ]
+    },
+    {
+      "observed": [
+        "13948",
+        "403585"
+      ],
+      "canonical": null,
+      "relation": "distinct_products_with_confirmed_misassociation",
+      "confidence": "very_high",
+      "note": "Schneider 13948 es la cerradura/accesorio Kaedra Eurolocks nº850. Legrand 403585 es magnetotérmico TX3 P+N 10A. La línea histórica con referencia 403585 y descripción de cerradura es un error de asociación; 13948 es la referencia coherente con esa descripción.",
+      "sources": [
+        "https://shop.suministradora.com/material-electrico/armarios-electricos/cerradura-c-llave-kaedra-13948.html",
+        "https://www.legrand.com/ecatalogue/en/catalog/products/mcb-tx3-6000a-1-pole-neutral-10a-curve-403585"
+      ]
+    },
+    {
+      "observed": [
+        "50010432-030",
+        "51010103-030"
+      ],
+      "canonical": null,
+      "relation": "distinct_products_with_description_outlier",
+      "confidence": "very_high",
+      "note": "Simon 50010432-030 es base doble Schuko blanca con LED y 1Click. Simon 51010103-030 es marco empotrar con bastidores para 3 elementos dobles. Las líneas 51010103-030 descritas como Schuko son outliers de descripción.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/51000001-030-caja-pared-superficie-1-elemento-doble-blanco-simon-500-cima",
+        "https://www.simonelectric.com/es-ad/51010103-030-marco-pared-empotrar-bastidores-3-elementos-dobles-blanco-simon-500-cima"
+      ]
+    },
+    {
+      "observed": [
+        "205.W36-B0"
+      ],
+      "canonical": "205.W36-B0",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "SCAME/SOBEM WALL BOX BE-W, 1 toma Tipo 2, 7,4 kW, 32A monofásica, RFID y contador de energía.",
+      "sources": [
+        "https://espacepro.miler.fr/catalogue/pro-electricite-borne-de-charge",
+        "https://www.elematis.ro/statie-incarcare-ev-in-curent-alternativ-tip-wallbox-be-cu-o-priza-tip-2-7-4kw-cu-display/pd/205-W36-B0"
+      ]
+    },
+    {
+      "observed": [
+        "A979463",
+        "A9F79463"
+      ],
+      "canonical": "A9F79463",
+      "relation": "probable_typo_alias",
+      "confidence": "high",
+      "note": "A9F79463 es la referencia Schneider oficial para iC60N 4P 63A curva C. A979463 aparece una sola vez con la misma descripción técnica y no se localiza como referencia oficial; probable pérdida de la letra F.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9F79463/"
+      ]
+    },
+    {
+      "observed": [
+        "VTO2111D-P-S2"
+      ],
+      "canonical": "VTO2111D-P-S2",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Dahua VTO2111D-P-S2 es una estación exterior IP de villa con cámara 1MP, PoE, lector de tarjeta y ángulo horizontal 107°.",
+      "sources": [
+        "https://www.dahuasecurity.com/in/products/Video-Intercoms/IP-Products/Outdoor-Stations/VTO2111D-P-S2"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
