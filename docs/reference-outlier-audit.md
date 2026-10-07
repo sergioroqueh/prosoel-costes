@@ -130,3 +130,52 @@ no se dividen ni corrigen automáticamente hasta revisar fecha/documentación.
 serie no equivale necesariamente a 100 W exactos. Las comprobaciones de
 consistencia no deben deducir potencia a partir del nombre del modelo salvo que
 el fabricante documente expresamente esa codificación.
+
+
+## Cuarta pasada: colisiones confirmadas y errores aislados
+
+### Referencia 30413540
+
+DELUXE publica `30413540` como SLE-T ECO 35W 4000K 1200mm. En el histórico
+aparece tres veces:
+
+- dos líneas describen la luminaria SLE-T ECO y comparten el mismo precio;
+- una línea aislada describe una caja de derivación, manteniendo exactamente el
+  mismo precio de la luminaria.
+
+La evidencia pública y la coherencia interna apuntan a error de descripción en
+esa línea aislada.
+
+### Referencia 5270
+
+Es una colisión legítima entre fabricantes:
+
+- TELEVES 5270 = toma de paso puenteada FM/TV-SAT;
+- SOLERA 5270 = caja de distribución empotrable de 56 elementos.
+
+No se crea incidencia si el fabricante/proveedor/contexto resuelve la identidad.
+
+### Referencia 31801272
+
+FONTINI identifica `31801272` como marco de porcelana negra de 1 elemento.
+Una descripción histórica que lo denomina marco de madera/haya es incompatible
+con el catálogo del fabricante y queda como candidata de corrección.
+
+### Referencia 3314
+
+FERMAX publica `3314` como conector LOFT VDS. Algunos distribuidores siguen
+usando ADS para el mismo código y EAN. Se considera terminología histórica,
+no una referencia distinta.
+
+### Referencia interna 2TE+I160A+PSTIB
+
+Sin evidencia pública suficiente para resolver el conjunto completo. El código
+interno contiene `I160A`, pero una de dos apariciones históricas describe
+`I. 600A`; ambas tienen el mismo precio. Se mantiene como incidencia interna
+de alta prioridad, sin corrección automática.
+
+### Evolución de terminología HPI -> tipo F
+
+LEGRAND `410545` aparece en catálogos históricos como 4P 40A 300mA HPI y en
+documentación actual como tipo F. Se conserva como el mismo producto/referencia,
+registrando la evolución de nomenclatura.
