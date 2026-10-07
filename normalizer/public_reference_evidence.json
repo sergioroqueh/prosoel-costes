@@ -2218,6 +2218,139 @@
       "sources": [
         "https://www.dahuasecurity.com/in/products/Video-Intercoms/IP-Products/Outdoor-Stations/VTO2111D-P-S2"
       ]
+    },
+    {
+      "observed": [
+        "209901",
+        "209992"
+      ],
+      "canonical": null,
+      "relation": "same_technical_product_different_packaging",
+      "confidence": "very_high",
+      "note": "Televés publica ambas como conector RJ45 hembra UTP Cat.6 con mismas prestaciones básicas. 209901 (CAT6B-U) se suministra en caja plástica de 15 uds; 209992 (CAT6B-U75) en caja de 75 uds. Mismo material técnico, distinta variante comercial de embalaje.",
+      "sources": [
+        "https://www.televes.com/es/2099xx-conector-hembra-utp-cat6-conector-rj45-hembra-utp-cat-6-para-cables-de-datos.html",
+        "https://www.televes.com/downloadfile/DS06240001_000_1098990.pdf/DS06240001_000_209992_209994_209995_209997.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "069711-L",
+        "069711L"
+      ],
+      "canonical": "069711L",
+      "relation": "typographic_supplier_alias",
+      "confidence": "very_high",
+      "note": "Legrand publica 069711L para el conmutador Plexo monobloc superficie 10AX gris. La forma histórica 069711-L añade un guion no presente en la referencia oficial.",
+      "sources": [
+        "https://www.legrand.es/es/productos/conmutador-plexo-monobloc-superficie-10ax-gris-069711l"
+      ]
+    },
+    {
+      "observed": [
+        "6827k",
+        "6827K"
+      ],
+      "canonical": "6827K",
+      "relation": "case_alias",
+      "confidence": "very_high",
+      "note": "Solera publica 6827K como base fija empotrable 2P+T 25A 250V blanca. La variante 6827k solo cambia mayúscula/minúscula.",
+      "sources": [
+        "https://www.psolera.com/es/catalogo/pequeno-material/material-diverso/bases-y-clavijas/6828/6827k"
+      ]
+    },
+    {
+      "observed": [
+        "539VU"
+      ],
+      "canonical": "539 VU",
+      "relation": "confirmed_exact_format_alias",
+      "confidence": "very_high",
+      "note": "JUNG publica 539 VU como pulsador de persianas unipolar, 1 motor, 10A 250V. La forma sin espacio 539VU es una representación compacta del mismo código.",
+      "sources": [
+        "https://www.jung-group.com/es-ES/p/Pulsador-de-persianas-Unipolar-1-motor-10-A-250-V/539-VU"
+      ]
+    },
+    {
+      "observed": [
+        "61782",
+        "5TG22782WH01"
+      ],
+      "canonical": "61782",
+      "relation": "manufacturer_equivalent_codes",
+      "confidence": "very_high",
+      "note": "BJC Style 61782 es la tapa para 1 conector RJ45 blanco polar. El catálogo BJC/Siemens relaciona esta función con 5TG22782WH01 como código equivalente.",
+      "sources": [
+        "https://bjc.es/product/style-tapa-conector-1-rj45-blanco-polar/",
+        "https://www.bjc.es/sites/default/files/documentacion/catalogo_general_bjc_siemens_octubre_2024_0.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "61705",
+        "5TG72705WH00"
+      ],
+      "canonical": "61705",
+      "relation": "manufacturer_equivalent_codes",
+      "confidence": "very_high",
+      "note": "BJC Style 61705 es la tecla simple blanco polar. El catálogo BJC/Siemens la vincula con el código Siemens 5TG72705WH00.",
+      "sources": [
+        "https://bjc.es/product/style-tecla-simple-blanco-polar/",
+        "https://www.bjc.es/sites/default/files/documentacion/catalogo_general_bjc_siemens_octubre_2024_0.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "61709",
+        "5TG72701WH00"
+      ],
+      "canonical": "61709",
+      "relation": "manufacturer_equivalent_codes",
+      "confidence": "very_high",
+      "note": "BJC Style 61709 es la tecla doble blanco polar. El catálogo histórico BJC/Siemens la relaciona con el código Siemens 5TG72701WH00.",
+      "sources": [
+        "https://bjc.es/product/style-tecla-doble-negro-mate-2/",
+        "https://www.bjc.es/sites/default/files/documentacion/catalogo_general_bjc_siemens_octubre_2024_0.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "61724",
+        "5UH12724WH"
+      ],
+      "canonical": "61724",
+      "relation": "manufacturer_equivalent_codes",
+      "confidence": "very_high",
+      "note": "BJC Style 61724 es la tapa de base de enchufe de seguridad blanco polar; el catálogo BJC/Siemens la relaciona con 5UH12724WH.",
+      "sources": [
+        "https://bjc.es/product/style-tapa-base-enchufe-seguridad-blanco-polar/",
+        "https://www.bjc.es/sites/default/files/documentacion/catalogo_general_bjc_siemens_octubre_2024_0.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "61765"
+      ],
+      "canonical": "61765",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "BJC Style 61765 es la tecla doble de persianas blanco polar, compatible con mecanismos 18565/18569.",
+      "sources": [
+        "https://bjc.es/wp-content/uploads/2026/03/CATALOGO-SERIE-STYLE-2026.pdf",
+        "https://bjc.es/en/product/61593/"
+      ]
+    },
+    {
+      "observed": [
+        "61882"
+      ],
+      "canonical": "61882",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "BJC Style 61882 es la tapa para 2 conectores RJ45 blanco polar.",
+      "sources": [
+        "https://bjc.es/product/style-tapa-conector-2-rj45-blanco-polar/"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
