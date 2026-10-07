@@ -82,6 +82,9 @@ CREATE TABLE orders (
     supplier_email TEXT,
     project_contact TEXT,
     declared_total NUMERIC(14, 4),
+    unit_header TEXT,
+    template_variant TEXT,
+    internal_order_reference TEXT,
     source_filename TEXT NOT NULL,
     source_sha256 CHAR(64) NOT NULL UNIQUE,
     imported_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -113,8 +116,11 @@ CREATE TABLE order_lines (
     description_original TEXT NOT NULL,
     pvp NUMERIC(14, 6),
     discount_raw TEXT,
+    discount_components_raw JSONB NOT NULL DEFAULT '[]'::jsonb,
     net_unit_price NUMERIC(14, 6),
     total_price NUMERIC(14, 4),
+    price_validation_status TEXT NOT NULL DEFAULT 'pending',
+    price_validation_detail JSONB NOT NULL DEFAULT '{}'::jsonb,
     UNIQUE(order_id, line_number)
 );
 
@@ -139,3 +145,21 @@ CREATE INDEX idx_match_proposals_status
 
 CREATE INDEX idx_order_sequence_exceptions
     ON order_sequence_exceptions(order_year, status);
+
+
+CREATE TABLE review_issues (
+    id BIGSERIAL PRIMARY KEY,
+    order_id BIGINT REFERENCES orders(id) ON DELETE CASCADE,
+    order_line_id BIGINT REFERENCES order_lines(id) ON DELETE CASCADE,
+    issue_type TEXT NOT NULL,
+    severity TEXT NOT NULL,
+    detail JSONB NOT NULL DEFAULT '{}'::jsonb,
+    status TEXT NOT NULL DEFAULT 'pending',
+    reviewed_at TIMESTAMPTZ,
+    reviewed_by TEXT,
+    review_note TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_review_issues_queue
+    ON review_issues(status, issue_type);
