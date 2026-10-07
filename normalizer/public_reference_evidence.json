@@ -943,6 +943,175 @@
       "sources": [
         "https://b2b.diselectric.com/producto/3437400-cbl-exzhellent-class-750v-as-h07z1-k-1x2"
       ]
+    },
+    {
+      "observed": [
+        "403586"
+      ],
+      "canonical": "403586",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand TX3 magnetotérmico 1P+N 16A curva C, 6kA.",
+      "sources": [
+        "https://www.legrand.es/es/productos/magnetotermico-tx3-1pn-230v-16a-curva-2-modulos-403586"
+      ]
+    },
+    {
+      "observed": [
+        "403610"
+      ],
+      "canonical": "403610",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand TX3 magnetotérmico 2P 40A curva C. Referencia confirmada en documentación oficial Legrand.",
+      "sources": [
+        "https://www.legrand.es/es/reach/pdf/manufacturer-reach-declaration/174261"
+      ]
+    },
+    {
+      "observed": [
+        "403626"
+      ],
+      "canonical": "403626",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand TX3 magnetotérmico 4P 16A curva C, 6kA.",
+      "sources": [
+        "https://www.legrand.es/productos/magnetotermico-tx3-4p-400v-16a-curva-4-modulos-403626"
+      ]
+    },
+    {
+      "observed": [
+        "403628"
+      ],
+      "canonical": "403628",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand TX3 magnetotérmico 4P 25A curva C, 6kA.",
+      "sources": [
+        "https://www.legrand.es/es/productos/tetrapolares-400-v-17"
+      ]
+    },
+    {
+      "observed": [
+        "403004"
+      ],
+      "canonical": "403004",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand TX3 diferencial 4P 25A 30mA tipo AC.",
+      "sources": [
+        "https://www.legrand.es/es/productos/proteccion-modular-magnetotermica-y-diferencial"
+      ]
+    },
+    {
+      "observed": [
+        "403005"
+      ],
+      "canonical": "403005",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand TX3 diferencial 4P 40A 30mA tipo AC.",
+      "sources": [
+        "https://www.legrand.es/es/productos/proteccion-modular-magnetotermica-y-diferencial"
+      ]
+    },
+    {
+      "observed": [
+        "5317"
+      ],
+      "canonical": "5317",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Televés central banda ancha MiniKom F doble línea ICT-2, 2 entradas, retorno/VHF/UHF/FI1-FI2.",
+      "sources": [
+        "https://www.televes.com/es/catalogsearch/result/?q=5317",
+        "https://docs.televes.com/web/Legislacion/latam/IEC60728_2_AMPLFICADOR_531710.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "5795"
+      ],
+      "canonical": "5795",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Televés fuente PicoKom 24V 130mA, 2 salidas.",
+      "sources": [
+        "https://www.televes.com/es/5795-fuente-de-alimentacion-picokom-24v-130ma-2-salidas.html"
+      ]
+    },
+    {
+      "observed": [
+        "519506"
+      ],
+      "canonical": "519506",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Televés repartidor F 6D 5-2400MHz, pérdidas 12/11dB, embalaje colectivo.",
+      "sources": [
+        "https://www.televes.com/es/5195x6-splitter-6w-repartidor-f-6d-5-2400mhz-12-11db.html"
+      ]
+    },
+    {
+      "observed": [
+        "519342"
+      ],
+      "canonical": "519342",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Televés derivador F 4D 5-2400MHz, 12dB.",
+      "sources": [
+        "https://www.televes.com/downloadfile/PSH02230052_0_Espanol_843353.pdf/519342_es_ES_product_sheet_PSH02230052.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "864101"
+      ],
+      "canonical": "864101",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Niloé Step, tecla para interruptor y conmutador, blanco mate.",
+      "sources": [
+        "https://www.legrand.es/es/productos/tecla-niloe-step-interruptor-y-conmutador-blanco-mate-864101"
+      ]
+    },
+    {
+      "observed": [
+        "864011"
+      ],
+      "canonical": "864011",
+      "relation": "legacy_current",
+      "confidence": "very_high",
+      "note": "Legrand Niloé Step pulsador inversor 6A 250V. 864011 figura como obsoleto y Legrand indica 864011B como producto actualizado.",
+      "sources": [
+        "https://www.legrand.es/es/productos/pulsador-inversor-niloe-step-6a-250v-864011"
+      ]
+    },
+    {
+      "observed": [
+        "864171"
+      ],
+      "canonical": "864171",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Niloé Step placa embellecedora 1 elemento blanco mate.",
+      "sources": [
+        "https://www.legrand.es/sites/g/files/ocwmcr651/files/2022-10/Catalogo-Niloe-Step-Legrand.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "864172"
+      ],
+      "canonical": "864172",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Niloé Step placa embellecedora 2 elementos blanco mate.",
+      "sources": [
+        "https://www.legrand.es/es/productos/2-elementos-0"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
