@@ -746,6 +746,203 @@
       "sources": [
         "https://www.simonelectric.com/es-es/20001101-090-interruptor-unipolar-pulsante-10ax-230v-tecla-estrecha-sistema-embornamiento-rapido-blanco-simon-270"
       ]
+    },
+    {
+      "observed": [
+        "02281062"
+      ],
+      "canonical": "02281062",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Tecsoled/TSL cable paralelo blanco PVC 2x0,50 mm². Cualquier línea RAEE con esta referencia es un conflicto de referencia/descripción.",
+      "sources": [
+        "https://tecsoled.com/wp-content/uploads/Catalogo/Tecsoled-GetReady-22-23-ONLINE-POR-ENG-V1.pdf",
+        "https://ieferia.interempresas.net/FeriaVirtual/Catalogos_y_documentos/360968/Tecsoled-GetReady-22-23-ONLINE-ESP-ENG-V1.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "23330",
+        "GW62209H"
+      ],
+      "canonical": null,
+      "relation": "distinct_products_with_probable_misassociation",
+      "confidence": "very_high",
+      "note": "BJC 23330=tapa toma TV Viva 2 conectores blanca. GW62209H=GEWISS base inclinada 3P+T 16A 400V IP44. Una descripción de base industrial asociada a 23330 es incompatible.",
+      "sources": [
+        "https://bjc.es/productos-bjc/page/11/?categoria=es-viva-mecanismos",
+        "https://www.gruponovelec.com/p/gew_gw62209h"
+      ]
+    },
+    {
+      "observed": [
+        "3010"
+      ],
+      "canonical": "3010",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Televés mástil 45x3000x2 mm. La descripción 45x3000x20 mm es un error tipográfico de espesor.",
+      "sources": [
+        "https://www.gruponovelec.com/p/ves_3010",
+        "https://www.clientes.grupoelektra.es/catalogo/producto/053451/1"
+      ]
+    },
+    {
+      "observed": [
+        "A9R35440"
+      ],
+      "canonical": "A9R35440",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Acti9 iID 4P 40A 300mA selectivo tipo A-SI.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9R35440/interruptor-diferencial-acti9-iid-4p-40a-300mas-asi/"
+      ]
+    },
+    {
+      "observed": [
+        "A9P53616"
+      ],
+      "canonical": "A9P53616",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Acti9 iC40F 1P+N 16A curva C 6kA.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9P53616/interruptor-magnetot%C3%A9rmico-acti9-ic40f-1p%2Bn-16a-curva-c-6ka/"
+      ]
+    },
+    {
+      "observed": [
+        "069571L"
+      ],
+      "canonical": "069571L",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo modular gris 2P+T 16A IP55 con embornamiento por tornillos.",
+      "sources": [
+        "https://www.legrand.es/es/productos/base-corriente-plexo-modular-ip55-2pt-embornamiento-con-tornillos-gris-069571l"
+      ]
+    },
+    {
+      "observed": [
+        "069783L"
+      ],
+      "canonical": "069783L",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo monobloc superficie antracita, base Schuko 2P+T 16A con tornillos.",
+      "sources": [
+        "https://www.legrand.com/ecatalogue/en/catalog/products/plexo-german-standard-socket-outlet-with-screw-terminals-anthracite-surface-069783l"
+      ]
+    },
+    {
+      "observed": [
+        "09250054"
+      ],
+      "canonical": "09250054",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Tecsoled/Mean Well LPV-60-24, fuente 24VDC 60W IP67.",
+      "sources": [
+        "https://tecsoled.com/producto/fuentes/decoracion/lpv/lpv-60-24/",
+        "https://sonepar.es/catalog/es-es/products/sin-marca-transformador-lpv-60w-24vdc-313893"
+      ]
+    },
+    {
+      "observed": [
+        "09250055"
+      ],
+      "canonical": "09250055",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Tecsoled/TSL LPV 100W 24VDC IP67.",
+      "sources": [
+        "https://sonepar.es/catalog/es-es/products/tsl-transformador-lpv-100w-24vdc-394749"
+      ]
+    },
+    {
+      "observed": [
+        "149922"
+      ],
+      "canonical": "149922",
+      "relation": "confirmed_exact_supply_variant",
+      "confidence": "very_high",
+      "note": "Televés DAT BOSS UHF C21-48, embalaje colectivo. La 149921 es la misma antena en embalaje individual.",
+      "sources": [
+        "https://televes.com/es/distribucion-tv/antenas-terrestres/inteligentes-con-bosstech/serie-dat/14992x-datboss-700-antena-dat-boss-uhf-2-dividendo-digital-lte700.html"
+      ]
+    },
+    {
+      "observed": [
+        "2135165"
+      ],
+      "canonical": "2135165",
+      "relation": "confirmed_exact",
+      "confidence": "high",
+      "note": "URSA AIR Zero P8858 XS, 25 mm, 1,20x2,40 m.",
+      "sources": [
+        "https://teopsa.net/productos/aislamientos-termicos-y-acusticos/aislamientos-acusticos/ursa-air-zero-p8858/"
+      ]
+    },
+    {
+      "observed": [
+        "20302925"
+      ],
+      "canonical": "20302925",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable RZ1-K 0,6/1kV 5G10.",
+      "sources": [
+        "https://www.ilumitec.es/cable-unipolar-libre-halogenos-5x10-mm2-rz1k"
+      ]
+    },
+    {
+      "observed": [
+        "20302881"
+      ],
+      "canonical": "20302881",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable RZ1-K 0,6/1kV 1x16.",
+      "sources": [
+        "https://www.clientes.elektraaragon.com/catalogo/producto/0622758/1"
+      ]
+    },
+    {
+      "observed": [
+        "20302883"
+      ],
+      "canonical": "20302883",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable RZ1-K 0,6/1kV 1x35.",
+      "sources": [
+        "https://www.voltimum.es/detalles-producto/9pq2VCU8/general-cable/exzhellent-xxi-rz1-kas-1kv-1x35"
+      ]
+    },
+    {
+      "observed": [
+        "20302817"
+      ],
+      "canonical": "20302817",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable H07Z1-K 1x2,5 mm² amarillo/verde, caja 200m.",
+      "sources": [
+        "https://sonepar.es/catalog/es-es/products/general-cable-cable-exzhellent-class-750v-as-h07z1-k-1x2-5-amarillo-verde-caja-GENC1S23107AVP"
+      ]
+    },
+    {
+      "observed": [
+        "20302821"
+      ],
+      "canonical": "20302821",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable H07Z1-K 1x2,5 mm² marrón.",
+      "sources": [
+        "https://b2b.diselectric.com/producto/3437400-cbl-exzhellent-class-750v-as-h07z1-k-1x2"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
