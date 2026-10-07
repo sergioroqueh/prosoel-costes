@@ -3284,6 +3284,342 @@
       "sources": [
         "https://www.simonelectric.com/es-es/82620-30-marco-2-elementos-blanco-simon-82"
       ]
+    },
+    {
+      "observed": [
+        "2244-3"
+      ],
+      "canonical": "2244-3",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "UNEX brida de uso interior U60X 4,8x188 mm.",
+      "sources": [
+        "https://www.unex.net/es/brida-de-uso-interior-48x188-mm-en-u60x/2244-3"
+      ]
+    },
+    {
+      "observed": [
+        "20000472-090"
+      ],
+      "canonical": "20000472-090",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 270 base Schuko 16A 250V blanca con embornamiento a tornillo.",
+      "sources": [
+        "https://www.simonelectric.com/en-ww/20000472-090-schuko-socket-outlet-16a-250-v-with-screw-terminal-system-white-simon-270"
+      ]
+    },
+    {
+      "observed": [
+        "50010800-030"
+      ],
+      "canonical": "50010800-030",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 500 Cima tapa ciega para 1 elemento, blanco.",
+      "sources": [
+        "https://www.simonelectric.com/intl/50010800-030-blind-cover-for-1-element-white-simon-500-cima.html"
+      ]
+    },
+    {
+      "observed": [
+        "3008"
+      ],
+      "canonical": "3008",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Televés mástil 2,5 m, Ø35 mm, espesor 1,5 mm, zinc + RPR.",
+      "sources": [
+        "https://www.televes.com/es/3008-mastil-2-5m-x-o-35mm-x-espesor-1-5mm-zinc-rpr.html"
+      ]
+    },
+    {
+      "observed": [
+        "A9K17625"
+      ],
+      "canonical": "A9K17625",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Acti9 iK60 1P+N 25A curva C 6kA.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9K17625/interruptor-magnetot%C3%A9rmico-acti9-ik60-1p%2Bn-25a-curva-c-6ka/"
+      ]
+    },
+    {
+      "observed": [
+        "PKE1612"
+      ],
+      "canonical": "PKE1612",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Cembre puntera PKE 16 mm² marfil, longitud de puntera 12 mm.",
+      "sources": [
+        "https://products.cembre.com/es/spain/family/1790"
+      ]
+    },
+    {
+      "observed": [
+        "403590"
+      ],
+      "canonical": "403590",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand TX3 magnetotérmico 1P+N 40A curva C 6kA.",
+      "sources": [
+        "https://www.legrand.com/ecatalogue/en/catalog/products/mcb-tx3-6000a-1-pole-neutral-40a-curve-403590"
+      ]
+    },
+    {
+      "observed": [
+        "A9K17425"
+      ],
+      "canonical": "A9K17425",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Acti9 iK60N 4P 25A curva C 6kA.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9K17425/interruptor-magnetot%C3%A9rmico-acti9-ik60n-4p-25a-curva-c-6000-a/"
+      ]
+    },
+    {
+      "observed": [
+        "20000920-039"
+      ],
+      "canonical": "20000920-039",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 270 bastidor para 2 elementos.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/20000920-039-bastidor-2-elementos-simon-270"
+      ]
+    },
+    {
+      "observed": [
+        "20000101-090"
+      ],
+      "canonical": "20000101-090",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 270 interruptor unipolar pulsante 10AX 230V blanco, embornamiento rápido.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/20000101-090-interruptor-unipolar-pulsante-10ax-230v-sistema-embornamiento-rapido-blanco-simon-270"
+      ]
+    },
+    {
+      "observed": [
+        "069839L"
+      ],
+      "canonical": "069839L",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo base modular IP55 2P+T 16A antracita, bornes a tornillo.",
+      "sources": [
+        "https://www.legrand.es/es/productos/plexo-componible-ip-55-bases-corriente"
+      ]
+    },
+    {
+      "observed": [
+        "403630"
+      ],
+      "canonical": "403630",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand TX3 magnetotérmico 4P 40A curva C 6kA.",
+      "sources": [
+        "https://www.legrand.es/es/productos/tetrapolares-400-v-17"
+      ]
+    },
+    {
+      "observed": [
+        "2401"
+      ],
+      "canonical": "2401",
+      "relation": "confirmed_exact",
+      "confidence": "high",
+      "note": "Soporte/suplemento de pared atornillable 300 mm en L para mástil, zinc + RPR.",
+      "sources": [
+        "https://www.gruponovelec.com/p/ves_2401"
+      ]
+    },
+    {
+      "observed": [
+        "715"
+      ],
+      "canonical": "715",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Solera caja estanca 100x100x55 mm IP55, 7 conos Ø25.",
+      "sources": [
+        "https://www.psolera.com/es/catalogo/envolventes/cajas-estancas/cajas-estancas-ip55-con-conos/715/715"
+      ]
+    },
+    {
+      "observed": [
+        "1253-3"
+      ],
+      "canonical": "1253-3",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "UNEX taco a presión Ø6 mm U64X gris.",
+      "sources": [
+        "https://www.unex.net/es/taco-a-presion-diametro-6-mm-en-u64x/1253-3"
+      ]
+    },
+    {
+      "observed": [
+        "IH UNI T"
+      ],
+      "canonical": "IH UNI T",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "DINUY interruptor horario analógico 1 módulo sin reserva.",
+      "sources": [
+        "https://dinuy.com/es/producto/114/interruptor-horario-analogico-1-modulo-sin-reserva/"
+      ]
+    },
+    {
+      "observed": [
+        "51020104-039"
+      ],
+      "canonical": "51020104-039",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 500 Cima caja de pared empotrable para 4 elementos dobles.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/51020104-039-caja-pared-empotrar-4-elementos-dobles-simon-500-cima"
+      ]
+    },
+    {
+      "observed": [
+        "5825GW"
+      ],
+      "canonical": "5825GW",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Solera caja de mecanismos empotrable en tabique hueco para 3 elementos, fijación mediante bridas.",
+      "sources": [
+        "https://www.psolera.com/es/catalogo/envolventes/cajas-para-tabique-hueco-serie-blue/cajas-para-mecanismos-serie-blue/5625gw/5825gw"
+      ]
+    },
+    {
+      "observed": [
+        "324GW"
+      ],
+      "canonical": "324GW",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Solera caja de conexión empotrable en tabique hueco 250x250x50 mm, fijación mediante bridas.",
+      "sources": [
+        "https://www.psolera.com/es/catalogo/envolventes/cajas-para-tabique-hueco-serie-blue/cajas-de-conexion-serie-blue/324gw/324gw"
+      ]
+    },
+    {
+      "observed": [
+        "CCM061450"
+      ],
+      "canonical": "CCM061450",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Cablecel armario mural 19 pulgadas, 6U, 1 cuerpo, fondo 450 mm.",
+      "sources": [
+        "https://www.cablecel.com/productos/armarios-rack-murales-y-accesorios/armarios-murales-19-de-pared-y-minimurales/armario-mural-19-1-cuerpo-fondo-450/armario-mural-19-6u-1c-f450-mm/"
+      ]
+    },
+    {
+      "observed": [
+        "092166"
+      ],
+      "canonical": "092166",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo caja de derivación rectangular IP55 155x110x80 mm, 10 entradas.",
+      "sources": [
+        "https://www.legrand.es/es/productos/155-x-110-x-74-mm"
+      ]
+    },
+    {
+      "observed": [
+        "20302818"
+      ],
+      "canonical": "20302818",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable Exzhellent H07Z1-K 1x2,5 mm² azul, caja 200 m.",
+      "sources": [
+        "https://www.ilumitec.es/unipolar-flexible-2-5-750v-h07z1-k-libre-halogenos"
+      ]
+    },
+    {
+      "observed": [
+        "20302822"
+      ],
+      "canonical": "20302822",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable Exzhellent H07Z1-K 1x2,5 mm² negro, caja 200 m.",
+      "sources": [
+        "https://www.ilumitec.es/unipolar-flexible-2-5-750v-h07z1-k-libre-halogenos"
+      ]
+    },
+    {
+      "observed": [
+        "20000800-090"
+      ],
+      "canonical": "20000800-090",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 270 tapa ciega blanco brillante.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/mecanismos-electricos/interruptores-y-enchufes/tapas-ciegas"
+      ]
+    },
+    {
+      "observed": [
+        "403608"
+      ],
+      "canonical": "403608",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand TX3 magnetotérmico 2P 25A curva C 6kA.",
+      "sources": [
+        "https://assets.legrand.com/pim/Certif/LGYIXLQLYG.PDF"
+      ]
+    },
+    {
+      "observed": [
+        "PKT614"
+      ],
+      "canonical": "PKT614",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Cembre puntera hueca doble TWIN 2x6 mm², amarillo, longitud 14 mm.",
+      "sources": [
+        "https://products.cembre.com/es/slu/family/1769-pkt"
+      ]
+    },
+    {
+      "observed": [
+        "20000087-090"
+      ],
+      "canonical": "20000087-090",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 270 tapa de voz/datos plana con guardapolvo para 1 RJ45, blanco, sin conector.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/20000087-090-tapa-voz-datos-plana-guardapolvo-1-conector-rj45-blanco-simon-270"
+      ]
+    },
+    {
+      "observed": [
+        "OB110330CH"
+      ],
+      "canonical": "OB110330CH",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "ORBIS ORBISON timbre musical 2 notas, 230V.",
+      "sources": [
+        "https://www.gruposinelec.com/web_sinelec/es/p/ob110330ch_orbis"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
