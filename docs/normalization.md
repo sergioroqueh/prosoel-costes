@@ -113,3 +113,20 @@ La identidad comercial debe usar, por este orden:
 
 Nunca se hará una unión automática entre dos líneas de fabricantes/proveedores
 distintos solo porque compartan el mismo código corto.
+
+
+## Comprobaciones de consistencia
+
+Algunas referencias internas codifican parámetros técnicos de forma explícita,
+por ejemplo sección y número de conductores.
+
+En estos casos se permite detectar contradicciones entre referencia y
+descripción. Ejemplos:
+
+- `H07Z1K1,5NGR` + descripción `H07Z1-K 1x2,5 negro` -> incidencia;
+- `RZ1K4X1,5R` + descripción `RZ1-K 5G1,5` -> incidencia.
+
+Estas comprobaciones **no corrigen ni normalizan** la línea. Solo generan una
+incidencia de alta prioridad para revisión humana. Esto permite localizar
+errores aislados de copia/pega dentro de referencias muy repetidas sin
+sobreajustar el normalizador.
