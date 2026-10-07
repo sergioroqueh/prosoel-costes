@@ -93,3 +93,23 @@ acelerar la revisión humana.
 - No inferir atributos ausentes.
 - No fusionar materiales por similitud textual.
 - Mantener categoría "pendiente" cuando haya duda.
+
+
+## Referencias con namespace
+
+Una referencia numérica o alfanumérica **no es globalmente única**.
+
+La auditoría pública ha encontrado colisiones reales. Por ejemplo, el código
+`56130` aparece públicamente en Schneider Electric como un relé de fuga RH10M,
+mientras que en pedidos históricos de PROSOEL aparece asociado a un
+"CONMUTADOR SERIE REAL". Por tanto, no se puede resolver un material usando solo
+el texto de la referencia.
+
+La identidad comercial debe usar, por este orden:
+
+1. fabricante + referencia de fabricante, cuando estén confirmados;
+2. proveedor + referencia de proveedor, para el histórico;
+3. descripción y atributos técnicos como contexto adicional.
+
+Nunca se hará una unión automática entre dos líneas de fabricantes/proveedores
+distintos solo porque compartan el mismo código corto.
