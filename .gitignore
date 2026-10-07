@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Real PROSOEL orders and exports
+*.xlsx
+*.xls
+*.xlsm
+*.csv
+*.zip
+*.pdf
+
+# Local ingestion folders
+data/
+samples/private/
+imports/
+exports/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
