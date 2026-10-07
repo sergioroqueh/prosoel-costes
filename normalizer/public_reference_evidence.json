@@ -1,0 +1,446 @@
+{
+  "version": 1,
+  "policy": {
+    "auto_apply": false,
+    "note": "Registro de evidencia pública para asistir revisión humana. No modifica histórico ni normaliza automáticamente."
+  },
+  "entries": [
+    {
+      "observed": [
+        "069711",
+        "069711L"
+      ],
+      "canonical": "069711L",
+      "relation": "legacy_current",
+      "confidence": "very_high",
+      "sources": [
+        "https://www.legrand.es/es/productos/conmutador-plexo-monobloc-superficie-10ax-gris-069711l",
+        "https://www.legrand.es/es/productos/plexo-monobloc-superficie-ip-55"
+      ]
+    },
+    {
+      "observed": [
+        "069537",
+        "069537L"
+      ],
+      "canonical": "069537L",
+      "relation": "legacy_current",
+      "confidence": "very_high",
+      "sources": [
+        "https://www.legrand.es/es/productos/plexo-accesorios"
+      ]
+    },
+    {
+      "observed": [
+        "069558",
+        "069558L"
+      ],
+      "canonical": "069558L",
+      "relation": "legacy_current",
+      "confidence": "very_high",
+      "sources": [
+        "https://www.legrand.co.ke/en/catalog/products/plexo-mechanism-tv-r-sat-socket-grey-069558",
+        "https://www.legrand.com/ecatalogue/en/catalog/products/plexo-tv-r-sat-socket-grey-mechanism-069558l?category_id=43976"
+      ]
+    },
+    {
+      "observed": [
+        "08463001",
+        "8463001"
+      ],
+      "canonical": "08463001",
+      "relation": "format_alias",
+      "confidence": "very_high",
+      "sources": [
+        "https://tecsoled.com/producto/complementos/difusor-blanco-3/"
+      ]
+    },
+    {
+      "observed": [
+        "06378",
+        "6378"
+      ],
+      "canonical": "06378",
+      "relation": "format_alias",
+      "confidence": "very_high",
+      "sources": [
+        "https://www.klk.es/descargas/fichas-tecnicas-puesta-a-tierra-seleccion/fichas-tecnicas-puesta-a-tierra/ficha-tecnica-grapa-conexion-ku/"
+      ]
+    },
+    {
+      "observed": [
+        "A9K17616",
+        "AIC9K17616"
+      ],
+      "canonical": "A9K17616",
+      "relation": "supplier_or_capture_alias",
+      "confidence": "high",
+      "sources": [
+        "https://www.se.com/es/es/product/A9K17616/"
+      ]
+    },
+    {
+      "observed": [
+        "NU320318",
+        "NICU320318"
+      ],
+      "canonical": "NU320318",
+      "relation": "supplier_or_capture_alias",
+      "confidence": "very_high",
+      "sources": [
+        "https://www.se.com/es/es/product/NU320318/"
+      ]
+    },
+    {
+      "observed": [
+        "NU320118",
+        "NICU320118"
+      ],
+      "canonical": "NU320118",
+      "relation": "supplier_or_capture_alias",
+      "confidence": "very_high",
+      "sources": [
+        "https://www.se.com/es/es/product/NU320118/"
+      ]
+    },
+    {
+      "observed": [
+        "NU944118",
+        "NICU944118"
+      ],
+      "canonical": "NU944118",
+      "relation": "supplier_or_capture_alias",
+      "confidence": "very_high",
+      "sources": [
+        "https://www.se.com/es/es/product/NU944118/"
+      ]
+    },
+    {
+      "observed": [
+        "NU600218",
+        "NICU600218"
+      ],
+      "canonical": "NU600218",
+      "relation": "supplier_or_capture_alias",
+      "confidence": "very_high",
+      "sources": [
+        "https://www.se.com/es/es/product/NU600218/"
+      ]
+    },
+    {
+      "observed": [
+        "NU303718",
+        "NICU303718"
+      ],
+      "canonical": "NU303718",
+      "relation": "supplier_or_capture_alias",
+      "confidence": "very_high",
+      "sources": [
+        "https://www.se.com/es/es/product/NU303718/"
+      ]
+    },
+    {
+      "observed": [
+        "A9F79440",
+        "A9799440"
+      ],
+      "canonical": "A9F79440",
+      "relation": "typo_alias",
+      "confidence": "very_high",
+      "sources": [
+        "https://www.se.com/es/es/product/A9F79440/"
+      ]
+    },
+    {
+      "observed": [
+        "A9F79463",
+        "AIC9F79463"
+      ],
+      "canonical": "A9F79463",
+      "relation": "supplier_or_capture_alias",
+      "confidence": "very_high",
+      "sources": [
+        "https://www.se.com/es/es/product/A9F79463/"
+      ]
+    },
+    {
+      "observed": [
+        "403033",
+        "4033033"
+      ],
+      "canonical": "403033",
+      "relation": "typo_alias",
+      "confidence": "very_high",
+      "sources": [
+        "https://www.legrand.es/es/productos/diferencial-tx3-2p-230v-30ma-40a-tipo-ac-403033"
+      ]
+    },
+    {
+      "observed": [
+        "LVSXG424",
+        "LIVCSXG424"
+      ],
+      "canonical": "LVSXG424",
+      "relation": "supplier_or_capture_alias",
+      "confidence": "very_high",
+      "sources": [
+        "https://www.se.com/es/es/product/LVSXG424/"
+      ]
+    },
+    {
+      "observed": [
+        "LVSXG524",
+        "LIVCSXG524"
+      ],
+      "canonical": "LVSXG524",
+      "relation": "supplier_or_capture_alias",
+      "confidence": "very_high",
+      "sources": [
+        "https://www.se.com/es/es/product/LVSXG524/"
+      ]
+    },
+    {
+      "observed": [
+        "LVSXL524",
+        "LIVCSXL524"
+      ],
+      "canonical": "LVSXL524",
+      "relation": "supplier_or_capture_alias",
+      "confidence": "very_high",
+      "sources": [
+        "https://www.se.com/es/es/product/LVSXL524/"
+      ]
+    },
+    {
+      "observed": [
+        "20302902",
+        "20302939"
+      ],
+      "canonical": null,
+      "relation": "same_technical_material_different_supply_variant",
+      "confidence": "very_high",
+      "technical_identity": "RZ1-K 0.6/1kV 3G6",
+      "sources": [
+        "https://www.clientes.grupoelektra.es/catalogo/producto/622838/1",
+        "https://www.clientes.elektraandalucia.com/catalogo/producto/622779/1"
+      ]
+    },
+    {
+      "observed": [
+        "20302940",
+        "20302944"
+      ],
+      "canonical": null,
+      "relation": "distinct_products",
+      "confidence": "very_high",
+      "note": "20302940=RZ1-K 4G1,5; 20302944=RZ1-K 5G1,5",
+      "sources": [
+        "https://www.clientes.grupoelektra.es/catalogo/producto/622839/1",
+        "https://www.clientes.grupoelektra.es/catalogo/producto/622843/1"
+      ]
+    },
+    {
+      "observed": [
+        "20302998",
+        "20302898"
+      ],
+      "canonical": null,
+      "relation": "distinct_products",
+      "confidence": "very_high",
+      "note": "20302998=SEGURFOC SZ1-K 5G6; 20302898=RZ1-K 2x16",
+      "sources": [
+        "https://sonepar.es/catalog/es-es/products/general-cable-cable-1kv-5g6-segurfoc-331-sz1-k-as-rz1-mica-as-naranja-GENC1S37509NJP",
+        "https://www.clientes.grupoelektra.es/catalogo/producto/622775/1"
+      ]
+    },
+    {
+      "observed": [
+        "610190",
+        "610191"
+      ],
+      "canonical": null,
+      "relation": "distinct_products",
+      "confidence": "very_high",
+      "note": "610190=tabique EUROQUINT altura 40; 610191=tabique altura 60",
+      "sources": [
+        "https://www.legrand.es/es/productos/tabique-para-canal-distribucion-euroquint-alt-40-610190",
+        "https://www.legrand.es/es/productos/accesorios-canal-60-x-110"
+      ]
+    },
+    {
+      "observed": [
+        "PX-0351-BLA",
+        "PX-0380-NEG"
+      ],
+      "canonical": null,
+      "relation": "distinct_products",
+      "confidence": "very_high",
+      "note": "PX-0351-BLA=NOD Round 2.6W IP65 blanco; PX-0380-NEG=ORION aprox. 5.6W IP54 negro",
+      "sources": [
+        "https://forlight.com/forlight/en/products/productDetail.html?productUrl=%2Fes%2Fnod-round%2Fnod%2Fpx-0351-bla",
+        "https://forlight.com/forlight/es/products/productDetail.html?productUrl=%2Fes%2Forion%2Forion%2Fpx-0380-neg"
+      ]
+    },
+    {
+      "observed": [
+        "260828",
+        "296-031"
+      ],
+      "canonical": null,
+      "relation": "same_function_distinct_products",
+      "confidence": "very_high",
+      "note": "260828=PROIMAN pelamangueras; 296-031=DOGHER pelamangueras profesional",
+      "sources": [
+        "https://www.matmax.es/herramientas-manuales/productos/proiman/260828-pela-manguera-con-cuchillo-diametro-8-28mm-145mm-0885000826",
+        "https://www.valpimetales.es/CATALOGOS%20PDF/CATALOGO%20DOGHER.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "PKE1012",
+        "PKE1010"
+      ],
+      "canonical": "PKE1012",
+      "relation": "description_driven_review",
+      "confidence": "very_high",
+      "note": "Para puntera 10 mm² marrón con largo de puntera 12 mm, Cembre publica PKE1012. PKE1010 no figura en la familia pública consultada.",
+      "sources": [
+        "https://products.cembre.com/es/spain/family/1790"
+      ]
+    },
+    {
+      "observed": [
+        "069733L",
+        "069743L"
+      ],
+      "canonical": null,
+      "relation": "distinct_products",
+      "confidence": "very_high",
+      "note": "069733L=base simple 2P+T; 069743L=base triple horizontal 3x2P+T",
+      "sources": [
+        "https://www.legrand.es/es/productos/base-corriente-plexo-monobloc-superficie-ip55-16a-2pt-embornamiento-con-tornillos-gris-069733l",
+        "https://www.legrand.es/es/productos/base-corriente-plexo-monobloc-superficie-horizontal-ip55-16a-3x2pt-embornamiento-automatico-gris-069743l"
+      ]
+    },
+    {
+      "observed": [
+        "11891"
+      ],
+      "canonical": "11891",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Pica KLK UNE 202006, 1.5m, Ø real 14.20 mm",
+      "sources": [
+        "https://www.klk.es/descargas/fichas-tecnicas-puesta-a-tierra-seleccion/fichas-tecnicas-puesta-a-tierra/ficha-tecnica-pica-une-2020006/"
+      ]
+    },
+    {
+      "observed": [
+        "94411"
+      ],
+      "canonical": "94411",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "FERMAX KIT CITY VEO WIFI DUOX+ 1L",
+      "sources": [
+        "https://fermax.com/intl-en/products/2-wire-door-entry-system/kits/video-entry-kits-individual-houses-1-or-2-ways-tertiary/f94411-1w-city-veo-wifi-duox-kit/"
+      ]
+    },
+    {
+      "observed": [
+        "509812"
+      ],
+      "canonical": "509812",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Televés amplificador monocanal selectivo T12 UHF 470-862MHz",
+      "sources": [
+        "https://www.televes.com/es/509812-amplificador-monocanal-selectivo-t12-uhf-tdt-470-862mhz.html"
+      ]
+    },
+    {
+      "observed": [
+        "660104"
+      ],
+      "canonical": "660104",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand URA NEXT AUTOTEST 200 lm 1h no permanente",
+      "sources": [
+        "https://www.legrand.es/es/productos/luminaria-emergencia-ura-next-autotest-200-lumenes-1h-no-permanente-660104"
+      ]
+    },
+    {
+      "observed": [
+        "660191"
+      ],
+      "canonical": "660191",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand caja estanca URA NEXT IP66 IK10",
+      "sources": [
+        "https://www.legrand.es/es/productos/caja-estanca-para-gama-luminarias-emergencia-ura-next-660191"
+      ]
+    },
+    {
+      "observed": [
+        "A9L20763"
+      ],
+      "canonical": "A9L20763",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Combi SPU 3P+N 63A",
+      "sources": [
+        "https://www.se.com/es/es/faqs/FA345364/"
+      ]
+    },
+    {
+      "observed": [
+        "42502220-130"
+      ],
+      "canonical": "42502220-130",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 400 Top: kit 2 Schuko + 2 SAI + placa 2 RJ45 blanco",
+      "sources": [
+        "https://www.simonelectric.com/es-es/42502220-130-kit-completo-2-bases-enchufe-schuko-2-bases-sai-placa-2-conectores-rj45-blanco-s400-top"
+      ]
+    },
+    {
+      "observed": [
+        "41059102500B00"
+      ],
+      "canonical": "41059102500B00",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Pinazo PNZ-CGP 10-250 BUC IB",
+      "sources": [
+        "https://pinazo.com/41059102500b00---300694---pnz-cgp-10---250-buc-ib"
+      ]
+    },
+    {
+      "observed": [
+        "410542IM310B00"
+      ],
+      "canonical": "410542IM310B00",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Pinazo PNZ-CPM3-D/E4-M 2c BUC-00 IB",
+      "sources": [
+        "https://pinazo.com/410542im310b00---301981---pnz-cpm3-de4-m-2c-buc-00-ib"
+      ]
+    },
+    {
+      "observed": [
+        "404471"
+      ],
+      "canonical": "404471",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Prilux ETNA SLIM 60x60 40W 840",
+      "sources": [
+        "https://prilux.es/producto/pantalla-etna-slim-60x60-40w-840/"
+      ]
+    }
+  ]
+}
