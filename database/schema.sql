@@ -197,3 +197,36 @@ CREATE INDEX idx_material_reference_relations_lookup
 
 CREATE INDEX idx_external_reference_evidence_relation
     ON external_reference_evidence(relation_id);
+
+
+CREATE TABLE reference_resolutions (
+    id BIGSERIAL PRIMARY KEY,
+    observed_reference TEXT NOT NULL,
+    manufacturer TEXT,
+    canonical_reference TEXT,
+    relation_type TEXT NOT NULL,
+    technical_scope TEXT,
+    confidence NUMERIC(5, 4),
+    status TEXT NOT NULL DEFAULT 'pending',
+    rationale TEXT,
+    reviewed_at TIMESTAMPTZ,
+    reviewed_by TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(observed_reference, manufacturer, canonical_reference, relation_type)
+);
+
+CREATE TABLE reference_resolution_evidence (
+    id BIGSERIAL PRIMARY KEY,
+    resolution_id BIGINT NOT NULL REFERENCES reference_resolutions(id) ON DELETE CASCADE,
+    source_url TEXT NOT NULL,
+    source_kind TEXT NOT NULL DEFAULT 'public_web',
+    source_title TEXT,
+    checked_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    note TEXT
+);
+
+CREATE INDEX idx_reference_resolutions_lookup
+    ON reference_resolutions(observed_reference, manufacturer, status);
+
+CREATE INDEX idx_reference_evidence_resolution
+    ON reference_resolution_evidence(resolution_id);
