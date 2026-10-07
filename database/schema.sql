@@ -163,3 +163,37 @@ CREATE TABLE review_issues (
 
 CREATE INDEX idx_review_issues_queue
     ON review_issues(status, issue_type);
+
+
+CREATE TABLE material_reference_relations (
+    id BIGSERIAL PRIMARY KEY,
+    material_id BIGINT REFERENCES materials(id),
+    manufacturer TEXT,
+    reference_from TEXT NOT NULL,
+    reference_to TEXT,
+    relation_type TEXT NOT NULL,
+    -- Examples: canonical, legacy_of, supplier_alias_of, typo_of,
+    -- equivalent_variant, distinct_product, pending_review
+    confidence NUMERIC(5, 4),
+    status TEXT NOT NULL DEFAULT 'pending',
+    reviewed_at TIMESTAMPTZ,
+    reviewed_by TEXT,
+    review_note TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE external_reference_evidence (
+    id BIGSERIAL PRIMARY KEY,
+    relation_id BIGINT REFERENCES material_reference_relations(id) ON DELETE CASCADE,
+    source_url TEXT NOT NULL,
+    source_type TEXT NOT NULL DEFAULT 'web',
+    source_authority TEXT,
+    evidence_summary TEXT,
+    checked_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_material_reference_relations_lookup
+    ON material_reference_relations(manufacturer, reference_from, status);
+
+CREATE INDEX idx_external_reference_evidence_relation
+    ON external_reference_evidence(relation_id);
