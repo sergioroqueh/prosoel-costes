@@ -2082,6 +2082,63 @@
       "sources": [
         "https://sonepar.es/catalog/es-es/products/gescable-cable-paralelo-altavoz-2x1-00mm-blanco-rollo-100m-eca-442932"
       ]
+    },
+    {
+      "observed": [
+        "610-B",
+        "864107"
+      ],
+      "canonical": null,
+      "relation": "distinct_products_with_confirmed_misassociation",
+      "confidence": "very_high",
+      "note": "BJC 610-B es un zumbador de superficie antiparásito regulable 230V. Legrand 864107 es la tecla Niloé Step para cruzamiento blanco mate. En el histórico, una línea 610-B quedó descrita como la tecla Niloé; es una asociación incorrecta. La tarifa BJC 2024 sitúa 610-B en 21,52 € PVP, coherente con el PVP histórico de 20,28 € y muy alejado de las compras de 864107.",
+      "sources": [
+        "https://bjc.es/product/zumbador-superficie-antiparasito-regulable-230v-alt/",
+        "https://www.bjc.es/sites/default/files/common/tarifa_bjc_nacional_2024.pdf",
+        "https://www.legrand.es/es/productos/teclas-para-mecanismos-mando"
+      ]
+    },
+    {
+      "observed": [
+        "30130",
+        "56130"
+      ],
+      "canonical": null,
+      "manufacturer": "EDECOR",
+      "relation": "probable_supplier_reference_revision",
+      "confidence": "high",
+      "note": "EDECOR confirma públicamente la existencia de la Serie Real. En el histórico del mismo proveedor, 'CONMUTADOR SERIE REAL' pasa de 30130 (29-07-2026) a 56130 (10-09-2026) manteniendo exactamente PVP 45 €, dto. 45% y neto 24,75 €. Se trata como probable cambio de referencia de proveedor/fabricante, no como dos materiales, pero sin autoaprobar hasta disponer de catálogo que publique ambos códigos.",
+      "sources": [
+        "https://edecor.es/real/"
+      ]
+    },
+    {
+      "observed": [
+        "30420",
+        "56400"
+      ],
+      "canonical": null,
+      "manufacturer": "EDECOR",
+      "relation": "probable_supplier_reference_revision",
+      "confidence": "high",
+      "note": "EDECOR confirma públicamente la Serie Real. En el histórico del mismo proveedor, 'PULSADOR SERIE REAL' pasa de 30420 a 56400 entre julio y septiembre de 2026, conservando PVP 41,50 €, dto. 45% y neto 22,825 €. Probable revisión de código comercial, pendiente solo de catálogo con referencias.",
+      "sources": [
+        "https://edecor.es/real/"
+      ]
+    },
+    {
+      "observed": [
+        "2TE+I160A+PSTIB"
+      ],
+      "canonical": null,
+      "manufacturer": "PINAZO",
+      "relation": "internal_description_conflict_probable_typo",
+      "confidence": "high",
+      "note": "El código interno contiene I160A. Dos compras del mismo proveedor y mismo precio describen el conjunto una vez con I.160A y otra con I.600A. La gama pública Pinazo de medida indirecta usa escalones 160A, 250A, 400A y 630A; no se ha localizado variante 600A. La descripción 600A queda como probable error de texto, aunque la composición exacta del conjunto sigue pendiente.",
+      "sources": [
+        "https://pinazo.com/pnz-m-1t-li-nhc-entrada-inferior---salida-superior-zona-sevillana",
+        "https://pinazo.com/en/equipos-tipo--emv"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
