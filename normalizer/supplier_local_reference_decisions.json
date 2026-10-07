@@ -39,6 +39,13 @@
       "decision": "accepted_supplier_local_item",
       "confidence": "high",
       "rationale": "Código coherente como referencia local para cable de altavoz blanco 2x1 mm². Se mantiene separada de otras marcas."
+    },
+    {
+      "supplier": "REDSTONE",
+      "reference": "VTO2111G-P",
+      "decision": "accepted_unverified_model_variant",
+      "confidence": "medium",
+      "rationale": "Aparece una vez junto a VTO2111D-P-S2 en el mismo pedido y con PVP superior. No se ha localizado VTO2111G-P como modelo público exacto; sí existen modelos Dahua cercanos VTO2111G-WP/VTO2211G-WP. Se conserva como variante comercial separada y no se fusiona ni corrige automáticamente."
     }
   ]
 }
