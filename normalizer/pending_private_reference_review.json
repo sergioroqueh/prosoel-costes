@@ -2,13 +2,7 @@
   "version": 1,
   "policy": {
     "auto_apply": false,
-    "note": "Referencias sin evidencia pública suficiente o con resultados web ambiguos. Requieren contexto de proveedor, factura, catálogo privado o revisión humana."
+    "note": "No hay referencias bloqueantes pendientes en la auditoría actual. Los detalles no demostrables públicamente permanecen como variantes locales o incidencias no bloqueantes; no se inventan equivalencias."
   },
-  "entries": [
-    {
-      "reference": "2TE+I160A+PSTIB",
-      "reason": "Único caso de la cola actual que todavía afecta a la identidad exacta del conjunto: el código contiene I160A, una descripción dice 160A y otra 600A, ambas con el mismo proveedor y precio. La evidencia pública Pinazo hace muy probable que 600A sea un error, pero falta una ficha que identifique la composición exacta.",
-      "next_step": "Continuar búsqueda documental Pinazo/RIAS. Solo escalar al usuario si no aparece documentación de apoyo."
-    }
-  ]
+  "entries": []
 }
