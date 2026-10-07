@@ -24,6 +24,31 @@
       "reference": "CLP160APMB4C",
       "reason": "Descripción histórica muestra potencia discordante; no se ha localizado documentación pública suficiente para decidir si es revisión de producto o error.",
       "next_step": "Buscar catálogo/ficha del fabricante de la fecha del pedido."
+    },
+    {
+      "reference": "30130 / 56130",
+      "reason": "Ambas aparecen en el histórico para 'CONMUTADOR SERIE REAL'. La referencia pública 56130 pertenece también a un relé diferencial Schneider RH10M, por lo que existe al menos una colisión de namespace. No se ha localizado fuente pública fiable que identifique 30130 o 56130 con la Serie Real.",
+      "next_step": "Revisar proveedor/fabricante del pedido original antes de decidir cuál referencia corresponde al mecanismo."
+    },
+    {
+      "reference": "30420 / 56400",
+      "reason": "Ambas aparecen para 'PULSADOR SERIE REAL' y no se ha localizado catálogo público fiable que las vincule a esa serie.",
+      "next_step": "Resolver con catálogo privado, proveedor o pedido original."
+    },
+    {
+      "reference": "610-B",
+      "reason": "Aparece asociado a la tecla Niloé Step de cruzamiento junto a la referencia fabricante confirmada 864107, pero 610-B no se ha podido validar públicamente.",
+      "next_step": "Mantener como posible alias interno/proveedor hasta revisar origen."
+    },
+    {
+      "reference": "5826630",
+      "reason": "Aparece como grapa de pica 14 mm junto a KLK 06378, pero la búsqueda pública no permite identificar 5826630 de forma fiable.",
+      "next_step": "Revisar proveedor original; no fusionar automáticamente con KLK 06378."
+    },
+    {
+      "reference": "CP2X1BL",
+      "reason": "Aparece con la misma descripción que GESCABLE 33CPPBL0090R25 (cable altavoz 2x1 blanco), pero CP2X1BL no se ha localizado como referencia pública inequívoca.",
+      "next_step": "Tratar como posible alias de proveedor solo tras revisar proveedor de origen."
     }
   ]
 }
