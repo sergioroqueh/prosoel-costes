@@ -1112,6 +1112,199 @@
       "sources": [
         "https://www.legrand.es/es/productos/2-elementos-0"
       ]
+    },
+    {
+      "observed": [
+        "069720L"
+      ],
+      "canonical": "069720L",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo monobloc superficie, pulsador NA 10A gris, IP55.",
+      "sources": [
+        "https://www.legrand.es/es/productos/pulsador-na-plexo-monobloc-superficie-10a-gris-069720l"
+      ]
+    },
+    {
+      "observed": [
+        "069601L"
+      ],
+      "canonical": "069601L",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo caja superficie con membranas, 1 elemento, antracita, IP55.",
+      "sources": [
+        "https://www.legrand.com/ecatalogue/en/catalog/products/plexo-1-gang-surface-box-with-2-membrane-glands-2-x-1-entry-ip55-anthracite-069601l"
+      ]
+    },
+    {
+      "observed": [
+        "069603L"
+      ],
+      "canonical": "069603L",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo caja superficie con membranas, 3 elementos H/V, antracita, IP55.",
+      "sources": [
+        "https://www.legrand.com/ecatalogue/en/catalog/products/plexo-3-gang-surface-box-with-5-membrane-glands-4x1-entry-1x2-entries-horizontal-and-vertical-ip55-anthracite-069603l"
+      ]
+    },
+    {
+      "observed": [
+        "069683L"
+      ],
+      "canonical": "069683L",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo marco de empotrar con soporte, 2 elementos horizontal/vertical, gris, IP55.",
+      "sources": [
+        "https://www.legrand.com/ecatalogue/en/catalog/products/plexo-flush-mounting-support-frame-2-gang-horizontal-and-vertical-ip55-grey-069683l"
+      ]
+    },
+    {
+      "observed": [
+        "069687L"
+      ],
+      "canonical": "069687L",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo marco de empotrar con soporte, 3 elementos horizontal/vertical, gris, IP55.",
+      "sources": [
+        "https://www.legrand.fr/pro/catalogue/support-plaque-etanche-pour-montage-encastre-3-postes-horizontaux-ou-verticaux-plexo-gris"
+      ]
+    },
+    {
+      "observed": [
+        "CR50"
+      ],
+      "canonical": "CR50",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "AISCAN-CR tubo corrugado doble capa PVC negro, diámetro 50 mm.",
+      "sources": [
+        "https://www.aiscan.com/producto/cr/tubo-aiscan-cr-cr50/",
+        "https://www.aiscan.com/producto/cr/"
+      ]
+    },
+    {
+      "observed": [
+        "27472-65"
+      ],
+      "canonical": "27472-65",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 27 Play base Schuko blanca 16A 250V con protección infantil y embornamiento a tornillo.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/27472-65-base-enchufe-schuko-16-250v-dispositivo-seguridad-embornamiento-tornillo-blanco-simon-27-play"
+      ]
+    },
+    {
+      "observed": [
+        "75432-39"
+      ],
+      "canonical": "75432-39",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 75 base Schuko 16A 250V con embornamiento a tornillo; compatible con varias series Simon.",
+      "sources": [
+        "https://www.simonelectric.com/es-ad/75432-39-base-enchufe-schuko-16-250v-sistema-embornamiento-tornillo-simon-75"
+      ]
+    },
+    {
+      "observed": [
+        "531U"
+      ],
+      "canonical": "531U",
+      "relation": "confirmed_exact",
+      "confidence": "high",
+      "note": "JUNG mecanismo pulsador unipolar 10AX 250V. Confirmación pública mediante distribuidor profesional.",
+      "sources": [
+        "https://www.gruponovelec.com/p/jun_531u"
+      ]
+    },
+    {
+      "observed": [
+        "509U"
+      ],
+      "canonical": "509U",
+      "relation": "confirmed_exact",
+      "confidence": "high",
+      "note": "JUNG mecanismo doble conmutador 10AX 250V. Confirmación pública mediante distribuidor profesional.",
+      "sources": [
+        "https://www.gruponovelec.com/p/jun_509u"
+      ]
+    },
+    {
+      "observed": [
+        "A5-M10"
+      ],
+      "canonical": "A5-M10/14",
+      "relation": "abbreviated_reference",
+      "confidence": "very_high",
+      "note": "Cembre publica A5-M10/14 para terminal redondo de pala estrecha, conductor 25 mm², taladro M10. El histórico abrevia como A5-M10.",
+      "sources": [
+        "https://products.cembre.com/es/spain/family/1768"
+      ]
+    },
+    {
+      "observed": [
+        "09251002"
+      ],
+      "canonical": "09251002",
+      "relation": "confirmed_exact",
+      "confidence": "high",
+      "note": "TSL/Tecsoled transformador MGR 75W 24V DC regulable DALI/PUSH/1-10V.",
+      "sources": [
+        "https://www.matmax.es/alumbrado-de-interior/productos/tsl/09251002-transformador-mgr-75w-24v-dc-dali-push-1-10v-1262004679"
+      ]
+    },
+    {
+      "observed": [
+        "50000085-030"
+      ],
+      "canonical": "50000085-030",
+      "relation": "confirmed_exact",
+      "confidence": "high",
+      "note": "Simon 500 Cima placa voz/datos plana con guardapolvo, 1 elemento, para 1 RJ45 compatible con otros fabricantes, blanca.",
+      "sources": [
+        "https://www.gruponovelec.com/p/sim_50000085-030"
+      ]
+    },
+    {
+      "observed": [
+        "51000003-030"
+      ],
+      "canonical": "51000003-030",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 500 Cima caja de pared de superficie para 3 elementos dobles (6 elementos), blanca.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/51000003-030-caja-pared-superficie-3-elementos-dobles-blanco-simon-500-cima"
+      ]
+    },
+    {
+      "observed": [
+        "20000940-039"
+      ],
+      "canonical": "20000940-039",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 270 bastidor/soporte para 4 elementos.",
+      "sources": [
+        "https://www.simonelectric.com/ma/20000940-039-support-pour-4modules-simon270.html"
+      ]
+    },
+    {
+      "observed": [
+        "27000640-090"
+      ],
+      "canonical": "27000640-090",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 270 marco estética Icon para 4 elementos, blanco.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/27000640-090-marco-4-elementos-blanco-simon-270"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
