@@ -22,9 +22,27 @@ CREATE TABLE materials (
     manufacturer TEXT,
     manufacturer_reference TEXT,
     base_unit TEXT,
+    canonical_key TEXT UNIQUE,
+    attributes JSONB NOT NULL DEFAULT '{}'::jsonb,
     review_status TEXT NOT NULL DEFAULT 'pending',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE commercial_items (
+    id BIGSERIAL PRIMARY KEY,
+    supplier_id BIGINT NOT NULL REFERENCES suppliers(id),
+    supplier_reference TEXT,
+    manufacturer TEXT,
+    manufacturer_reference TEXT,
+    preferred_description TEXT,
+    material_id BIGINT REFERENCES materials(id),
+    match_status TEXT NOT NULL DEFAULT 'pending',
+    match_confidence NUMERIC(5, 4),
+    match_rule TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(supplier_id, supplier_reference)
 );
 
 CREATE TABLE orders (
@@ -51,6 +69,7 @@ CREATE TABLE order_lines (
     line_number INTEGER NOT NULL,
     source_row INTEGER NOT NULL,
     material_id BIGINT REFERENCES materials(id),
+    commercial_item_id BIGINT REFERENCES commercial_items(id),
     quantity NUMERIC(14, 4) NOT NULL,
     supplier_reference TEXT,
     description_original TEXT NOT NULL,
@@ -69,3 +88,7 @@ CREATE INDEX idx_order_lines_material
 
 CREATE INDEX idx_orders_order_date
     ON orders(order_date);
+
+
+CREATE INDEX idx_commercial_items_material
+    ON commercial_items(material_id);
