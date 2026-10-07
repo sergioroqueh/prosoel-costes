@@ -107,6 +107,48 @@
       "decision": "accepted_supplier_local_item",
       "confidence": "very_high",
       "rationale": "12 líneas coherentes como adhesivo personalizado PROSOEL para extintor CO2 de 5 kg."
+    },
+    {
+      "supplier": "GRUPO JARAMA",
+      "reference": "LHAR2010B",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "12 líneas coherentes como aro redondo/orientable GU10 IP20 aluminio blanco."
+    },
+    {
+      "supplier": "RELUZ",
+      "reference": "02440522R",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "12 líneas coherentes como tira flexible DRAC 10, 8,5W/m, 24VDC, 3000K, IP65/H, rollo 5m."
+    },
+    {
+      "supplier": "FANAIR",
+      "reference": "MM300",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "10 líneas coherentes como larguero de marco de montaje 300 mm."
+    },
+    {
+      "supplier": "RIAS",
+      "reference": "BB201-63",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "10 líneas coherentes como barra de pines para interruptores 2P 63A."
+    },
+    {
+      "supplier": "EFLUX",
+      "reference": "8313950024463",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "10 líneas coherentes como tira LED Standard 14,4W/m, 24V, 3000K, CRI90, IP20."
+    },
+    {
+      "supplier": "GRUPO JARAMA",
+      "reference": "LHMO15730",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "high",
+      "rationale": "10 líneas coherentes como módulo LED 7W 3000K, familia Leds Home; diferencias menores de óptica/redacción quedan como variante textual."
     }
   ]
 }
