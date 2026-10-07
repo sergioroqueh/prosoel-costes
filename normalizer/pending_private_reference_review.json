@@ -6,34 +6,9 @@
   },
   "entries": [
     {
-      "reference": "2184030029",
-      "reason": "Búsqueda pública devuelve colisiones irrelevantes (p.ej. identificadores no relacionados). No hay evidencia fiable para asociar el código al material histórico.",
-      "next_step": "Revisar proveedor original o documento de compra."
-    },
-    {
       "reference": "2TE+I160A+PSTIB",
-      "reason": "La contradicción 160A/600A está casi resuelta: el código contiene I160A, las dos compras tienen el mismo precio y la gama pública Pinazo usa 160/250/400/630A, no 600A. Falta únicamente identificar públicamente la composición exacta del conjunto.",
-      "next_step": "No requiere decisión de usuario todavía; buscar catálogo Pinazo/proveedor con la composición exacta."
-    },
-    {
-      "reference": "CABLH25BOB",
-      "reason": "Parece código interno/genérico de cable 1x25 mm²; existen variantes de color separadas en el histórico, pero no hay referencia pública fiable.",
-      "next_step": "Resolver por proveedor + descripción + variante de color; no tratar el código solo como material canónico."
-    },
-    {
-      "reference": "CLP160APMB4C",
-      "reason": "Descripción histórica muestra potencia discordante; no se ha localizado documentación pública suficiente para decidir si es revisión de producto o error.",
-      "next_step": "Buscar catálogo/ficha del fabricante de la fecha del pedido."
-    },
-    {
-      "reference": "5826630",
-      "reason": "Aparece repetidamente en AMARA como grapa de pica 14 mm, a 0,80 €, mientras KLK 06378 aparece en otros proveedores con función y precio próximos pero especificaciones textuales no idénticas (16-50 frente a 16-35).",
-      "next_step": "Mantener separado de KLK 06378 hasta identificar el código de AMARA; no fusionar por similitud ni precio."
-    },
-    {
-      "reference": "CP2X1BL",
-      "reason": "Solo aparece en GRUPO RIAS en 2026 con la misma descripción que GESCABLE 33CPPBL0090R25. RIAS también compró antes la referencia GESCABLE exacta. Es compatible con alias/referencia interna de proveedor, pero no existe prueba pública del código CP2X1BL.",
-      "next_step": "Mantener como variante comercial RIAS separada hasta localizar tarifa/ficha del proveedor; no pedir decisión humana aún."
+      "reason": "Único caso de la cola actual que todavía afecta a la identidad exacta del conjunto: el código contiene I160A, una descripción dice 160A y otra 600A, ambas con el mismo proveedor y precio. La evidencia pública Pinazo hace muy probable que 600A sea un error, pero falta una ficha que identifique la composición exacta.",
+      "next_step": "Continuar búsqueda documental Pinazo/RIAS. Solo escalar al usuario si no aparece documentación de apoyo."
     }
   ]
 }
