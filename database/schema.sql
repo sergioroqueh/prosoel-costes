@@ -89,6 +89,18 @@ CREATE TABLE orders (
     validation_status TEXT NOT NULL DEFAULT 'pending'
 );
 
+CREATE TABLE order_sequence_exceptions (
+    id BIGSERIAL PRIMARY KEY,
+    order_year INTEGER NOT NULL,
+    order_number INTEGER NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    note TEXT,
+    reviewed_at TIMESTAMPTZ,
+    reviewed_by TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(order_year, order_number)
+);
+
 CREATE TABLE order_lines (
     id BIGSERIAL PRIMARY KEY,
     order_id BIGINT NOT NULL REFERENCES orders(id) ON DELETE RESTRICT,
@@ -123,3 +135,7 @@ CREATE INDEX idx_commercial_items_material
 
 CREATE INDEX idx_match_proposals_status
     ON material_match_proposals(status);
+
+
+CREATE INDEX idx_order_sequence_exceptions
+    ON order_sequence_exceptions(order_year, status);
