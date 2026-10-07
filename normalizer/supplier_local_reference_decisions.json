@@ -46,6 +46,18 @@
       "decision": "accepted_unverified_model_variant",
       "confidence": "medium",
       "rationale": "Aparece una vez junto a VTO2111D-P-S2 en el mismo pedido y con PVP superior. No se ha localizado VTO2111G-P como modelo público exacto; sí existen modelos Dahua cercanos VTO2111G-WP/VTO2211G-WP. Se conserva como variante comercial separada y no se fusiona ni corrige automáticamente."
+    },
+    {
+      "supplier": "RIAS",
+      "reference": "2TE+I160A+PSTIB",
+      "decision": "accepted_supplier_local_item_with_description_conflict",
+      "confidence": "high",
+      "rationale": "El propio código codifica I160A. Dos compras tienen el mismo proveedor y PVP; una descripción dice 160A y otra 600A. Pinazo publica PNZ-M-8ME y módulos/interruptores de 160A y 250A para centralizaciones directas, y en medida indirecta usa 160/250/400/630A. No se ha encontrado escalón 600A. Se conserva el código como artículo local de RIAS y la descripción 600A queda marcada como probable error textual, sin reescribir el histórico.",
+      "sources": [
+        "https://pinazo.com/suministros-monofasicos-y-trifasicos-zona-unelco",
+        "https://pinazo.com/en/pnz-m-1t-li-nhc-entrada-inferior---salida-superior-1",
+        "https://www.chint.eu/content/download/7224/file/Homologaci%C3%83%C2%B3n%20Iberdrola_Ex9UE1%202%2025.pdf"
+      ]
     }
   ]
 }
