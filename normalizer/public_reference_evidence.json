@@ -1357,6 +1357,124 @@
       "sources": [
         "https://www.ilumitec.es/cable-unipolar-libre-halogenos-5x2-5-mm2-rz1k"
       ]
+    },
+    {
+      "observed": [
+        "5363"
+      ],
+      "canonical": null,
+      "relation": "namespace_collision",
+      "confidence": "very_high",
+      "note": "La misma referencia 5363 existe públicamente en dos fabricantes: TELEVES 5363 es una central amplificadora MiniKom F de 2 entradas VHF/UHF-FI; SOLERA 5363 es una caja de conexión empotrable para tabique hueco 164x106mm con 16 entradas Ø25. Nunca resolver 5363 sin fabricante/proveedor/contexto.",
+      "sources": [
+        "https://www.televes.com/es/5363xx-minikomf-smatv-central-banda-ancha-minikom-f-2-entradas-vhf-uhf-fi-terrestre-mix.html",
+        "https://www.latiendadeelectricidad.com/es/cajas-electricas-de-empotrar/148832-caja-de-conexion-de-empotrar-en-tabique-hueco-164x106mm-tornillo-16-entradas-tubo-diametro-25-solera-5363-8423220011137.html"
+      ]
+    },
+    {
+      "observed": [
+        "3015"
+      ],
+      "canonical": "3015",
+      "relation": "public_description_variation",
+      "confidence": "very_high",
+      "note": "FAMATEL 3015 aparece públicamente tanto con la descripción comercial antigua 310x240 PG29-36 como con la especificación de catálogo 250x320x135, tapa 1/4 vuelta IP55. Las dos descripciones históricas no deben separarse automáticamente en dos materiales.",
+      "sources": [
+        "https://sonepar.es/catalog/es-es/brand/famatel?page=3",
+        "https://famatel.com/wp-content/uploads/TARIFA-PROFESIONAL-2022.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "ECOSKYC100"
+      ],
+      "canonical": "ECOSKYC100",
+      "relation": "confirmed_exact_with_description_conflicts",
+      "confidence": "very_high",
+      "note": "ROBLAN ECOSKYC100 es ECO SKY GU10 5W, 3000K, 110°, 535 lm en fichas públicas recientes y anteriores consultadas. La descripción histórica de 7W queda como incidencia, no como nueva variante.",
+      "sources": [
+        "https://roblan.com/es/productos/eco-sky/ECOSKYC100/",
+        "https://d7rh5s3nxmpy4.cloudfront.net/CMP2379/files/13/ECOSKYC100-ROBLAN_TDS_Es_En.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "ECOSKYF100"
+      ],
+      "canonical": "ECOSKYF100",
+      "relation": "confirmed_exact_with_description_conflicts",
+      "confidence": "very_high",
+      "note": "ROBLAN ECOSKYF100 es ECO SKY GU10 5W, 4000K, 110°. Varias fichas públicas de distintas fechas lo mantienen en 5W; la descripción histórica de 7W es un outlier.",
+      "sources": [
+        "https://roblan.com/es/productos/eco-sky/ECOSKYF100/",
+        "https://d7rh5s3nxmpy4.cloudfront.net/CMP2379/files/3/ECOSKYF100-ROBLAN_TDS_Es_En.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "3305"
+      ],
+      "canonical": "3305",
+      "relation": "legacy_terminology_alias",
+      "confidence": "very_high",
+      "note": "FERMAX identifica 3305 oficialmente como MONITOR LOFT VDS COLOR 3,5. Sin embargo, documentación/comercialización histórica usa también ADS y el propio soporte agrupa VDS/ADS en sistemas heredados. No tratar ADS vs VDS como dos materiales sin revisar época/sistema.",
+      "sources": [
+        "https://fermax.com/spain/single-products/pvt03305-monitor-loft-vds-color-3-5-repuesto",
+        "https://soporte.fermax.com/portal/es/kb/articles/cual-es-el-equivalente-de-mi-monitor-fermax",
+        "https://www.matmax.es/portero-electronico-y-videoportero/productos/fermax/3305-monitor-loft-color-ads-35-0062033240"
+      ]
+    },
+    {
+      "observed": [
+        "LHMO15740"
+      ],
+      "canonical": "LHMO15740",
+      "relation": "confirmed_exact_spec_revision_review",
+      "confidence": "very_high",
+      "note": "Leds Home publica actualmente LHMO15740 como módulo LED 7W, 4000K, 600 lm, CRI95, 60°, IP54. El histórico incluye 650 lm CRI95 y otra descripción CRI90/90 lm/W; conservarlas como posibles revisiones de especificación hasta revisar fecha, no crear referencias distintas.",
+      "sources": [
+        "https://www.ledshomelighting.com/producto/modulo-led/",
+        "https://www.ledshomelighting.com/wp-content/uploads/2026/06/FICHA-TECNICA-MODULO-7W-4000K-V.2026.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "215501"
+      ],
+      "canonical": "215501",
+      "relation": "confirmed_exact_description_aliases",
+      "confidence": "very_high",
+      "note": "TELEVES 215501 es T100plus 16PRtC, clase A, Cu/Cu, cubierta PE negra, Euroclase Fca. Las descripciones 'T100 CU/CU polietileno clase A' y 'T100plus 16PRtC Fca' son formas compatibles de describir el mismo producto.",
+      "sources": [
+        "https://www.televes.com/es/215501-cable-coaxial-t100plus-16prtc-euroclase-fca-y-blindaje-clase-a.html",
+        "https://www.guarconsa.com/cable-coaxial/26146-cable-coaxial-t100-cu-cu-polietileno-clase-a-100m-negro-8424450103500.html"
+      ]
+    },
+    {
+      "observed": [
+        "LRS-100-24",
+        "LRS100-24"
+      ],
+      "canonical": "LRS-100-24",
+      "relation": "model_alias_and_spec_note",
+      "confidence": "very_high",
+      "note": "MEAN WELL LRS-100-24 entrega 24V, 4.5A y potencia máxima 108W. El '100' del nombre de serie no debe usarse para inferir exactamente la potencia. LRS100-24 es una variante tipográfica observada.",
+      "sources": [
+        "https://www.digikey.es/es/products/detail/mean-well-usa-inc/LRS-100-24/25624027",
+        "https://www.tme.eu/es/details/lrs-100-24/fuentes-de-alimentacion-para-incorporar/mean-well/"
+      ]
+    },
+    {
+      "observed": [
+        "08460004/3M"
+      ],
+      "canonical": "08460004",
+      "relation": "supplier_length_variant",
+      "confidence": "high",
+      "note": "TSL/Tecsoled 08460004 es el perfil de superficie TSL-S15 y se publica en longitudes 1/2/3/6m. El sufijo /3M es coherente con una variante comercial de 3m. Una línea con la misma referencia descrita solo como PORTE debe quedar como incidencia de tipo de línea.",
+      "sources": [
+        "https://tecsoled.com/wp-content/uploads/Catalogo/Tecsoled-GetReady-22-23-ONLINE-ESP-ENG-V1.pdf"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
