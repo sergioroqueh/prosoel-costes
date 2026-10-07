@@ -39,3 +39,41 @@ error.
 
 La aplicación debe mostrar este razonamiento como evidencia, nunca aplicarlo
 como corrección automática.
+
+
+## Segunda pasada: referencias ancla
+
+Se cruzaron referencias repetidas con producto fabricante confirmado y con sus
+otras apariciones históricas. Se detectaron **11 líneas de alta prioridad** cuyo
+texto no es compatible con la referencia observada:
+
+- 1 línea con referencia `02281062` descrita como RAEE, mientras esa referencia
+  corresponde a cable paralelo 2x0,50 mm²;
+- 1 línea con referencia `180064` descrita como repartidor Schneider
+  `LGY412548`, cuando `180064` es un peine QRB bipolar 63A 54P;
+- 2 líneas con referencia `403585` descritas respectivamente como accesorio de
+  cofret y conducto de chapa, cuando `403585` es un magnetotérmico Legrand TX3
+  P+N 10A;
+- 1 línea con referencia `41059102500B00` descrita como una central PNZ-M,
+  cuando Pinazo identifica la referencia como CGP PNZ-CGP 10-250 BUC IB;
+- 2 líneas con referencia `50010432-037` descritas como embornamiento a
+  tornillo; Simon publica esa referencia como 1Click y reserva
+  `50010472-037` para la versión a tornillo;
+- 3 líneas con referencia `51010103-030` descritas como cajetín o base Schuko,
+  aunque Simon confirma que es el marco/bastidores de 3 elementos dobles;
+- 1 línea `TP6KG` descrita como alta eficacia 34A 233B, variante que aparece
+  separadamente como `TP6KGAE`.
+
+Estas incidencias no se corrigen automáticamente. Se registran como candidatos
+de revisión con evidencia de fabricante y contexto histórico.
+
+## Reutilización de referencias del proveedor
+
+También se confirmó un caso estructural importante: la referencia `P1` se usa
+en pedidos del mismo proveedor para productos completamente distintos
+(emergencia, canaleta, tapa y pica).
+
+Esto demuestra que incluso **proveedor + referencia** puede no identificar de
+forma única un artículo histórico. La base necesita una huella de variante
+comercial basada en referencia observada + descripción normalizada, conservando
+después la posibilidad de fusionar variantes mediante revisión.
