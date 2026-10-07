@@ -13,7 +13,7 @@ trabajo de normalización de materiales y fuera del KPI de avance**.
 
 Se siguen detectando únicamente para apartarlos del catálogo y preservar la
 trazabilidad del pedido. Los servicios explícitos también se mantienen en una
-cola separada del catálogo de materiales.
+capa separada del catálogo de materiales.
 
 En la carga actual:
 
@@ -23,36 +23,47 @@ En la carga actual:
 
 El universo activo de materiales queda en **11.270 líneas**.
 
-## Resultado actual - iteración V7
+## Resultado actual - iteración V10
 
 | Categoría material | Líneas |
 | --- | ---: |
-| Material conocido | 4.908 |
+| Material conocido | 5.398 |
 | Variante comercial | 148 |
 | Alias / referencia normalizable | 94 |
 | Conflicto detectado | 49 |
-| Pendiente | 6.071 |
+| Pendiente | 5.581 |
 | **Total material** | **11.270** |
 
 Material resuelto sin conflicto:
 
-- **5.150 líneas**
-- **45,70 % del universo material**
+- **5.640 líneas**
+- **50,04 % del universo material**
 
 Incluyendo conflictos ya identificados:
 
-- **5.199 líneas**
-- **46,13 % del universo material**
+- **5.689 líneas**
+- **50,48 % del universo material**
 
-La simulación anterior estaba en 4.597 líneas resueltas sin conflicto. Esta
-ronda ha liberado otras **553 líneas**.
+La iteración anterior estaba en 5.520 líneas resueltas sin conflicto
+(48,98 %). Esta ronda ha liberado otras **120 líneas** y cruza por primera vez
+el 50 % del histórico material.
+
+## Por año
+
+| Año | Conocido | Variante | Alias | Conflicto | Pendiente |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 2024 | 1.940 | 80 | 51 | 21 | 2.199 |
+| 2025 | 1.843 | 34 | 28 | 17 | 1.730 |
+| 2026 | 1.615 | 34 | 15 | 11 | 1.652 |
+
+Las líneas no-materiales se mantienen fuera de esta tabla.
 
 ## Calidad de precio en material resuelto
 
-Sobre las 5.150 líneas ya resueltas como material/alias/variante:
+Sobre las **5.640 líneas** ya resueltas como material/alias/variante:
 
-- 5.096 tienen precio aritméticamente válido;
-- 41 tienen precio incompleto;
+- 5.582 tienen precio aritméticamente válido;
+- 45 tienen precio incompleto;
 - 10 tienen valor cero/no positivo;
 - 3 presentan discrepancia aritmética.
 
@@ -61,19 +72,34 @@ problemático en referencia válida de coste.
 
 ## Pendientes
 
-Quedan **6.071 líneas materiales pendientes**.
+Quedan **5.581 líneas materiales pendientes**.
 
-La prioridad sigue siendo frecuencia x fiabilidad. Después de resolver los
-bloques de 10-25 apariciones, la cabecera de pendientes ya ha bajado a familias
-de unas 8-9 apariciones por referencia, además de 133 líneas sin referencia.
+La cabecera de pendientes ya ha bajado a referencias de unas 7-8 apariciones,
+además de **133 líneas sin referencia**, que no se forzarán a una referencia por
+similitud textual.
 
-Ejemplos del siguiente bloque:
+Siguiente bloque por impacto:
 
-`82005-30`, `6618`, `27432-65`, `20302926`, `411524`,
-`411664`, `CCBFO24SCAS`, `403606`, `3251`,
-`20000930-039`, `27000610-090`, `864007`, `50000089-030`,
-`5825`, `2247-3`, `A9C20732`, `BT1438`, `09250083`,
-`NSYS2535` y `EHF25`.
+- 111403
+- A9F79616
+- 113574
+- 113350
+- LS990SWM
+- 18516
+- 069602L
+- 400405
+- 407728
+- 82630-30
+- 0102040
+- JX39136LED
+- JX39236LED
+- MM400
+- 864173
+- R9F12610
+- CCPGSC/A01
+- CP4020
+- 20302900
+- 020MARM025
 
 ## Política
 
