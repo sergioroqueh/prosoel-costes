@@ -3728,6 +3728,42 @@
       "sources": [
         "https://www.legrand.es/es/rohs/pdf/rohs-certificate-of-compliance/199351"
       ]
+    },
+    {
+      "observed": [
+        "362"
+      ],
+      "canonical": "362",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Solera caja empotrable 100x100x45 mm, tapa blanca con tornillos.",
+      "sources": [
+        "https://www.latiendadeelectricidad.com/es/cajas-electricas-de-empotrar/149101-caja-100x100x45-tapa-blanco-con-tornillos-solera-362-8423220003620.html"
+      ]
+    },
+    {
+      "observed": [
+        "SF100WSST"
+      ],
+      "canonical": "SF100WSST",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Komttech/Teletek sirena interior convencional óptico-acústica con flash blanco, EN54-3/23.",
+      "sources": [
+        "https://www.komtesdeteccion.com/productos/sistema-de-deteccion-convencional-komttech/item/sirena-interior-convencional-optico-acustica-en54-23"
+      ]
+    },
+    {
+      "observed": [
+        "IDTBA11"
+      ],
+      "canonical": "IDTBA11",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Komttech suplemento universal para entubar base de detector/sirena de 100 mm.",
+      "sources": [
+        "https://www.komtesdeteccion.com/productos/sistema-de-deteccion-convencional-komttech/category/suplemento-tubo-vista-universal"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
