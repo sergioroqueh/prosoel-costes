@@ -697,6 +697,55 @@
       "sources": [
         "https://www.simonelectric.com/es-es/82914-33-marco-1-elemento-aluminio-mate-interior-aluminio-simon-82"
       ]
+    },
+    {
+      "observed": [
+        "3255"
+      ],
+      "canonical": null,
+      "relation": "namespace_collision",
+      "confidence": "very_high",
+      "note": "El código 3255 es válido en al menos dos fabricantes distintos: FAMATEL 3255=caja para 1 mecanismo en tabiquería hueca; FERMAX 3255=adaptador/terminación de línea DUOX PLUS. La referencia 3255 nunca puede resolverse sin fabricante/proveedor/contexto.",
+      "sources": [
+        "https://famatel.com/productos/cajas-para-tabiqueria-hueca/caja-para-1-mecanismo/",
+        "https://fermax.com/spain/productos/videoportero-2-hilos/monitores/monitor-veo-wifi/f03255-adaptador-linea-duox-plus/"
+      ]
+    },
+    {
+      "observed": [
+        "41059102500B00"
+      ],
+      "canonical": "41059102500B00",
+      "relation": "confirmed_exact_with_description_conflicts",
+      "confidence": "very_high",
+      "note": "Pinazo identifica 41059102500B00 como PNZ-CGP 10-250 BUC IB (código 300694). Una descripción histórica de central PNZ-M con I 160A asociada a esta referencia es incompatible y debe quedar como incidencia de línea.",
+      "sources": [
+        "https://pinazo.com/41059102500b00---300694---pnz-cgp-10---250-buc-ib"
+      ]
+    },
+    {
+      "observed": [
+        "13005125"
+      ],
+      "canonical": "13005125",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "PEMSA confirma 13005125 como tubo rígido RLH1250 libre de halógenos DN25 gris RAL7035; el manguito RLH está incluido en el suministro del producto.",
+      "sources": [
+        "https://www.pemsa-rejiband.com/catalog/es/n/W_RLH_1250/13005125"
+      ]
+    },
+    {
+      "observed": [
+        "20001101-090"
+      ],
+      "canonical": "20001101-090",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon confirma 20001101-090 como interruptor unipolar pulsante 10AX 230V de tecla estrecha, embornamiento rápido, blanco, serie 270.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/20001101-090-interruptor-unipolar-pulsante-10ax-230v-tecla-estrecha-sistema-embornamiento-rapido-blanco-simon-270"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
