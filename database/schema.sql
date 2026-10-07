@@ -35,6 +35,7 @@ CREATE TABLE orders (
     project_id BIGINT REFERENCES projects(id),
     responsible TEXT,
     supplier_contact TEXT,
+    supplier_email TEXT,
     project_contact TEXT,
     declared_total NUMERIC(14, 4),
     source_filename TEXT NOT NULL,
@@ -48,14 +49,15 @@ CREATE TABLE order_lines (
     id BIGSERIAL PRIMARY KEY,
     order_id BIGINT NOT NULL REFERENCES orders(id) ON DELETE RESTRICT,
     line_number INTEGER NOT NULL,
+    source_row INTEGER NOT NULL,
     material_id BIGINT REFERENCES materials(id),
     quantity NUMERIC(14, 4) NOT NULL,
     supplier_reference TEXT,
     description_original TEXT NOT NULL,
     pvp NUMERIC(14, 6),
     discount_raw TEXT,
-    net_unit_price NUMERIC(14, 6) NOT NULL,
-    total_price NUMERIC(14, 4) NOT NULL,
+    net_unit_price NUMERIC(14, 6),
+    total_price NUMERIC(14, 4),
     UNIQUE(order_id, line_number)
 );
 
