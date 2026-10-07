@@ -69,6 +69,11 @@ CREATE TABLE material_match_proposals (
 CREATE TABLE orders (
     id BIGSERIAL PRIMARY KEY,
     order_reference TEXT,
+    order_year INTEGER,
+    order_number INTEGER,
+    order_subnumber TEXT,
+    order_identity_source TEXT,
+    order_identity_status TEXT NOT NULL DEFAULT 'pending',
     order_date DATE,
     supplier_id BIGINT REFERENCES suppliers(id),
     project_id BIGINT REFERENCES projects(id),
@@ -109,6 +114,9 @@ CREATE INDEX idx_order_lines_material
 
 CREATE INDEX idx_orders_order_date
     ON orders(order_date);
+
+CREATE INDEX idx_orders_sequence
+    ON orders(order_year, order_number);
 
 CREATE INDEX idx_commercial_items_material
     ON commercial_items(material_id);
