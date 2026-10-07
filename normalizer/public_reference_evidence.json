@@ -3620,6 +3620,114 @@
       "sources": [
         "https://www.gruposinelec.com/web_sinelec/es/p/ob110330ch_orbis"
       ]
+    },
+    {
+      "observed": [
+        "419926"
+      ],
+      "canonical": "419926",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand RX3 magnetotérmico vivienda 1P+N 16A curva C, 6kA.",
+      "sources": [
+        "https://www.gruposinelec.com/web_sinelec/es/p/419926_legrand"
+      ]
+    },
+    {
+      "observed": [
+        "20302811"
+      ],
+      "canonical": "20302811",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable Exzhellent H07Z1-K 1x1,5 mm² gris, caja 200 m.",
+      "sources": [
+        "https://sonepar.es/catalog/es-es/products/general-cable-cable-exzhellent-class-750v-as-h07z1-k-1x1-5-gris-caja-GENC1S23106GRP"
+      ]
+    },
+    {
+      "observed": [
+        "82010-30"
+      ],
+      "canonical": "82010-30",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 82 tecla individual blanca para mecanismos de mando; válida para interruptor, conmutador y cruzamiento.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/82010-30-tecla-individual-mecanismos-mando-blanco-simon-82"
+      ]
+    },
+    {
+      "observed": [
+        "5625"
+      ],
+      "canonical": "5625",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Solera caja de mecanismos empotrable en tabique hueco para 1 elemento, Ø68x46 mm.",
+      "sources": [
+        "https://www.psolera.com/es/catalogo/envolventes/cajas-para-tabique-hueco-serie-blue/cajas-para-mecanismos-serie-blue/5625gw/5625"
+      ]
+    },
+    {
+      "observed": [
+        "CCAR0019"
+      ],
+      "canonical": "CCAR0019",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Cablecel panel rack 19 pulgadas 1U, 8 enchufes Schuko con interruptor bipolar.",
+      "sources": [
+        "https://www.cablecel.com/productos/armarios-rack-murales-y-accesorios/accesorios-para-racks/regletas-de-alimentacion-pdu/panel-19-8-enchufes-con-interruptor/"
+      ]
+    },
+    {
+      "observed": [
+        "412523"
+      ],
+      "canonical": "412523",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand CX3 contactor 25A 2NA, bobina 230V, 1 módulo.",
+      "sources": [
+        "https://www.legrand.es/es/productos/contactor-con-bobina-230v-2p-250v-25a-2-na-1-modulo-412523"
+      ]
+    },
+    {
+      "observed": [
+        "A9R84440"
+      ],
+      "canonical": "A9R84440",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Acti9 iID 4P 40A 300mA tipo AC.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9R84440/interruptor-diferencial-acti9-iid-4p-40a-300ma-ac/"
+      ]
+    },
+    {
+      "observed": [
+        "08460004"
+      ],
+      "canonical": "08460004",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Tecsoled TSL-S15 perfil de aluminio de superficie, formatos 1/2/3/6 m según ficha.",
+      "sources": [
+        "https://tecsoled.com/wp-content/uploads/Perfileria/Descargas/perfil-08460004-ft.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "069801L"
+      ],
+      "canonical": "069801L",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo conmutador modular IP55 IK08 10AX, antracita.",
+      "sources": [
+        "https://www.legrand.es/es/rohs/pdf/rohs-certificate-of-compliance/199351"
+      ]
     }
   ],
   "updated_at": "2026-10-07"
