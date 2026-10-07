@@ -3992,6 +3992,258 @@
       "sources": [
         "https://www.aiscan.com/producto/ehf/"
       ]
+    },
+    {
+      "observed": [
+        "A9C20732"
+      ],
+      "canonical": "A9C20732",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Acti9 iCT contactor modular 25A, 2P, 2NA, bobina 230/240V CA.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9C20732/contactor-modular-acti9-ict-25-a-2-p-2-na-230-240v-ca/"
+      ]
+    },
+    {
+      "observed": [
+        "82026-30"
+      ],
+      "canonical": "82026-30",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 82 tecla doble blanca para mecanismos de mando: interruptores, conmutadores y pulsadores.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/82026-30-tecla-doble-mecanismos-mando-blanco-simon-82"
+      ]
+    },
+    {
+      "observed": [
+        "20000201-090"
+      ],
+      "canonical": "20000201-090",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 270 conmutador pulsante 10AX 230V blanco, embornamiento rápido.",
+      "sources": [
+        "https://www.gruponovelec.com/p/sim_20000201-090"
+      ]
+    },
+    {
+      "observed": [
+        "069511L"
+      ],
+      "canonical": "069511L",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo conmutador modular gris, 10AX, IP55.",
+      "sources": [
+        "https://www.legrand.com/ecatalogue/en/catalog/products/plexo-1-gang-2-way-switch-grey-mechanism-069511l"
+      ]
+    },
+    {
+      "observed": [
+        "10040220"
+      ],
+      "canonical": "10040220",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "PEMSA tubo flexible corrugado CLH libre de halógenos DN20 gris RAL7035, IP65, 320N.",
+      "sources": [
+        "https://www.pemsa-rejiband.com/catalog/es/n/W_CLH/10040220"
+      ]
+    },
+    {
+      "observed": [
+        "A9R81240"
+      ],
+      "canonical": "A9R81240",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Acti9 iID diferencial 2P 40A 30mA tipo AC.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9R81240/interruptor-diferencial-acti9-iid-2p-40a-30ma-ac/"
+      ]
+    },
+    {
+      "observed": [
+        "10002909"
+      ],
+      "canonical": "10002909",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Toscano COMBI-MINI-2P40T15: sobretensiones transitorias/permanentes con IGA 2x40A, 10kA, 240Vac.",
+      "sources": [
+        "https://new.toscano.es/producto/combi-mini-2p40t15/?download_product_pdf=42165"
+      ]
+    },
+    {
+      "observed": [
+        "864120"
+      ],
+      "canonical": "864120",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Niloé Step frontal/centro blanco mate para base de corriente 2P+T tipo Schuko.",
+      "sources": [
+        "https://www.legrand.pt/e-catalogo/864120-niloe-step-centro-para-tomada-2p-t-tipo-schuko-branco-mate.html"
+      ]
+    },
+    {
+      "observed": [
+        "1251-3"
+      ],
+      "canonical": "1251-3",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "UNEX taco a presión U64X/U63X Ø8 gris para fijación de cables y tubos.",
+      "sources": [
+        "https://www.unex.net/int/cable-tie-wall-plug-flush-o8-in-u64x/1251-3"
+      ]
+    },
+    {
+      "observed": [
+        "4400092-035"
+      ],
+      "canonical": "4400092-035",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon Aqua marco con tapa abatible gris, IP55.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/4400092-035-marco-tapa-abatible-gris-simon-aqua"
+      ]
+    },
+    {
+      "observed": [
+        "R9F12625"
+      ],
+      "canonical": "R9F12625",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Resi9 magnetotérmico 1P+N 25A, 6000A, 230V.",
+      "sources": [
+        "https://www.se.com/es/es/product/R9F12625/interruptor-magnetot%C3%A9rmico-resi9-1p%2Bn-25-a-6000-a-230-v/"
+      ]
+    },
+    {
+      "observed": [
+        "CCPF60"
+      ],
+      "canonical": "CCPF60",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Cablecel protector de fusión de fibra óptica 60 mm, paquete de 100.",
+      "sources": [
+        "https://www.cablecel.com/productos/ftth-ict2/accesorios-de-fibra-optica/protector-de-fusion-60-mm-pk100/"
+      ]
+    },
+    {
+      "observed": [
+        "AB4545"
+      ],
+      "canonical": "AB4545",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "IDE registro secundario de superficie 450x450 IP33 con placa hidrófuga.",
+      "sources": [
+        "https://www.gruposinelec.com/web_sinelec/es/p/ab4545_ide"
+      ]
+    },
+    {
+      "observed": [
+        "20302899"
+      ],
+      "canonical": "20302899",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable Exzhellent RZ1-K (AS) 0,6/1kV 3G1,5 mm².",
+      "sources": [
+        "https://www.ilumitec.es/cable-unipolar-libre-halogenos-3x1-5-mm2-rz1k"
+      ]
+    },
+    {
+      "observed": [
+        "AMY0011"
+      ],
+      "canonical": "AMY0011",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Zemper ALYA accesorio/marco de empotrar blanco.",
+      "sources": [
+        "https://zemper.com/es-es/alumbrado-de-emergencia-1/alya-1/"
+      ]
+    },
+    {
+      "observed": [
+        "CCTELRJ456UA"
+      ],
+      "canonical": "CCTELRJ456UA",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Cablecel conector RJ45 macho Cat.6 sin guía, azul, paquete 100.",
+      "sources": [
+        "https://www.cablecel.com/productos/redes-voz-y-datos/conectores-rj-y-protectores/conectores-rj-macho-cat6/conector-rj45-macho-cat6-sin-guia-azul/"
+      ]
+    },
+    {
+      "observed": [
+        "6828K"
+      ],
+      "canonical": "6828K",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Solera clavija 2P+T 25A 250V blanca para cocina.",
+      "sources": [
+        "https://www.psolera.com/es/catalogo/pequeno-material/material-diverso/bases-y-clavijas/6828/6828k"
+      ]
+    },
+    {
+      "observed": [
+        "135"
+      ],
+      "canonical": "135",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "TEKOX regleta de conexión Serie 100, 12 polos, 35 mm², natural.",
+      "sources": [
+        "https://www.guarconsa.com/hasta-50-mm2/2588-regleta-conexion-12p-35mm-estandar-natural-8429784009306.html"
+      ]
+    },
+    {
+      "observed": [
+        "1201"
+      ],
+      "canonical": "1201",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Televés antena FM omnidireccional de dipolo circular.",
+      "sources": [
+        "https://www.televes.com/es/1201-antena-de-fm-recepcion-de-radio.html"
+      ]
+    },
+    {
+      "observed": [
+        "1050"
+      ],
+      "canonical": "1050",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Televés antena DAB Banda III de 3 elementos.",
+      "sources": [
+        "https://www.televes.com/downloadfile/PSH01230005_0_Espanol_1584342.pdf/1050_es_ES_product_sheet_PSH01230005.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "MTME25"
+      ],
+      "canonical": "MTME25",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "AISCAN manguito metálico enchufable para tubo Ø25 mm.",
+      "sources": [
+        "https://www.gruponovelec.com/p/ais_mtme25"
+      ]
     }
   ],
   "updated_at": "2026-10-08"
