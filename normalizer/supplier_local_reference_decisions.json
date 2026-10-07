@@ -79,6 +79,34 @@
       "decision": "accepted_supplier_local_item",
       "confidence": "very_high",
       "rationale": "17 compras coherentes del mismo set de perfil de aluminio de superficie 17,1x7,83 mm, 2 m, con difusor opal, tapas y grapas."
+    },
+    {
+      "supplier": "AMARA",
+      "reference": "5631314C",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "16 líneas coherentes como cable RZ1 (AS) de aluminio 1x120 mm²; referencia local estable de AMARA."
+    },
+    {
+      "supplier": "EFLUX",
+      "reference": "8313950060041",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "14 líneas coherentes como driver Eaglerise DALI2 42W 1050mA; código estable en el histórico del proveedor."
+    },
+    {
+      "supplier": "FANAIR",
+      "reference": "MM150",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "12 líneas coherentes como larguero de marco de montaje 150 mm; referencia local estable de FANAIR."
+    },
+    {
+      "supplier": "TODO EXTINTOR",
+      "reference": "PROSOEL5C",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "12 líneas coherentes como adhesivo personalizado PROSOEL para extintor CO2 de 5 kg."
     }
   ]
 }
