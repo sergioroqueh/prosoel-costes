@@ -441,6 +441,141 @@
       "sources": [
         "https://prilux.es/producto/pantalla-etna-slim-60x60-40w-840/"
       ]
+    },
+    {
+      "observed": [
+        "3012",
+        "30413540"
+      ],
+      "canonical": "3012",
+      "relation": "confirmed_reference_with_unresolved_alias",
+      "confidence": "high",
+      "note": "FAMATEL 3012 está confirmado públicamente para caja derivación estanca 153x110 PG16-21. 30413540 no se ha podido confirmar como referencia de fabricante.",
+      "sources": [
+        "https://www.gruponovelec.com/p/fam_3012",
+        "https://www.clientes.grupoelektra.es/catalogo/producto/025249/1"
+      ]
+    },
+    {
+      "observed": [
+        "51010102-030",
+        "K01/6"
+      ],
+      "canonical": null,
+      "relation": "distinct_products",
+      "confidence": "very_high",
+      "note": "51010102-030=marco empotrar Simon 500 Cima para 2 elementos dobles blanco; K01/6=base Schuko Simon K45 roja. Si comparten descripción histórica, hay error de arrastre.",
+      "sources": [
+        "https://www.simonelectric.com/es-ad/electrical-mechanisms/workplaces/wall-mounted-boxes/frames-and-holders",
+        "https://cdn.pimber.ly/public/asset/raw/61e53326b02781001c06e002/3b3607cc/68f925837a637318bead1f59/K01-6-es-datasheet.pdf"
+      ]
+    },
+    {
+      "observed": [
+        "A9R61425",
+        "BV8PO"
+      ],
+      "canonical": null,
+      "relation": "distinct_products",
+      "confidence": "very_high",
+      "note": "A9R61425=Schneider Acti9 iID 4P 25A 30mA A-SI; BV8PO=IDE caja distribución superficie IP40 1x8 módulos. Son familias totalmente distintas.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9R61425/interruptor-diferencial-acti9-iid-4p-25a-30ma-asi/",
+        "https://ide.es/esp/productos/cajas-de-distribucion/cajas-de-distribucion-en-superficie-ip40/ref_BV8PO"
+      ]
+    },
+    {
+      "observed": [
+        "08463068",
+        "08464052"
+      ],
+      "canonical": null,
+      "relation": "distinct_products",
+      "confidence": "very_high",
+      "note": "08463068=difusor PC blanco para TSL-T68R; 08464052=difusor silicona blanco para TSL-P52/E52/T21. No fusionar.",
+      "sources": [
+        "https://tecsoled.com/wp-content/uploads/Catalogo/Secciones/Perfiles-GetReady-22-23-ONLINE-ESP-ENG-V1.pdf",
+        "https://electro-profesional.com/es/5796-perfil-trimless"
+      ]
+    },
+    {
+      "observed": [
+        "LS1520KIPLSW",
+        "LS982SW"
+      ],
+      "canonical": null,
+      "relation": "distinct_products",
+      "confidence": "very_high",
+      "note": "LS1520KIPLSW=tapa/placa central Schuko negra con protección infantil; LS982SW=marco JUNG LS990 de 2 elementos negro.",
+      "sources": [
+        "https://www.clientes.grupoelektra.es/catalogo/producto/667595/1",
+        "https://www.leroymerlin.es/productos/marco-2-elementos-negro-jung-87107588.html"
+      ]
+    },
+    {
+      "observed": [
+        "TP6KG",
+        "TP6KGAE"
+      ],
+      "canonical": null,
+      "relation": "same_family_distinct_variants",
+      "confidence": "high",
+      "note": "Ambos son extintores ABC de 6 kg, pero TP6KGAE está identificado específicamente como alta eficacia 34A 233B. Mantener variantes separadas.",
+      "sources": [
+        "https://extintoressevilla.com/product/extintor-de-polvo-abc-de-6-kg/",
+        "https://extintoressevilla.com/product/extintor-de-polvo-abc-de-6kg-alta-eficacia/"
+      ]
+    },
+    {
+      "observed": [
+        "A9R60225",
+        "AIC9R60225"
+      ],
+      "canonical": "A9R60225",
+      "relation": "supplier_or_capture_alias",
+      "confidence": "high",
+      "note": "Schneider publica A9R60225 como referencia oficial del iID 2P 25A 30mA AC. AIC9R60225 aparece en documentación pública de terceros como forma extendida, pero no como referencia oficial Schneider.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9R60225/interruptor-diferencial-acti9-iid-2p-25a-30ma-ac-residencial/",
+        "https://contrataciondelestado.es/wps/wcm/connect/80bf7a77-38e8-4546-a410-27e74f14d32b/DOC20240205101607PliegoDePrescripcionesTecnicas.PDF?MOD=AJPERES"
+      ]
+    },
+    {
+      "observed": [
+        "069672L"
+      ],
+      "canonical": "069672L",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo: caja con membranas modular gris, 2 elementos horizontales/verticales.",
+      "sources": [
+        "https://www.legrand.es/es/productos/cajas-superficie-con-membrana-2-y-3-elementos?current_tab=tab-A"
+      ]
+    },
+    {
+      "observed": [
+        "09251003"
+      ],
+      "canonical": "09251003",
+      "relation": "confirmed_exact",
+      "confidence": "high",
+      "note": "TSL/Tecsoled MGR 150W 24V DC regulable DALI/PUSH/1-10V.",
+      "sources": [
+        "https://electro-profesional.com/es/fuentes-de-alimentacion/47619-transformador-mgr-150w-24v-dc-dali-push-1-10v-8435517565742.html"
+      ]
+    },
+    {
+      "observed": [
+        "143071"
+      ],
+      "canonical": "143071",
+      "relation": "confirmed_exact",
+      "confidence": "high",
+      "note": "Fischer SX Plus 6x30, caja 100 unidades.",
+      "sources": [
+        "https://ferreteriasindustriales.es/es/anclajes-plasticos/39228-taco-nilon-sx-plus-6-x-30-100-uds-4048962480825.html"
+      ]
     }
-  ]
+  ],
+  "updated_at": "2026-10-07"
 }
