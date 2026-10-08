@@ -516,7 +516,8 @@ async function loadCounter() {
   orderCounter.querySelector("strong").textContent =
     "Último: " + last +
     " · Siguiente: " + next +
-    " · Huecos: " + (row.pending_gaps ?? 0);
+    " · Avisos anotados: " + (row.pending_gaps ?? 0);
+  orderCounter.title = "Avisos anotados manualmente sobre la secuencia; no equivale a todos los números ausentes. Consulta el Control de importaciones.";
 }
 
 // Solo activar la comprobación global cuando parece que se ha escrito un código,
