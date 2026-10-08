@@ -20,7 +20,7 @@ import re
 import socket
 import sys
 import time
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urljoin, urlsplit
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 
@@ -242,6 +242,9 @@ def run(limit=12,scan=120,dry_run=False):
     researched = 0
     submitted = 0
     unsupported = 0
+    reachable_pages = 0
+    transient_errors = 0
+    items_blocked = 0
     for item in queue:
         if researched >= limit:
             break
@@ -251,9 +254,13 @@ def run(limit=12,scan=120,dry_run=False):
             continue  # no paid API? keep candidate untouched, do not claim research
         researched += 1
         found = False
+        checked_without_match = False
+        temporary_issue = False
         for url in urls:
             try:
                 final, page = open_safe_official(url)
+                reachable_pages += 1
+                checked_without_match = True
                 evidence = build_evidence(item,final,page)
                 if evidence is None:
                     continue
@@ -267,16 +274,39 @@ def run(limit=12,scan=120,dry_run=False):
                                       "source":final,"result":response},ensure_ascii=False))
                     submitted += 1
                 break  # one official link per item per run
-            except Exception as exc:
-                print("Official source failed: "+type(exc).__name__+" "+str(exc)[:180],
-                      file=sys.stderr)
-        if not found and not dry_run:
-            api_rpc(endpoint,key,"material_research_mark_attempt",
-                    {"p_item_id":int(item["commercial_item_id"]),"p_found":False})
+            except HTTPError as exc:
+                if exc.code in (404, 410):
+                    checked_without_match = True
+                else:
+                    temporary_issue = True
+                    transient_errors += 1
+                print("Official source HTTP problem:",exc.code,
+                      "for",urlsplit(url).hostname,file=sys.stderr)
+            except (URLError, OSError, TimeoutError, ValueError) as exc:
+                temporary_issue = True
+                transient_errors += 1
+                print("Official source connection problem:",
+                      type(exc).__name__,str(exc)[:150],file=sys.stderr)
+        if not found:
+            if temporary_issue:
+                items_blocked += 1
+            elif checked_without_match and not dry_run:
+                # A genuine 404 or a fetched page with no reference is a no-match.
+                # A blocked host/timeout is NOT a no-match.
+                api_rpc(endpoint,key,"material_research_mark_attempt",
+                        {"p_item_id":int(item["commercial_item_id"]),"p_found":False})
         time.sleep(0.7)
     print(json.dumps({"scanned":len(queue),"attempted":researched,
                       "proposals_recorded":submitted,"unsupported":unsupported,
+                      "reachable_pages":reachable_pages,
+                      "items_blocked_by_network":items_blocked,
+                      "transient_connection_errors":transient_errors,
                       "dry_run":dry_run,"search_provider_configured":bool(brave)}))
+    if researched and not reachable_pages and items_blocked:
+        print("RESEARCH INCOMPLETE: none of the official manufacturer pages "+
+              "were reachable. No reference is marked absent because of this.",
+              file=sys.stderr)
+        return 2
     return 0
 
 if __name__ == "__main__":
