@@ -156,7 +156,7 @@ function selectedFilters() {
   return {
     supplierId: selectedSupplierId,
     year: yearFilter.value ? Number(yearFilter.value) : null,
-    sort: sortFilter.value || "relevance",
+    sort: sortFilter.value || "recent",
   };
 }
 
@@ -580,7 +580,7 @@ function renderExactReferenceNotice(query, filters, referenceRows) {
     supplierFilter.value = "";
     closeSupplierSuggestions();
     yearFilter.value = "";
-    sortFilter.value = "relevance";
+    sortFilter.value = "recent";
     runSearch();
   });
   exactReferenceNotice.append(message, button);
@@ -683,7 +683,7 @@ function renderResults(rows, total) {
     const metaParts = [];
     if (row.reference) metaParts.push(row.reference);
     if (row.manufacturer) metaParts.push(row.manufacturer);
-    metaParts.push(row.kind === "material" ? "Material consolidado" : "Histórico pendiente");
+    metaParts.push(row.kind === "material" ? "Material consolidado" : "Compra histórica · sin ficha unificada");
     if (row.last_supplier) metaParts.push("Último: " + row.last_supplier);
     meta.textContent = metaParts.join(" · ");
 
@@ -888,7 +888,7 @@ function renderHistoricalDetail(result, rows) {
   html.push('<div class="detail-header">');
   html.push('<div><h2>' + escapeHtml(result.title) + "</h2>");
   html.push('<div class="detail-subtitle">' + escapeHtml(result.reference || "Sin referencia") + "</div></div>");
-  html.push('<span class="status-badge pending">Pendiente de normalizar</span>');
+  html.push('<span class="status-badge pending">Identidad técnica sin verificar</span>');
   html.push("</div>");
 
   html.push('<div class="stats-grid">');
@@ -907,7 +907,7 @@ function renderHistoricalDetail(result, rows) {
 
   html.push('<div class="price-origin">');
   html.push('<div class="price-origin-title">Histórico trazable</div>');
-  html.push("<p>Este resultado aún no está consolidado, pero puedes comprobar cada compra y cada precio de origen.</p>");
+  html.push("<p>Precio de compra histórico, con proveedor y fecha verificables en el pedido. La identidad del producto aún no se ha validado para agruparlo con otras referencias; esto no invalida su precio.</p>");
   html.push("</div>");
 
   if (result.reference) {
@@ -1678,7 +1678,7 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
     supplierFilter.value = "";
     closeSupplierSuggestions();
     yearFilter.value = "";
-    sortFilter.value = "relevance";
+    sortFilter.value = "recent";
     searchInput.value = row.observed_reference;
     activateWorkspace("costs");
     runSearch();
@@ -2419,7 +2419,7 @@ resetFiltersButton.addEventListener("click", () => {
   supplierFilter.value = "";
   closeSupplierSuggestions();
   yearFilter.value = "";
-  sortFilter.value = "relevance";
+  sortFilter.value = "recent";
   if (searchInput.value.trim().length >= 2) runSearch();
 });
 moreResultsButton.addEventListener("click", () => runSearch({ append: true }));
