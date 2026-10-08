@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex,nofollow">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https://kusbndefngttaiytcrui.supabase.co wss://kusbndefngttaiytcrui.supabase.co; img-src 'self' data:; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <title>PROSOEL Costes</title>
-  <link rel="stylesheet" href="./styles.css?v=20261008-v6">
+  <link rel="stylesheet" href="./styles.css?v=20261008-v7">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -62,6 +62,13 @@
     </header>
 
     <main>
+      <nav class="workspace-tabs" role="tablist" aria-label="Secciones de PROSOEL Costes">
+        <button type="button" class="workspace-tab is-active" id="costsTab" role="tab"
+                aria-selected="true" aria-controls="costsWorkspace">Consultar precios</button>
+        <button type="button" class="workspace-tab" id="reviewTab" role="tab"
+                aria-selected="false" aria-controls="reviewWorkspace">Normalización <span class="tab-pending">Revisión</span></button>
+      </nav>
+      <div id="costsWorkspace" role="tabpanel" aria-labelledby="costsTab">
       <section class="search-panel">
         <label for="searchInput">¿Qué material buscas?</label>
         <div class="search-row">
@@ -135,6 +142,46 @@
           </div>
         </aside>
       </section>
+      </div>
+
+      <section id="reviewWorkspace" class="review-workspace hidden" role="tabpanel" aria-labelledby="reviewTab">
+        <header class="review-intro">
+          <div>
+            <h2>Normalización supervisada</h2>
+            <p>Referencias observadas en varios proveedores o con descripciones diferentes. Son <strong>candidatos a revisión</strong>, no equivalencias aprobadas.</p>
+          </div>
+          <div class="review-summary" id="reviewTotal" aria-live="polite">Sin cargar</div>
+        </header>
+        <div class="review-controls">
+          <label for="reviewQuery">Buscar referencia o descripción
+            <input id="reviewQuery" type="search" placeholder="Ej.: A9F79425, CLP160, downlight" autocomplete="off">
+          </label>
+          <label for="reviewRisk">Tipo de caso
+            <select id="reviewRisk">
+              <option value="">Todos los candidatos</option>
+              <option value="technical_conflict">Conflictos de potencia</option>
+              <option value="variant_descriptions">Descripciones diferentes</option>
+              <option value="cross_supplier">Código en varios proveedores</option>
+            </select>
+          </label>
+        </div>
+        <div class="review-guidance">
+          <strong>Sin fusiones automáticas.</strong> Compartir código no confirma fabricante ni identidad técnica.
+          Antes de consolidar revisaremos modelo, características y procedencia.
+        </div>
+        <div class="review-layout">
+          <div class="review-list-panel">
+            <div class="section-title"><h3>Cola de revisión</h3><span class="muted" id="reviewVisibleCount">—</span></div>
+            <div id="reviewResults" class="review-list empty-state">Abre esta pestaña para cargar los candidatos.</div>
+            <div id="reviewFooter" class="results-footer hidden">
+              <button id="reviewMoreButton" class="more-results-button" type="button">Mostrar más casos</button>
+            </div>
+          </div>
+          <aside class="review-detail-panel" id="reviewDetail">
+            <div class="empty-state">Selecciona una referencia para ver sus variantes, proveedores y compras originales.</div>
+          </aside>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -151,6 +198,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261008-v6"></script>
+  <script type="module" src="./app.js?v=20261008-v7"></script>
 </body>
 </html>
