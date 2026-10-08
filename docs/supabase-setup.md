@@ -35,6 +35,10 @@ En Supabase Auth:
 2. Invitar a Sergio.
 3. Invitar al compañero.
 4. Insertar sus correos en `public.app_users`.
+5. En **URL Configuration**, usar como Site URL y Redirect URL:
+   `https://sergioroqueh.github.io/prosoel-costes/`
+
+La web usa acceso por **magic link** de Supabase, no contraseña en GitHub Pages.
 
 Ejemplo:
 
@@ -89,3 +93,19 @@ Con la migración aplicada y los dos usuarios creados:
 3. cargar los tres ZIP históricos;
 4. materializar las decisiones de normalización;
 5. desplegar en GitHub Pages.
+
+
+## 7. GitHub Pages
+
+El sitio está desplegado mediante `.github/workflows/pages.yml` desde
+`app/static`.
+
+URL prevista:
+
+`https://sergioroqueh.github.io/prosoel-costes/`
+
+La web pública solo contiene HTML/JS y la publishable key de Supabase. Los datos
+de compras siguen protegidos por Auth + RLS + allowlist.
+
+GitHub Pages es público. No se incluyen secretos, pedidos ni precios en el
+repositorio desplegado.
