@@ -933,8 +933,8 @@ function makePriceTimeline(rows, outliers) {
     }
   }
   lines.push('</svg>');
-  lines.push('<div class="comparison-legend">' + providers.map((provider) =>
-    '<span><i style="background:' + provider.color + '"></i>' + escapeHtml(provider.name) + '</span>'
+  lines.push('<div class="comparison-legend">' + providers.map((provider, index) =>
+    '<span><i class="legend-color-' + (index % palette.length) + '"></i>' + escapeHtml(provider.name) + '</span>'
   ).join("") + '</div>');
   return lines.join("");
 }
