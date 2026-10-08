@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
 -- Esquema lógico inicial. PostgreSQL será el objetivo de producción.
 
 CREATE TABLE suppliers (
@@ -242,3 +244,27 @@ CREATE INDEX idx_commercial_items_supplier_reference
 
 CREATE INDEX idx_order_lines_line_kind
     ON order_lines(line_kind, line_kind_review_status);
+
+
+CREATE INDEX IF NOT EXISTS idx_materials_canonical_name_trgm
+    ON materials USING GIN (LOWER(canonical_name) gin_trgm_ops);
+
+
+CREATE INDEX IF NOT EXISTS idx_materials_manufacturer_reference_trgm
+    ON materials USING GIN (LOWER(manufacturer_reference) gin_trgm_ops);
+
+
+CREATE INDEX IF NOT EXISTS idx_commercial_items_description_trgm
+    ON commercial_items USING GIN (LOWER(preferred_description) gin_trgm_ops);
+
+
+CREATE INDEX IF NOT EXISTS idx_commercial_items_supplier_reference_trgm
+    ON commercial_items USING GIN (LOWER(supplier_reference) gin_trgm_ops);
+
+
+CREATE INDEX IF NOT EXISTS idx_order_lines_description_trgm
+    ON order_lines USING GIN (LOWER(description_original) gin_trgm_ops);
+
+
+CREATE INDEX IF NOT EXISTS idx_order_lines_supplier_reference_trgm
+    ON order_lines USING GIN (LOWER(supplier_reference) gin_trgm_ops);
