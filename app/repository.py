@@ -313,3 +313,60 @@ def get_order_counter(connection: Connection, year: int) -> dict[str, Any]:
     ).first()
     data["pending_gaps"] = int(gap_row._mapping["pending_gaps"]) if gap_row else 0
     return data
+
+
+def get_historical_price_history(
+    connection: Connection,
+    *,
+    reference: str | None,
+    description: str,
+    limit: int = 200,
+) -> list[dict[str, Any]]:
+    sql = text(
+        """
+        SELECT
+            ol.id AS order_line_id,
+            o.id AS order_id,
+            o.order_reference,
+            o.order_year,
+            o.order_number,
+            o.order_subnumber,
+            o.order_date,
+            s.name AS supplier,
+            p.name AS project,
+            ol.quantity,
+            ol.supplier_reference,
+            ol.description_original,
+            ol.pvp,
+            ol.discount_raw,
+            ol.net_unit_price,
+            ol.total_price,
+            ol.price_validation_status,
+            ol.line_kind,
+            o.source_filename
+        FROM order_lines ol
+        JOIN orders o ON o.id = ol.order_id
+        LEFT JOIN suppliers s ON s.id = o.supplier_id
+        LEFT JOIN projects p ON p.id = o.project_id
+        WHERE
+            ol.material_id IS NULL
+            AND ol.line_kind NOT IN ('environmental_fee', 'freight', 'service')
+            AND (
+                (:reference IS NOT NULL AND ol.supplier_reference = :reference)
+                OR ol.description_original = :description
+            )
+        ORDER BY o.order_date DESC NULLS LAST, o.id DESC, ol.line_number DESC
+        LIMIT :limit
+        """
+    )
+    return [
+        _row_dict(row)
+        for row in connection.execute(
+            sql,
+            {
+                "reference": reference,
+                "description": description,
+                "limit": limit,
+            },
+        )
+    ]
