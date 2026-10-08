@@ -212,6 +212,20 @@
       "decision": "accepted_supplier_local_item",
       "confidence": "very_high",
       "rationale": "8 apariciones idénticas como fuente DALI2 24V 80W con PVP estable; referencia local de EFLUX."
+    },
+    {
+      "supplier": "FANAIR",
+      "reference": "MM400",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "7 apariciones idénticas como larguero de marco de montaje 400 mm; referencia local estable de FANAIR."
+    },
+    {
+      "supplier": "GRUPO JARAMA / GUARCONSA",
+      "reference": "CP4020",
+      "decision": "accepted_supplier_local_item",
+      "confidence": "very_high",
+      "rationale": "7 apariciones coherentes como perfil galvanizado 40x20x1 mm, tira 2 m; se conserva como referencia comercial observada sin forzar fabricante."
     }
   ]
 }
