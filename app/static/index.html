@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex,nofollow">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https://kusbndefngttaiytcrui.supabase.co wss://kusbndefngttaiytcrui.supabase.co; img-src 'self' data:; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <title>PROSOEL Costes</title>
-  <link rel="stylesheet" href="./styles.css?v=20261008-v11">
+  <link rel="stylesheet" href="./styles.css?v=20261008-v12">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -285,6 +285,52 @@
     </main>
   </div>
 
+  <dialog id="purchaseEditDialog" class="purchase-review-dialog" aria-labelledby="purchaseEditHeading">
+    <div class="purchase-review-dialog-inner">
+      <div class="purchase-review-modal-head">
+        <h2 id="purchaseEditHeading">Revisar compra del histórico</h2>
+        <button id="purchaseEditClose" type="button" aria-label="Cerrar sin guardar">✕</button>
+      </div>
+      <p class="purchase-review-modal-intro">El Excel, la referencia original y los precios no se modifican. Solo registramos qué valor técnico debe utilizar el catálogo, o si una compra se excluye de sus cálculos.</p>
+      <div id="purchaseEditSource" class="purchase-edit-source"></div>
+      <label for="purchaseEditAction">¿Qué deseas hacer?</label>
+      <select id="purchaseEditAction">
+        <option value="correct">Corregir referencia o descripción para el catálogo</option>
+        <option value="exclude">Excluir esta línea de los precios</option>
+        <option value="restore">Restaurar esta línea a los valores originales</option>
+        <option value="exclude_order">Excluir TODO el pedido de los precios</option>
+        <option value="restore_order">Restaurar TODO el pedido</option>
+      </select>
+      <div id="purchaseEditFields" class="purchase-edit-fields">
+        <label for="purchaseEditReference">Referencia correcta para el catálogo
+          <input id="purchaseEditReference" type="text" maxlength="120" autocomplete="off">
+        </label>
+        <label for="purchaseEditDescription">Descripción técnica correcta para el catálogo
+          <textarea id="purchaseEditDescription" rows="3" maxlength="1000"></textarea>
+        </label>
+      </div>
+      <label for="purchaseEditReason" class="purchase-review-reason">Motivo de la decisión / comprobación realizada
+        <textarea id="purchaseEditReason" rows="3" maxlength="2000" placeholder="Ej.: contrastado con la referencia del fabricante en el pedido 24/991."></textarea>
+      </label>
+      <div id="purchaseEditOrderConfirmPanel" class="purchase-edit-order-confirm hidden">
+        <label for="purchaseEditOrderConfirm">Para excluir el pedido completo, escribe su número exactamente:
+          <strong id="purchaseEditOrderExpected"></strong>
+          <input id="purchaseEditOrderConfirm" type="text" autocomplete="off" placeholder="Número de pedido">
+        </label>
+        <p>El pedido seguirá registrado, junto con todas sus líneas, para su recuperación posterior.</p>
+      </div>
+      <label class="purchase-review-ack" for="purchaseEditAcknowledged">
+        <input id="purchaseEditAcknowledged" type="checkbox">
+        <span>He comprobado el pedido de origen. Comprendo que la corrección o exclusión quedará auditada y afectará a los resultados de precios.</span>
+      </label>
+      <div id="purchaseEditStatus" role="status" aria-live="polite" class="purchase-edit-status"></div>
+      <div class="purchase-review-modal-actions">
+        <button type="button" id="purchaseEditCancel">Cancelar</button>
+        <button type="button" id="purchaseEditSubmit">Guardar decisión</button>
+      </div>
+    </div>
+  </dialog>
+
   <template id="resultTemplate">
     <button class="result-card" type="button">
       <div class="result-main">
@@ -298,6 +344,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261008-v11"></script>
+  <script type="module" src="./app.js?v=20261008-v12"></script>
 </body>
 </html>
