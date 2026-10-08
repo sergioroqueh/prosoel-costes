@@ -1633,7 +1633,7 @@ async function loadImportDashboard() {
         .select("reference_key",{count:"exact",head:true}).eq("review_status","pending"),
       supabase.rpc("order_counter",{p_year:year}),
       supabase.from("order_import_audit")
-        .select("id,created_at,line_count,source_filename,order:orders!inner(id,order_year,order_number,order_subnumber,order_reference,order_date,declared_total,validation_status,supplier:suppliers(name))")
+        .select("id,created_at,line_count,source_filename,order:orders!inner(id,order_year,order_number,order_subnumber,order_reference,order_date,declared_total,validation_status,supplier:suppliers(name))",{count:"exact"})
         .eq("order.order_year",year)
         .order("created_at",{ascending:false})
         .limit(20),
@@ -1665,6 +1665,8 @@ async function loadImportDashboard() {
       importAuditMetric("Último número registrado",lastNum===null?"—":String(year).slice(-2)+"/"+lastNum,"Siguiente: "+(lastNum===null?"—":String(year).slice(-2)+"/"+(lastNum+1))),
       importAuditMetric("Pedidos con aviso de totales",number(flaggedOrders.count,0),"Del año seleccionado"),
       importAuditMetric("Normalizaciones pendientes",number(reviewPending.count,0),"Todas las referencias"),
+      importAuditMetric("Altas desde la web",number(imports.count??recent.length,0),"Del año seleccionado"),
+      importAuditMetric("Números sin pedido",number(possibleGaps.length,0),"Últimos 100 números"),
     ].join("");
     importGapCount.textContent=possibleGaps.length+" posibles huecos";
     importGapDescription.textContent=start===null
