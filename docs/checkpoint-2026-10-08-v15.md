@@ -46,3 +46,9 @@ Para cubrir cientos/miles de artículos sin trabajo manual habrá que implementa
 5. Mantener originales intactos y auditar la incorporación.
 
 Este servicio **todavía no existe/está conectado**. Puede requerir claves de servicio y coste externo y no se promete su ejecución en segundo plano hasta instalarlo.
+
+## Prueba de importación end-to-end (transaccional)
+- Se ejecutó la RPC real `public.import_new_prosoel_order` con un pedido ficticio 27/98976 y una línea de cable `H07Z1-K 1,5 MM AZUL`, dentro de una transacción con `ROLLBACK`.
+- El importador creó automáticamente el registro de cola en estado `waiting_for_evidence` y detectó familia `H07Z1-K`, 1 conductor, 1,5 mm².
+- Confirmación posterior fuera de la transacción: **0 pedidos ficticios y 0 candidatos ficticios**. Ningún pedido de prueba persiste.
+- En la UI, las métricas distinguen `Sin ficha externa contrastada` de `Nombres de ayuda publicados`, para no atribuir investigación que aún no se ha realizado.
