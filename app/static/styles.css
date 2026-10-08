@@ -524,3 +524,11 @@ main {
     border-left: 0;
   }
 }
+
+.login-help {
+  margin: 10px 0 0;
+  color: #6c7685;
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: center;
+}
