@@ -1232,10 +1232,25 @@ function renderReviewResults() {
     description.textContent = row.sample_description;
     const meta = document.createElement("div");
     meta.className = "review-result-meta";
-    meta.textContent = row.supplier_count + " proveedores · " + row.purchase_count
-      + " pedidos · " + row.description_count + " descripciones · "
-      + (reviewStatusLabels[row.review_status] || "Pendiente");
+    meta.textContent = (reviewFamilyLabels[row.suggested_family] || "Sin clasificar") +
+      " (orientativa) · " + row.supplier_count + " proveedores · " +
+      row.purchase_count + " pedidos · " + row.description_count +
+      " descripciones · " + (reviewStatusLabels[row.review_status] || "Pendiente");
     button.append(head, description, meta);
+    const alerts = candidateTechnicalAlerts(row);
+    if (alerts.length) {
+      const warning = document.createElement("div");
+      warning.className = "review-card-alert";
+      warning.textContent = "⚠ Contradicciones: " +
+        alerts.map(([key]) => technicalAlertLabels[key]).join(", ");
+      button.appendChild(warning);
+    }
+    if (row.requires_recheck) {
+      const update = document.createElement("div");
+      update.className = "review-card-recheck";
+      update.textContent = "Nuevas compras desde la última revisión; comprobar decisión";
+      button.appendChild(update);
+    }
     button.addEventListener("click", () => {
       reviewSelectedKey = row.reference_key;
       reviewResults.querySelectorAll(".review-result-card").forEach((item) => item.classList.remove("is-selected"));
