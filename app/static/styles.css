@@ -1224,3 +1224,34 @@ main {
 .import-notice {font-size:12px; color:#68788e; line-height:1.55; margin-top:12px;}
 @media(max-width:900px) {.import-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}}
 @media(max-width:520px) {.import-metrics{grid-template-columns:1fr;} .import-card{padding:14px;} .import-intro{padding:14px;}}
+
+/* Revisión asistida: sugerencias derivadas del histórico, jamás automáticas. */
+.review-assist-panel {
+  margin: 18px 0;
+  border: 1px solid #b9d6e8;
+  border-radius: 11px;
+  background: #f1f8fc;
+  padding: 13px 15px;
+}
+.review-assist-panel > strong {
+  color: #345d7b;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+.review-assist-panel h3 { margin: 6px 0 7px; color: #173c5f; font-size: 14px; }
+.review-assist-panel p { font-size: 12px; line-height: 1.55; color: #3f5871; margin: 5px 0; }
+.review-assist-panel .review-assist-disclaimer {font-size: 11px; color: #667b91; margin-top: 9px;}
+.review-assist-button {
+  border: 1px solid #83aeca;
+  background: #fff;
+  color: #244d80;
+  font-size: 12px;
+  font-weight: 750;
+  border-radius: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  margin-top: 12px;
+}
+.review-assist-button:hover { background: #e5f2ff; }
+.review-assist-button:focus-visible { outline: 3px solid #8badd4; outline-offset: 2px; }
