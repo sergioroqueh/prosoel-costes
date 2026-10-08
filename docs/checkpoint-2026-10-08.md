@@ -286,3 +286,8 @@ PVP, descuento, neto, total y archivo de origen.
 - Sintaxis de JavaScript PASS; HTML y CSS con selectores correctos; permisos y recuentos conservados.
 - Auditor Supabase: sin avisos nuevos; persiste aviso previo de protección de contraseñas filtradas desactivada.
 - **Pendiente:** prueba visual final desde navegador real y definición del flujo de aprobación controlada.
+
+### Cierre del despliegue V7
+- GitHub Pages Actions run #43, commit `0dec3cac`: `completed / success`; la nueva pestaña de Normalización está publicada.
+- Punto de control guardado sin alterar el histórico; SQL de la cola en GitHub y Supabase. Primera prueba recomendada: filtrar **Conflictos de potencia**, abrir `CLP160APMB4C` y comprobar por separado las luminarias de 38 W y 44 W.
+- Próxima fase tras validación visual: decisiones de normalización supervisadas y auditables, con evidencia, revisión individual y sin combinaciones por nombre parecido.
