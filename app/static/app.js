@@ -67,6 +67,7 @@ const purchaseEditHeading = document.getElementById("purchaseEditHeading");
 const purchaseEditClose = document.getElementById("purchaseEditClose");
 const purchaseEditCancel = document.getElementById("purchaseEditCancel");
 const purchaseEditSource = document.getElementById("purchaseEditSource");
+const purchaseEditHistory = document.getElementById("purchaseEditHistory");
 const purchaseEditAction = document.getElementById("purchaseEditAction");
 const purchaseEditFields = document.getElementById("purchaseEditFields");
 const purchaseEditReference = document.getElementById("purchaseEditReference");
@@ -1838,7 +1839,56 @@ function openPurchaseReviewEditor(line,candidate) {
   purchaseEditAction.querySelector('option[value="restore"]').disabled=
     !line.line_excluded && !line.corrected_reference && !line.corrected_description;
   updatePurchaseReviewAction();
+  purchaseEditHistory.textContent="Consultando la bitácora...";
   purchaseEditDialog.showModal();
+  loadPurchaseReviewHistory(line);
+}
+
+async function loadPurchaseReviewHistory(line) {
+  const [lineHistory, orderHistory]=await Promise.all([
+    supabase.from("purchase_review_events")
+      .select("id,target_type,previous_value,next_value,reason,actor,occurred_at")
+      .eq("target_type","line").eq("target_id",line.order_line_id)
+      .order("occurred_at",{ascending:false}).limit(12),
+    supabase.from("purchase_review_events")
+      .select("id,target_type,previous_value,next_value,reason,actor,occurred_at")
+      .eq("target_type","order").eq("target_id",line.order_id)
+      .order("occurred_at",{ascending:false}).limit(12),
+  ]);
+  if(purchaseLineInEditor?.order_line_id!==line.order_line_id)return;
+  if(lineHistory.error||orderHistory.error){
+    purchaseEditHistory.textContent="No se pudo consultar la bitácora de este pedido.";
+    return;
+  }
+  const events=[...(lineHistory.data||[]),...(orderHistory.data||[])]
+    .sort((a,b)=>String(b.occurred_at).localeCompare(String(a.occurred_at)));
+  if(!events.length){
+    purchaseEditHistory.textContent="Todavía no se han registrado correcciones o exclusiones.";
+    return;
+  }
+  const html=[];
+  for(const event of events.slice(0,16)){
+    const date=new Date(event.occurred_at);
+    const when=Number.isFinite(date.getTime())?date.toLocaleString("es-ES"):event.occurred_at;
+    const isOrder=event.target_type==="order";
+    const before=event.previous_value||{};
+    const after=event.next_value||{};
+    const state=after.excluded?(isOrder?"Pedido excluido":"Línea excluida"):
+      isOrder?"Pedido restaurado":
+      after.corrected_reference||after.corrected_description?"Corrección registrada":"Línea restaurada";
+    html.push('<div class="purchase-review-history-entry"><strong>'+
+      escapeHtml(state)+'</strong> · '+escapeHtml(when)+
+      ' · '+escapeHtml(event.actor||"Administrador"));
+    if(!isOrder&&(before.corrected_reference!==after.corrected_reference ||
+      before.corrected_description!==after.corrected_description)){
+      html.push('<p>Antes: '+escapeHtml(before.corrected_reference||"Referencia original")+
+        ' · '+escapeHtml(before.corrected_description||"Descripción original")+
+        '</p><p>Después: '+escapeHtml(after.corrected_reference||"Referencia original")+
+        ' · '+escapeHtml(after.corrected_description||"Descripción original")+'</p>');
+    }
+    html.push('<p><em>Motivo:</em> '+escapeHtml(event.reason||"—")+'</p></div>');
+  }
+  purchaseEditHistory.innerHTML=html.join("");
 }
 
 async function submitPurchaseReview() {
