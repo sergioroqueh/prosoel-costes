@@ -1552,7 +1552,7 @@ function reviewPurchaseTableHtml(rows, notes) {
   return html.join("");
 }
 
-function renderReviewCandidate(row, purchases, reviewEvents = []) {
+function renderReviewCandidate(row, purchases, reviewEvents = [], researchEvidence = []) {
   const notes = candidateDescriptionGroups(purchases);
   const activePurchases = purchases.filter((purchase) => purchase.usable_for_prices &&
     purchase.belongs_to_effective_reference);
@@ -1607,6 +1607,34 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
   }
   if(outliers.size) {
     html.push('<p class="comparison-note">' + outliers.size + ' posibles precios atípicos identificados; no se han corregido ni descartado del histórico.</p>');
+  }
+  if (researchEvidence.length) {
+    const incompatible = researchEvidence.filter((entry) => !entry.description_match).length;
+    html.push('<section class="review-manufacturer-sources">');
+    html.push('<h3>Documentación oficial propuesta (' + researchEvidence.length + ')</h3>');
+    html.push('<p>Se ha localizado documentación del fabricante para estas referencias comerciales. ' +
+      'Son evidencias pendientes de aprobación: no sustituyen el Excel original, ' +
+      'no unifican precios y no certifican una equivalencia entre proveedores.</p>');
+    if (incompatible) html.push('<div class="review-source-disagreement"><strong>Atención:</strong> ' +
+      incompatible + ' descripciones de compra no coinciden con la referencia del fabricante. ' +
+      'Revisar el pedido antes de cualquier corrección.</div>');
+    for (const entry of researchEvidence) {
+      const mismatch = !entry.description_match;
+      const supplier = entry.supplier_name || "Proveedor sin identificar";
+      html.push('<div class="review-manufacturer-source' + (mismatch ? ' is-discrepant' : '') + '">');
+      html.push('<strong>' + escapeHtml(entry.supplier_reference || "Sin referencia") +
+        '</strong> · ' + escapeHtml(supplier) +
+        ' · ' + Number(entry.purchases || 0) + ' compras');
+      html.push('<div class="review-manufacturer-product">' + escapeHtml(entry.supplier_description || "") + '</div>');
+      html.push('<div class="review-source-verdict">' + (mismatch
+        ? '⚠ No coincide con las características del código oficial: verificar'
+        : 'Referencia y descripción compatibles a nivel documental; aprobación técnica pendiente') + '</div>');
+      html.push('<a href="' + escapeHtml(entry.source_url) +
+        '" target="_blank" rel="noopener noreferrer">Consultar fabricante: ' +
+        escapeHtml(entry.source_title || entry.manufacturer || "Ficha oficial") + ' ↗</a>');
+      html.push('</div>');
+    }
+    html.push('</section>');
   }
   html.push('<h3>Descripciones realmente observadas</h3>');
   for(const [index,item] of notes.slice(0,20).entries()){
@@ -1841,7 +1869,7 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
 async function showReviewCandidate(row) {
   const requestId = ++reviewDetailGeneration;
   reviewDetail.innerHTML = '<div class="empty-state">Consultando líneas originales y proveedores…</div>';
-  const [history, details, events] = await Promise.all([
+  const [history, details, events, manufacturerEvidence] = await Promise.all([
     supabase.rpc("purchase_reference_review_history", {
       p_reference: row.observed_reference, result_limit: 500,
     }),
@@ -1851,6 +1879,9 @@ async function showReviewCandidate(row) {
     supabase.from("normalization_review_events")
       .select("id,previous_status,next_status,next_note,changed_by,changed_at")
       .eq("reference_key", row.reference_key).order("changed_at",{ascending:false}).limit(12),
+    supabase.rpc("material_research_evidence_for_reference", {
+      p_reference: row.observed_reference,result_limit: 35,
+    }),
   ]);
   if (requestId !== reviewDetailGeneration) return;
   if (history.error || details.error || !details.data) {
@@ -1863,10 +1894,11 @@ async function showReviewCandidate(row) {
     return;
   }
   if (events.error) console.warn("Historial de decisiones no disponible", events.error);
+  if (manufacturerEvidence.error) console.warn("Documentación propuesta no disponible", manufacturerEvidence.error);
   const freshRow = { ...row, ...details.data };
   const listed = reviewRows.find((item) => item.reference_key === row.reference_key);
   if (listed) Object.assign(listed, { review_status: freshRow.review_status });
-  renderReviewCandidate(freshRow, history.data, events.data || []);
+  renderReviewCandidate(freshRow, history.data, events.data || [], manufacturerEvidence.data || []);
 }
 
 
