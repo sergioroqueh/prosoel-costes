@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex,nofollow">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https://kusbndefngttaiytcrui.supabase.co wss://kusbndefngttaiytcrui.supabase.co; img-src 'self' data:; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <title>PROSOEL Costes</title>
-  <link rel="stylesheet" href="./styles.css?v=20261008-v5">
+  <link rel="stylesheet" href="./styles.css?v=20261008-v6">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -78,7 +78,7 @@
           <button class="reset-filters" id="resetFiltersButton" type="button">Limpiar filtros</button>
         </div>
         <div class="filters-grid">
-          <div class="supplier-field">
+          <div class="filter-field supplier-field">
             <label for="supplierFilter">Proveedor</label>
             <div class="supplier-combobox" id="supplierCombobox">
               <input id="supplierFilter" type="search" placeholder="Todos los proveedores"
@@ -89,15 +89,17 @@
                    role="listbox" aria-label="Proveedores disponibles"></div>
             </div>
           </div>
-          <label for="yearFilter">Año del pedido
+          <div class="filter-field">
+            <label for="yearFilter">Año del pedido</label>
             <select id="yearFilter" aria-label="Filtrar por año">
               <option value="">Todos los años</option>
               <option value="2026">2026</option>
               <option value="2025">2025</option>
               <option value="2024">2024</option>
             </select>
-          </label>
-          <label for="sortFilter">Ordenar por
+          </div>
+          <div class="filter-field">
+            <label for="sortFilter">Ordenar por</label>
             <select id="sortFilter" aria-label="Ordenar resultados">
               <option value="relevance">Mayor relevancia</option>
               <option value="recent">Compra más reciente</option>
@@ -105,7 +107,7 @@
               <option value="price_asc">Menor precio neto</option>
               <option value="price_desc">Mayor precio neto</option>
             </select>
-          </label>
+          </div>
         </div>
         <p class="hint">
           Filtra el histórico completo antes de ordenar. Los importes son precios de compra históricos, no ofertas actuales.
@@ -149,6 +151,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261008-v5"></script>
+  <script type="module" src="./app.js?v=20261008-v6"></script>
 </body>
 </html>
