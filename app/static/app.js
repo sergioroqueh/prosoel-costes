@@ -1125,8 +1125,8 @@ function wireOriginButtons() {
 const reviewStatusLabels = {
   pending: "Pendiente",
   needs_evidence: "Necesita evidencia",
-  distinct_products: "Productos distintos",
-  ready_for_mapping: "Identidad para vincular",
+  distinct_products: "Contiene productos distintos",
+  ready_for_mapping: "Pendiente de vincular",
 };
 const reviewRiskLabels = {
   technical_conflict: "Conflicto técnico",
@@ -1314,8 +1314,8 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
     const options = [
       ["pending", "Mantener pendiente / reabrir"],
       ["needs_evidence", "Necesita más evidencia"],
-      ["distinct_products", "Son productos distintos: no fusionar"],
-      ["ready_for_mapping", "Identidad técnica verificada: pendiente de vincular"],
+      ["distinct_products", "Contiene productos distintos: NO fusionar el grupo"],
+      ["ready_for_mapping", "Mismo producto verificado: vinculación posterior"],
     ];
     for (const [value, label] of options) {
       html.push('<option value="' + value + '"' +
