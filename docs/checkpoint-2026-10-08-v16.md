@@ -67,3 +67,11 @@ La automatización semanal de GitHub **está configurada pero NO consulta Supaba
 2. Configurar GitHub Actions secret y ejecutar una **ronda real pequeña**, sin publicar ninguna ficha.
 3. Analizar resultados y ampliar fabricantes/familias. El sistema puede priorizar productos por frecuencia; nunca atribuir fabricantes a cables de almacén que no los identifiquen.
 4. Más adelante: aprobación supervisada dentro de PROSOEL Costes, con documentación contrastada y auditoría antes de publicar nuevos nombres de ayuda.
+
+## Cierre de despliegue y seguridad
+- **GitHub Pages V16:** ejecución #110, commit `024c8ab3`, `completed / success`.
+- **Tests del investigador:** workflow `Research official material references` #1, `completed / success`. Valida sintaxis funcional mediante Python `unittest`; no investiga aún por no haber clave configurada.
+- **Supabase Security Advisor:** detectó RPC de prioridad `SECURITY DEFINER` ejecutable por `authenticated`. Corregido en `20261008_037_restrict_research_priority_rpc.sql`: `authenticated=false`, `anon=false`, `service_role=true` en `has_function_privilege`. Advisor sin ese aviso tras la corrección.
+- Siguen avisos preexistentes: tabla privada de staging con RLS sin política (INFO, por diseño) y protección frente a contraseñas filtradas deshabilitada (WARN). Remediación contraseña: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
+- Conteos al cierre: **18 fuentes oficiales propuestas**, **1 incompatibilidad descriptiva**, **1 nombre de ayuda previamente publicado (Pinazo)**. No se han publicado nombres ni modificado compras durante V16.
+- La credencial `SUPABASE_SERVICE_ROLE_KEY` de GitHub Actions **todavía no se ha configurado**: no afirmar que el investigador semanal ya está funcionando con Supabase. Con esa acción se podrá hacer la primera prueba en modo simulación.
