@@ -291,3 +291,42 @@ PVP, descuento, neto, total y archivo de origen.
 - GitHub Pages Actions run #43, commit `0dec3cac`: `completed / success`; la nueva pestaña de Normalización está publicada.
 - Punto de control guardado sin alterar el histórico; SQL de la cola en GitHub y Supabase. Primera prueba recomendada: filtrar **Conflictos de potencia**, abrir `CLP160APMB4C` y comprobar por separado las luminarias de 38 W y 44 W.
 - Próxima fase tras validación visual: decisiones de normalización supervisadas y auditables, con evidencia, revisión individual y sin combinaciones por nombre parecido.
+
+## Actualización V8 — confirmación manual desde la aplicación (2026-10-08)
+
+### Solicitud y criterio
+- El usuario preguntó si puede **confirmar** las equivalencias desde la pestaña Normalización. En V7 solo había consulta.
+- V8 añade decisiones **supervisadas y auditadas** directamente en la app; no es una fusión real de productos ni una asignación automática de `material_id`.
+- Cada decisión está ligada al grupo de referencia observada (no todavía a una identidad técnica definitiva por cada variante). Un grupo puede contener productos distintos y debe tratarse así.
+
+### Base de datos / seguridad
+- Migración `supabase/migrations/20261008_009_review_decisions_admin_audit.sql` aplicada y versionada.
+- Tabla `public.normalization_review_events` con historial inmutable de cambios: referencia, estado anterior/nuevo, nota anterior/nueva, usuario real de la sesión y fecha.
+- Trigger `private.audit_normalization_review` asigna `reviewed_at`/`reviewed_by`, valida motivo y crea la bitácora automáticamente. Trigger en esquema `private`, `SECURITY DEFINER` con `search_path=''`, sin permiso EXECUTE para `anon/authenticated/public`.
+- Privilegios a la vista: `authenticated` tiene UPDATE **solo** de `review_status` y `review_note`, no en campos técnicos ni históricos. Política RLS UPDATE permite únicamente a la cuenta `admin` ya existente y activa, verificada con JWT y `app_users`.
+- Usuarios existentes sin cambio: cuenta Sergio rol `admin`; otra cuenta rol `user` puede consultar pero no confirmar.
+- Estados disponibles: `pending` (volver a pendiente), `needs_evidence`, `distinct_products` (contiene artículos distintos, no fusionar), `ready_for_mapping` (identidad verificada según revisión, pero **todavía no consolidada**).
+- La decisión `ready_for_mapping` está prohibida si un código agrupa distintas potencias explícitas. Justificación mínima 12/25 caracteres según acción; nota máxima 2.000 caracteres.
+- Auditoría solo con SELECT para usuarios autorizados; `anon` sin permisos. No se ha añadido ningún usuario.
+
+### Web
+- `app/static/app.js` muestra formulario a `admin` y vista solo lectura al otro usuario.
+- Campo de estado, nota técnica, casilla explícita de comprobación, botón **Guardar revisión**, errores/success y historial reciente de cambios.
+- La escritura utiliza bloqueo optimista por `review_status` y `reviewed_at` para no sobrescribir una revisión cambiada concurrentemente.
+- Se cargan los metadatos actualizados y hasta 12 entradas de auditoría al abrir la referencia; las tarjetas muestran el estado actual.
+- `app/static/styles.css`: formato de controles, auditoría y mensajes para móvil/escritorio.
+- `app/static/index.html`: nueva versión de caché `v=20261008-v8`.
+
+### Pruebas
+- Esquema SQL: en una transacción revertida, Sergio/admin cambió `CLP160APMB4C` a `distinct_products`; se generó 1 evento, se atribuyó el responsable y se conservaron 0 materiales y 0 líneas vinculadas. La transacción se revirtió.
+- Intento como rol `user`: **0 filas actualizadas** por RLS.
+- `authenticated` no tiene UPDATE de `supplier_count` ni INSERT en auditoría; `anon` no tiene UPDATE.
+- JS de render real con datos `CLP160APMB4C`: cuenta admin ve botón y casilla; opción de vincular deshabilitada por coexistir 38 W y 44 W; cuenta user no ve formulario. PASS.
+- Prueba simulada del guardado: se envía una única actualización, se refresca listado y detalle, y se muestra mensaje de registro en bitácora. PASS.
+- Recuento tras pruebas: 2.863 pedidos, 11.538 líneas, 890 candidatos, **0 decisiones persistidas, 0 eventos reales y 0 materiales canónicos**.
+- Auditor Supabase sin avisos nuevos: persisten los previos de staging RLS sin policy (intencional) y protección Auth de contraseñas filtradas.
+
+### Pendiente al cerrar la fase
+- Confirmar GitHub Pages deployment de V8.
+- Prueba humana: abrir Normalización / `CLP160APMB4C`, seleccionar `Contiene productos distintos: NO fusionar el grupo`, añadir justificación (38 W 1685 mm vs 44 W 1965 mm), marcar confirmación y pulsar Guardar. Ver mensaje, estado e historial.
+- Próximo módulo: consolidación de variantes y materiales canónicos **solo después de revisión técnica evidenciada y explícita**, nunca por simple coincidencia de códigos.
