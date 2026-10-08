@@ -848,8 +848,12 @@ function renderHistoricalDetail(result, rows) {
     html.push('<div id="referenceComparison" aria-live="polite"></div>');
   }
 
-  html.push('<div class="section-title"><h3>Procedencia</h3><span class="muted">' + rows.length + " líneas</span></div>");
-  html.push(historyTableHtml(rows));
+  // Fuente única: comienza con las líneas de la variante seleccionada;
+  // al comparar, se sustituye por el historial exacto de todos los proveedores.
+  html.push('<div class="section-title"><h3>Procedencia</h3><span id="provenanceCount" class="muted">' + rows.length + " líneas</span></div>");
+  html.push('<p id="provenanceScope" class="provenance-scope">Compras de la descripción seleccionada' +
+    (selectedFilters().supplierId !== null || selectedFilters().year !== null ? ' con los filtros actuales.' : '.') + '</p>');
+  html.push('<div id="provenanceRows">' + historyTableHtml(rows) + '</div>');
 
   detailPanel.innerHTML = html.join("");
   wireOriginButtons();
@@ -939,13 +943,6 @@ function makePriceTimeline(rows, outliers) {
   return lines.join("");
 }
 
-function comparisonHistoryHtml(rows) {
-  // Prefijos propios: la procedencia principal y la comparativa coexisten en la ficha.
-  return historyTableHtml(rows)
-    .replaceAll('data-origin-index="', 'data-comparison-index="')
-    .replaceAll('id="origin-row-', 'id="comparison-origin-row-');
-}
-
 function renderReferenceComparison(container, reference, rows) {
   if (!rows.length) {
     container.innerHTML = '<p class="comparison-note">No hay compras históricas para esta referencia.</p>';
@@ -995,16 +992,8 @@ function renderReferenceComparison(container, reference, rows) {
   html.push('<h4>Evolución de precios de compra</h4>');
   html.push(makePriceTimeline(rows,outliers));
   html.push('<p class="comparison-note">Cada punto corresponde a una línea de compra validada aritméticamente. Un precio diferente puede deberse a cantidad, descuento, fecha o condiciones comerciales.</p>');
-  html.push('<details class="comparison-details"><summary>Ver las ' + rows.length + ' líneas originales y su procedencia</summary>');
-  html.push(comparisonHistoryHtml(rows));
-  html.push('</details></section>');
+  html.push('</section>');
   container.innerHTML = html.join("");
-  container.querySelectorAll("[data-comparison-index]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const target = container.querySelector("#comparison-origin-row-" + button.getAttribute("data-comparison-index"));
-      if (target) target.classList.toggle("hidden");
-    });
-  });
 }
 
 async function showReferenceComparison(reference, detailRequestId) {
@@ -1027,6 +1016,20 @@ async function showReferenceComparison(reference, detailRequestId) {
     return;
   }
   renderReferenceComparison(area, reference, data || []);
+  // Solo una tabla de Procedencia en la ficha: ahora incluye todos los pedidos
+  // de la referencia exacta, no solamente la variante inicialmente elegida.
+  if (data?.length) {
+    const provenanceRows = detailPanel.querySelector("#provenanceRows");
+    const provenanceCount = detailPanel.querySelector("#provenanceCount");
+    const provenanceScope = detailPanel.querySelector("#provenanceScope");
+    if (provenanceRows && provenanceCount && provenanceScope) {
+      provenanceRows.innerHTML = historyTableHtml(data);
+      provenanceCount.textContent = data.length + (data.length === 1 ? " línea" : " líneas");
+      provenanceScope.textContent = "Todas las compras con esta referencia de compra en todos los proveedores y años. " +
+        "La coincidencia de código no garantiza equivalencia técnica.";
+      wireOriginButtons();
+    }
+  }
   button.textContent = "Comparativa cargada";
 }
 
