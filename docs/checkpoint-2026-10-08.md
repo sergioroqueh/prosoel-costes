@@ -250,3 +250,39 @@ PVP, descuento, neto, total y archivo de origen.
 - Prueba de interacción aislada con las siete líneas reales `A9F79425`: al comparar hay 1 gráfico, no existe acordeón duplicado, la tabla única muestra 7 líneas, contador `7 líneas`, leyenda de alcance global y `wireOriginButtons()` se ejecuta. PASS.
 - Pendiente validación visual final en navegador real del usuario (incluida alineación, expansión "Ver origen" y vista móvil).
 - Última publicación de Pages: comprobar que la ejecución del commit HTML `77ef6f5d` termina con éxito (o commit posterior en `app/static`).
+
+## Actualización V7 — normalización conservadora: cola de revisión real
+
+### Alcance
+- Se inicia la fase de catálogo normalizado, **sin aplicar fusiones automáticas** ni aprobar equivalencias por parecido textual.
+- Inventario del histórico: 3.474 referencias de compra no vacías y distintas tras compactar espacios, de las cuales **890** cumplen criterios para revisión:
+  - 714 aparecen en más de un proveedor.
+  - 502 tienen distintas descripciones originales (las categorías se solapan).
+  - 6 presentan más de una potencia explícita (W) bajo el mismo código.
+- Al clasificar los 890 grupos para la cola: 6 `technical_conflict`, 496 `variant_descriptions`, 388 `cross_supplier` (clases mutuamente excluyentes: cada referencia tiene la prioridad de su riesgo).
+
+### Base de datos
+- Nueva migración `supabase/migrations/20261008_008_normalization_review_queue.sql`.
+- Tabla `public.normalization_review_groups` guarda propuestas de revisión y métricas (referencia original, descripciones, proveedores, pedidos, potencia, prioridad).
+- Función `public.normalization_review_queue`: búsqueda por código o descripción, filtro de riesgo, paginación y total de candidatos.
+- Solo lectura desde la web. RLS y `private.has_app_access()` activos; `anon` no ejecuta la función. La identidad autenticada fuera de la allowlist obtiene 0 resultados.
+- Datos históricos originales intactos; no se crean materiales ni se asigna `material_id`.
+
+### Interfaz
+- Nueva pestaña `Normalización` junto a `Consultar precios`, en `app/static/index.html`.
+- Búsqueda por referencia o descripción, filtros por conflicto técnico/descripción distinta/código en varios proveedores, y paginación de 30 en 30.
+- Cada candidato muestra las descripciones observadas, número de proveedores y pedidos, precios históricos por proveedor, validación, posibles atípicos, y acceso a las líneas de origen.
+- Botón para buscar la referencia en la pestaña de precios.
+- CSS adaptable a móvil en `app/static/styles.css`, lógica `app/static/app.js`.
+- No existe botón de "aprobar" todavía; se añadirá con decisión explícita y evidencias suficientes para evitar fusiones indebidas.
+- Se ha preservado el buscador, comparativa V5 y Procedencia única V6.
+- Cache CSS/JS `v=20261008-v7`.
+
+### Pruebas
+- SQL autenticado: 890 candidatos; 6 riesgos `technical_conflict`, 30 resultados por página; filtro exacto `CLP160APMB4C` y `A9F79425` correcto.
+- `CLP160APMB4C`: hay dos líneas en un pedido, con descripciones técnicas incompatibles como un solo material: **38 W / 1685 mm** vs. **44 W / 1965 mm**. Advertencia mostrada (prueba JS con datos reales).
+- `A9F79425`: devuelve 7 líneas de 6 pedidos de 3 proveedores; no se mezcla con `A9K17425`.
+- Prueba de render del detalle con datos reales: advertencia de conflicto, ambas potencias presentes y botón "Ver origen" en cada compra. PASS.
+- Sintaxis de JavaScript PASS; HTML y CSS con selectores correctos; permisos y recuentos conservados.
+- Auditor Supabase: sin avisos nuevos; persiste aviso previo de protección de contraseñas filtradas desactivada.
+- **Pendiente:** prueba visual final desde navegador real y definición del flujo de aprobación controlada.
