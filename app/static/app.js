@@ -32,6 +32,34 @@ const currentUser = document.getElementById("currentUser");
 
 const searchInput = document.getElementById("searchInput");
 const searchButton = document.getElementById("searchButton");
+const cableSearchToggle = document.getElementById("cableSearchToggle");
+const cableSearchPanel = document.getElementById("cableSearchPanel");
+const cableFamily = document.getElementById("cableFamily");
+const cableCores = document.getElementById("cableCores");
+const cableSection = document.getElementById("cableSection");
+const cablePE = document.getElementById("cablePE");
+const cableColor = document.getElementById("cableColor");
+const cableSearchApply = document.getElementById("cableSearchApply");
+let guidedCableMode = false;
+function updateCableModeIndicator() {
+  cableSearchToggle.classList.toggle("is-mode-active", guidedCableMode);
+  cableSearchApply.textContent = guidedCableMode ? "Actualizar cables" : "Encontrar cables";
+}
+function guidedCableParams(filters, offset) {
+  return {
+    p_type: cableFamily.value || null,
+    p_cores: cableCores.value ? Number(cableCores.value) : null,
+    p_section: cableSection.value ? Number(cableSection.value) : null,
+    p_pe: cablePE.value || null,
+    p_color: cableColor.value || null,
+    p_supplier_id: filters.supplierId,
+    p_year: filters.year,
+    p_sort: filters.sort,
+    result_limit: 30,
+    p_offset: offset,
+  };
+}
+
 const resultsNode = document.getElementById("results");
 const resultCount = document.getElementById("resultCount");
 const exactReferenceNotice = document.getElementById("exactReferenceNotice");
@@ -197,7 +225,7 @@ function selectSupplier(option) {
   selectedSupplierId = option.id;
   supplierFilter.value = option.id === null ? "" : option.name;
   closeSupplierSuggestions({ restore: false });
-  if (previousId !== selectedSupplierId && searchInput.value.trim().length >= 2) {
+  if (previousId !== selectedSupplierId && (guidedCableMode || searchInput.value.trim().length >= 2)) {
     runSearch();
   }
 }
@@ -589,7 +617,7 @@ function renderExactReferenceNotice(query, filters, referenceRows) {
 
 async function runSearch({ append = false } = {}) {
   const query = searchInput.value.trim();
-  if (query.length < 2) {
+  if (!guidedCableMode && query.length < 2) {
     ++searchGeneration;
     visibleRows = [];
     totalResults = 0;
@@ -616,15 +644,17 @@ async function runSearch({ append = false } = {}) {
   searchButton.textContent = "Buscando…";
   moreResultsButton.disabled = true;
 
-  const searchPromise = supabase.rpc("search_costs_filtered", {
-    search_query: query,
-    result_limit: 30,
-    p_supplier_id: filters.supplierId,
-    p_year: filters.year,
-    p_sort: filters.sort,
-    p_offset: append ? visibleRows.length : 0,
-  });
-  const referencePromise = !append && (filters.supplierId !== null || filters.year !== null)
+  const searchPromise = guidedCableMode
+    ? supabase.rpc("search_cables_filtered", guidedCableParams(filters, append ? visibleRows.length : 0))
+    : supabase.rpc("search_costs_enriched", {
+      search_query: query,
+      result_limit: 30,
+      p_supplier_id: filters.supplierId,
+      p_year: filters.year,
+      p_sort: filters.sort,
+      p_offset: append ? visibleRows.length : 0,
+    });
+  const referencePromise = !guidedCableMode && !append && (filters.supplierId !== null || filters.year !== null)
     && looksLikePurchaseCode(query)
     ? supabase.rpc("reference_purchase_history_review", { p_reference: query, result_limit: 500 })
     : Promise.resolve({ data: [], error: null });
@@ -678,10 +708,12 @@ function renderResults(rows, total) {
     const badge = fragment.querySelector(".purchase-badge");
 
     button.classList.add(row.kind === "material" ? "verified" : "pending");
-    title.textContent = row.title || "Sin descripción";
+    title.textContent = row.descriptive_name || row.title || "Sin descripción";
 
     const metaParts = [];
     if (row.reference) metaParts.push(row.reference);
+    if (row.descriptive_name && row.title !== row.descriptive_name)
+      metaParts.push("Descripción del pedido: " + row.title);
     if (row.manufacturer) metaParts.push(row.manufacturer);
     metaParts.push(row.kind === "material" ? "Material consolidado" : "Compra histórica · sin ficha unificada");
     if (row.last_supplier) metaParts.push("Último: " + row.last_supplier);
@@ -886,7 +918,7 @@ function renderHistoricalDetail(result, rows) {
 
   const html = [];
   html.push('<div class="detail-header">');
-  html.push('<div><h2>' + escapeHtml(result.title) + "</h2>");
+  html.push('<div><h2>' + escapeHtml(result.descriptive_name || result.title) + "</h2>");
   html.push('<div class="detail-subtitle">' + escapeHtml(result.reference || "Sin referencia") + "</div></div>");
   html.push('<span class="status-badge pending">Identidad técnica sin verificar</span>');
   html.push("</div>");
@@ -905,6 +937,16 @@ function renderHistoricalDetail(result, rows) {
   );
   html.push("</div>");
 
+  if (result.descriptive_name) {
+    html.push('<div class="historical-name-profile"><strong>Nombre ampliado para búsqueda</strong>');
+    html.push('<p>Esta descripción facilita encontrar el producto, pero no fusiona referencias ni acredita por sí sola la configuración exacta.</p>');
+    html.push('<p><strong>Texto del pedido:</strong> ' + escapeHtml(result.title) + '</p>');
+    if (result.descriptive_source_url && /^https:\/\//i.test(result.descriptive_source_url)) {
+      html.push('<p><a href="' + escapeHtml(result.descriptive_source_url) +
+        '" target="_blank" rel="noopener noreferrer">Consultar documentación del fabricante ↗</a></p>');
+    }
+    html.push('</div>');
+  }
   html.push('<div class="price-origin">');
   html.push('<div class="price-origin-title">Histórico trazable</div>');
   html.push("<p>Precio de compra histórico, con proveedor y fecha verificables en el pedido. La identidad del producto aún no se ha validado para agruparlo con otras referencias; esto no invalida su precio.</p>");
@@ -1680,6 +1722,8 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
     yearFilter.value = "";
     sortFilter.value = "recent";
     searchInput.value = row.observed_reference;
+    guidedCableMode = false;
+    updateCableModeIndicator();
     activateWorkspace("costs");
     runSearch();
   });
@@ -2405,13 +2449,43 @@ importAcknowledged.addEventListener("change",()=>{
 });
 importSubmitButton.addEventListener("click",commitNewOrder);
 
-searchButton.addEventListener("click", () => runSearch());
+cableSearchToggle.addEventListener("click", () => {
+  const shouldOpen = cableSearchPanel.classList.contains("hidden");
+  cableSearchPanel.classList.toggle("hidden", !shouldOpen);
+  cableSearchToggle.setAttribute("aria-expanded", String(shouldOpen));
+});
+cableSearchApply.addEventListener("click", () => {
+  guidedCableMode = true;
+  searchInput.value = "";
+  updateCableModeIndicator();
+  runSearch();
+});
+for (const control of [cableFamily, cableCores, cableSection, cablePE, cableColor]) {
+  control.addEventListener("change", () => {
+    if (guidedCableMode) runSearch();
+  });
+}
+searchButton.addEventListener("click", () => {
+  guidedCableMode = false;
+  updateCableModeIndicator();
+  runSearch();
+});
+searchInput.addEventListener("input", () => {
+  if (guidedCableMode) {
+    guidedCableMode = false;
+    updateCableModeIndicator();
+  }
+});
 searchInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") runSearch();
+  if (event.key === "Enter") {
+    guidedCableMode = false;
+    updateCableModeIndicator();
+    runSearch();
+  }
 });
 for (const input of [yearFilter, sortFilter]) {
   input.addEventListener("change", () => {
-    if (searchInput.value.trim().length >= 2) runSearch();
+    if (guidedCableMode || searchInput.value.trim().length >= 2) runSearch();
   });
 }
 resetFiltersButton.addEventListener("click", () => {
@@ -2420,7 +2494,20 @@ resetFiltersButton.addEventListener("click", () => {
   closeSupplierSuggestions();
   yearFilter.value = "";
   sortFilter.value = "recent";
+  guidedCableMode = false;
+  for (const control of [cableFamily, cableCores, cableSection, cablePE, cableColor]) control.value = "";
+  updateCableModeIndicator();
   if (searchInput.value.trim().length >= 2) runSearch();
+  else {
+    ++searchGeneration;
+    visibleRows = [];
+    totalResults = 0;
+    resultCount.textContent = "";
+    resultsNode.innerHTML = '<div class="empty-state">Escribe una descripción o usa la búsqueda guiada de cables.</div>';
+    resultsFooter.classList.add("hidden");
+    exactReferenceNotice.classList.add("hidden");
+    detailPanel.innerHTML = '<div class="empty-state">Selecciona un material para consultar su procedencia.</div>';
+  }
 });
 moreResultsButton.addEventListener("click", () => runSearch({ append: true }));
 
