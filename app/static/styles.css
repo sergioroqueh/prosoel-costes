@@ -1950,3 +1950,52 @@ button, input, select, textarea { accent-color: var(--prosoel-blue); }
 @media(max-width:850px) {
   .enrichment-summary-metrics { justify-content: flex-start; }
 }
+
+/* V16 — fabricante identificado sin aprobar una equivalencia */
+.review-manufacturer-sources {
+  border: 1px solid #c7d8eb;
+  border-radius: 11px;
+  background: #f5f9ff;
+  padding: 14px;
+  margin: 16px 0;
+}
+.review-manufacturer-sources h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--prosoel-blue,#134079);
+}
+.review-manufacturer-sources > p {
+  margin: 0 0 12px;
+  line-height: 1.55;
+  color: #475c74;
+  font-size: 11px;
+}
+.review-manufacturer-source {
+  border: 1px solid #d8e4f0;
+  background: #fff;
+  padding: 10px 12px;
+  border-radius: 9px;
+  margin: 8px 0;
+  line-height: 1.45;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.review-manufacturer-source.is-discrepant { border-color: #e8b0a0; background: #fff6f3; }
+.review-manufacturer-product { color:#42556a; font-size:11px; margin-top: 5px; }
+.review-source-verdict { color:#315d48;font-size:11px;margin:7px 0; }
+.review-manufacturer-source.is-discrepant .review-source-verdict {color:#a3402f;font-weight:750;}
+.review-source-disagreement {
+  padding:10px 12px;
+  border:1px solid #ebb9a8;
+  border-radius:8px;
+  background:#fff1ec;
+  color:#853a28;
+  font-size:12px;
+  line-height:1.5;
+  margin-bottom:12px;
+}
+.review-manufacturer-source a {
+  font-size:11px;
+  font-weight:750;
+  color:var(--prosoel-blue,#134079);
+}
