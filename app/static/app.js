@@ -1664,6 +1664,27 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
 
   const sourceSelector = reviewDetail.querySelector("#reviewLineDescriptionFilter");
   const details = reviewDetail.querySelector("#reviewPurchaseDetails");
+  const selectVisible = reviewDetail.querySelector("#reviewSelectVisible");
+  const selectedCounter = reviewDetail.querySelector("#reviewSelectedCount");
+  const bulkButton = reviewDetail.querySelector("#reviewBulkButton");
+  const checkboxes=()=>[...reviewDetail.querySelectorAll("[data-review-line-checkbox-index]")];
+  const selectedLines=()=>checkboxes().filter((input)=>input.checked)
+    .map((input)=>purchases[Number(input.getAttribute("data-review-line-checkbox-index"))])
+    .filter(Boolean);
+  function updateBulkSelection() {
+    const selected=selectedLines();
+    const visible=checkboxes().filter((input)=>!input.closest("tr").classList.contains("hidden"));
+    const sameOrigin=selected.every((line)=>
+      line.supplier_reference_source===selected[0]?.supplier_reference_source &&
+      line.description_source===selected[0]?.description_source);
+    if(selectedCounter) selectedCounter.textContent=selected.length+" seleccionadas (máximo 30)";
+    if(bulkButton) bulkButton.disabled=selected.length<2 || selected.length>30 || !sameOrigin;
+    if(selectVisible) {
+      selectVisible.checked=visible.length>0 && visible.every((input)=>input.checked);
+      selectVisible.indeterminate=visible.some((input)=>input.checked) && !selectVisible.checked;
+      selectVisible.disabled=visible.length>30;
+    }
+  }
   function applyDescriptionFilter() {
     if (!sourceSelector) return;
     const chosen = sourceSelector.value;
@@ -1675,15 +1696,30 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
       else {
         tr.classList.toggle("hidden",!visible);
         if(visible)count++;
+        if(!visible) tr.querySelectorAll("[data-review-line-checkbox-index]").forEach((input)=>input.checked=false);
       }
     });
     const showing = reviewDetail.querySelector("#reviewLinesShowing");
     if(showing) showing.textContent = count + " líneas";
+    updateBulkSelection();
   }
   if(sourceSelector) {
     sourceSelector.addEventListener("change",applyDescriptionFilter);
     applyDescriptionFilter();
   }
+  checkboxes().forEach((input)=>input.addEventListener("change",updateBulkSelection));
+  if(selectVisible) {
+    selectVisible.addEventListener("change",()=>{
+      const visible=checkboxes().filter((input)=>!input.closest("tr").classList.contains("hidden"));
+      if(visible.length>30){selectVisible.checked=false;return;}
+      visible.forEach((input)=>input.checked=selectVisible.checked);
+      updateBulkSelection();
+    });
+  }
+  if(bulkButton) bulkButton.addEventListener("click",()=>{
+    const selection=selectedLines();
+    if(selection.length>=2 && selection.length<=30) openPurchaseBulkEditor(selection,row);
+  });
   reviewDetail.querySelectorAll("[data-review-description-index]").forEach((button) => {
     button.addEventListener("click", () => {
       if(!sourceSelector || !details)return;
