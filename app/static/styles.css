@@ -356,7 +356,7 @@ main {
   line-height: 1.5;
 }
 
-.hidden { display: none; }
+.hidden { display: none !important; }
 
 @media (max-width: 980px) {
   .layout { grid-template-columns: 1fr; }
@@ -568,3 +568,5 @@ main {
 #appView.hidden {
   display: none !important;
 }
+
+[hidden] { display: none !important; }
