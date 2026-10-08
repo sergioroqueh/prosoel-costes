@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex,nofollow">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https://kusbndefngttaiytcrui.supabase.co wss://kusbndefngttaiytcrui.supabase.co; img-src 'self' data:; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <title>PROSOEL Costes</title>
-  <link rel="stylesheet" href="./styles.css?v=20261008-v10">
+  <link rel="stylesheet" href="./styles.css?v=20261008-v11">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -176,6 +176,37 @@
             </select>
           </label>
         </div>
+        <div class="review-priority-controls" aria-label="Priorizar revisión técnica">
+          <label for="reviewFamilyFilter">Familia técnica probable
+            <select id="reviewFamilyFilter">
+              <option value="">Todas las familias</option>
+              <option value="aparamenta">Aparamenta y protecciones</option>
+              <option value="cables">Cables y conductores</option>
+              <option value="canalizaciones">Tubos y canalizaciones</option>
+              <option value="iluminacion">Iluminación</option>
+              <option value="mecanismos">Mecanismos</option>
+              <option value="telecomunicaciones">Telecomunicaciones</option>
+              <option value="envolventes_cajas">Envolventes y cajas</option>
+              <option value="puesta_tierra">Puesta a tierra</option>
+              <option value="fijaciones">Fijación y accesorios</option>
+              <option value="mixta">Familias incompatibles</option>
+              <option value="sin_clasificar">Pendiente de clasificar</option>
+            </select>
+          </label>
+          <label for="reviewSort">Orden de revisión
+            <select id="reviewSort">
+              <option value="impact">Alertas técnicas y más compras</option>
+              <option value="purchases">Más pedidos</option>
+              <option value="suppliers">Más proveedores</option>
+              <option value="recent">Compras más recientes</option>
+            </select>
+          </label>
+          <label class="review-alert-toggle" for="reviewAlertsOnly">
+            <input id="reviewAlertsOnly" type="checkbox">
+            <span>Solo referencias con alertas técnicas detectadas</span>
+          </label>
+        </div>
+        <p class="review-family-disclaimer">La familia se infiere de todas las descripciones originales. Es una ayuda para revisar, no una identificación verificada del producto.</p>
         <div class="review-guidance">
           <strong>Sin fusiones automáticas.</strong> Compartir código no confirma fabricante ni identidad técnica.
           Antes de consolidar revisaremos modelo, características y procedencia.
@@ -267,6 +298,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261008-v10"></script>
+  <script type="module" src="./app.js?v=20261008-v11"></script>
 </body>
 </html>
