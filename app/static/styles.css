@@ -1360,3 +1360,100 @@ main {
   .import-audit-metrics {grid-template-columns: 1fr;}
   .import-audit-table-head {align-items:start; flex-direction:column;}
 }
+
+/* V11 — normalización segmentada, alertas extraídas del histórico */
+.review-priority-controls {
+  display: grid;
+  grid-template-columns: minmax(180px,1fr) minmax(180px,1fr) minmax(200px,.95fr);
+  gap: 14px;
+  padding: 14px 20px;
+  background: #fff;
+  border: 1px solid #e1e5ea;
+  border-radius: 12px;
+  margin-bottom: 7px;
+  align-items: end;
+}
+.review-priority-controls > label:not(.review-alert-toggle) {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 12px;
+  color: #445773;
+  font-weight: 750;
+  min-width: 0;
+}
+.review-priority-controls select {
+  height: 42px;
+  width: 100%;
+  min-width: 0;
+  font: inherit;
+  font-size: 13px;
+  color: #172033;
+  padding: 0 10px;
+  background: #fff;
+  border: 1px solid #c8d1dd;
+  border-radius: 8px;
+}
+.review-alert-toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #465975;
+  line-height: 1.35;
+}
+.review-alert-toggle input {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: #255785;
+}
+.review-priority-controls select:focus-visible,
+.review-alert-toggle input:focus-visible {
+  outline: 3px solid #8badd4;
+  outline-offset: 2px;
+}
+.review-family-disclaimer {
+  margin: 0 0 12px;
+  color: #69798a;
+  font-size: 11px;
+  line-height: 1.55;
+}
+.review-card-alert {
+  margin-top: 9px;
+  padding: 7px 9px;
+  color: #8d4d18;
+  background: #fff5e5;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.review-card-recheck {
+  margin-top: 8px;
+  padding: 6px 9px;
+  color: #7a3838;
+  background: #ffefed;
+  border-radius: 7px;
+  font-size: 11px;
+}
+.review-alert-evidence {
+  margin: 9px 0;
+  padding-left: 19px;
+}
+.review-alert-evidence li {
+  font-size: 12px;
+  padding: 3px 0;
+}
+.review-warning.severe p { margin-bottom: 0; font-size: 12px; }
+@media (max-width: 1020px) {
+  .review-priority-controls { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .review-alert-toggle { grid-column: span 2; }
+}
+@media (max-width: 620px) {
+  .review-priority-controls { grid-template-columns: 1fr; padding: 13px; }
+  .review-alert-toggle { grid-column: auto; }
+}
