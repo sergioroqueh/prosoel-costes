@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150" role="img" aria-labelledby="title">
+  <title id="title">PROSOEL</title>
+  <rect width="150" height="150" fill="#f7f7f7"/>
+  <path fill="#134079" d="M62 20H109C125 20 137 32.3 137 48.6C137 64.7 125.7 77.3 109 77.3H87V56.2H103.5C108.4 56.2 111.8 53.1 111.8 48.7C111.8 44.1 108.4 41.1 103.5 41.1H62Z"/>
+  <path fill="#ec6b43" fill-rule="evenodd" d="M39.8 41.1H87V125.3H61.1V97.7H39.7C23.4 97.7 11.3 85.4 11.3 69.4S23.4 41.1 39.8 41.1ZM61.1 62.3H45.2C40.5 62.3 36.9 65.4 36.9 69.7S40.5 77.2 45.2 77.2H61.1Z"/>
+</svg>
