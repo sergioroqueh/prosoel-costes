@@ -710,12 +710,19 @@ function renderResults(rows, total) {
     const badge = fragment.querySelector(".purchase-badge");
 
     button.classList.add(row.kind === "material" ? "verified" : "pending");
-    title.textContent = row.descriptive_name || row.title || "Sin descripción";
+    // Nombre principal = el código original del almacén si existe descripción ampliada.
+    // El alias validado facilita la búsqueda, pero jamás sustituye la identidad de compra.
+    title.textContent = row.descriptive_name
+      ? (row.reference || row.title || "Sin descripción")
+      : (row.title || "Sin descripción");
 
     const metaParts = [];
-    if (row.reference) metaParts.push(row.reference);
-    if (row.descriptive_name && row.title !== row.descriptive_name)
-      metaParts.push("Descripción del pedido: " + row.title);
+    if (row.reference && !row.descriptive_name) metaParts.push(row.reference);
+    if (row.descriptive_name) {
+      metaParts.push("Descripción de ayuda: " + row.descriptive_name);
+      if (row.title && row.title !== row.reference)
+        metaParts.push("En el pedido: " + row.title);
+    }
     if (row.manufacturer) metaParts.push(row.manufacturer);
     metaParts.push(row.kind === "material" ? "Material consolidado" : "Compra histórica · sin ficha unificada");
     if (row.last_supplier) metaParts.push("Último: " + row.last_supplier);
@@ -920,8 +927,13 @@ function renderHistoricalDetail(result, rows) {
 
   const html = [];
   html.push('<div class="detail-header">');
-  html.push('<div><h2>' + escapeHtml(result.descriptive_name || result.title) + "</h2>");
-  html.push('<div class="detail-subtitle">' + escapeHtml(result.reference || "Sin referencia") + "</div></div>");
+  html.push('<div><h2>' + escapeHtml(
+    result.descriptive_name
+      ? (result.reference || result.title)
+      : result.title) + "</h2>");
+  html.push('<div class="detail-subtitle">' +
+    escapeHtml(result.descriptive_name ? "Referencia original del almacén" : (result.reference || "Sin referencia")) +
+    "</div></div>");
   html.push('<span class="status-badge pending">Identidad técnica sin verificar</span>');
   html.push("</div>");
 
@@ -940,8 +952,9 @@ function renderHistoricalDetail(result, rows) {
   html.push("</div>");
 
   if (result.descriptive_name) {
-    html.push('<div class="historical-name-profile"><strong>Nombre ampliado para búsqueda</strong>');
-    html.push('<p>Esta descripción facilita encontrar el producto, pero no fusiona referencias ni acredita por sí sola la configuración exacta.</p>');
+    html.push('<div class="historical-name-profile"><strong>Descripción de ayuda / búsqueda</strong>');
+    html.push('<p>' + escapeHtml(result.descriptive_name) + '</p>');
+    html.push('<p>Es información adicional para localizar y comprender el material; no cambia la referencia ni acredita por sí sola la configuración exacta.</p>');
     html.push('<p><strong>Texto del pedido:</strong> ' + escapeHtml(result.title) + '</p>');
     if (result.descriptive_source_url && /^https:\/\//i.test(result.descriptive_source_url)) {
       html.push('<p><a href="' + escapeHtml(result.descriptive_source_url) +
