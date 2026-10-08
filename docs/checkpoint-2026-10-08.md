@@ -101,3 +101,33 @@ PVP, descuento, neto, total y archivo de origen.
 - Pendiente: filtros por fabricante/proveedor/año, formato de descuentos para la interfaz, gráfico histórico y catálogo normalizado.
 - Regla permanente: solo 2 usuarios autorizados, sin altas nuevas; no almacenar archivos originales en GitHub/Supabase; conservar trazabilidad.
 - Nota: el bloque anterior sobre base vacía queda supersedido por esta actualización.
+
+## Actualización 2026-10-08 — buscador y filtros V3
+
+### Cambios implantados
+- Migración `supabase/migrations/20261008_004_search_filters_v3.sql` aplicada en PostgreSQL y versionada en GitHub.
+- RPC `public.search_costs_filtered` (SECURITY INVOKER, solo usuarios autenticados autorizados):
+  filtro por proveedor (`p_supplier_id`), año (`p_year`), orden (`p_sort`), paginación (`p_offset`), `total_count` real antes de limitar página.
+- Coincidencia exacta de referencia, potencia con unidad W, búsqueda aproximada y exclusión de RAEE/portes/servicios preservadas.
+- RPC `public.historical_price_history_filtered` devuelve exclusivamente la combinación **referencia original + descripción original** seleccionada; incluye filtros de proveedor y año. Corrige una discordancia anterior: al pulsar 1 pedido podían mostrarse 2 por compartir referencia con otra descripción.
+- Interfaz GitHub Pages actualizada con desplegables **Proveedor**, **Año del pedido** y **Ordenar por** (relevancia, recientes, frecuencia, precio ascendente/descendente); botón limpiar; carga incremental de 30 resultados; contador "Mostrando X de Y".
+- Descuentos legibles: ejemplo valor histórico `0.44` se ve como `44 %`; `NETO` se muestra como `Neto`; siempre se conserva el dato original en tooltip/procedencia.
+- Cambios de autenticación, contraseña y allowlist no modificados. Sin añadir usuarios.
+
+### Pruebas realizadas
+- Prueba SQL en sesión autenticada: búsqueda `DOWNLIGHT 12W` devuelve 33 grupos (30 + 3); el filtro año 2024 devuelve 17, año 2026 devuelve 11; filtro GRUPO RIAS devuelve 24.
+- `10101240` como búsqueda exacta devuelve esa referencia primera; ficha de variante `DOWNLIGHT EMPOTRAR DISCO 12W 4000K\\nBLANCO /E`: 1 línea, año 2024 y GRUPO RIAS; ninguna línea en 2026.
+- Ordenar por menor precio, mayor frecuencia y última fecha: consulta respondida correctamente.
+- Los 67 proveedores están disponibles para usuarios autorizados.
+- Sintaxis JavaScript verificada (PASS). Pendiente smoke-test humano en navegador una vez desplegado Pages.
+
+### Referencia 10101240 y normalización
+- Dos descripciones observadas con el mismo código `10101240`, 7,58 €; una tiene salto de línea antes de BLANCO, la otra concatena `4000KBLANCO`.
+- **No fusionar automáticamente** y no asumir referencia oficial de fabricante. La unión técnica irá por normalización validada.
+- Precio histórico ≠ precio vigente. No se ha alterado el histórico ni creado materiales consolidados.
+
+### Próximo paso
+1. Confirmar despliegue de Pages y revisar la nueva pantalla de filtros.
+2. Probar cambio de proveedor/año y trazabilidad de línea seleccionada.
+3. Mejorar facetas técnicas (potencia/IP/CCT) cuando haya datos normalizados y fiables.
+4. Auditar casos de precio y descuentos incoherentes sin sobrescribir originales.
