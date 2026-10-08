@@ -32,6 +32,30 @@ jobs:
       - uses: actions/checkout@v4
       - name: Python tests, no secrets and no network
         run: python3 -m unittest discover -s tests -p "test_research_manufacturers.py" -v
+      - name: Check outbound connectivity (diagnostic only)
+        if: github.event_name == 'push'
+        continue-on-error: true
+        run: |
+          python3 - <<'PY'
+          import os, socket, urllib.request
+          print("HTTPS_PROXY configured:", bool(os.getenv("HTTPS_PROXY") or os.getenv("https_proxy")))
+          for host in ("example.com", "www.aiscan.com", "www.legrand.es"):
+              try:
+                  ips=socket.getaddrinfo(host,443,type=socket.SOCK_STREAM)
+                  print(host,"IPv4",sum(x[0]==socket.AF_INET for x in ips),
+                        "IPv6",sum(x[0]==socket.AF_INET6 for x in ips))
+              except Exception as exc:
+                  print(host,"DNS failure:",type(exc).__name__,str(exc)[:140])
+          for url in ("https://example.com/",
+                      "https://www.aiscan.com/producto/cr/tubo-aiscan-cr-cr20/"):
+              try:
+                  req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0"})
+                  with urllib.request.urlopen(req,timeout=7) as response:
+                      print(url,"HTTP",response.status,
+                            "content-type",response.headers.get("content-type",""))
+              except Exception as exc:
+                  print(url,"Download failure:",type(exc).__name__,str(exc)[:160])
+          PY
 
   researcher:
     needs: tests
