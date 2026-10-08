@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex,nofollow">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https://kusbndefngttaiytcrui.supabase.co wss://kusbndefngttaiytcrui.supabase.co; img-src 'self' data:; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <title>PROSOEL Costes</title>
-  <link rel="stylesheet" href="./styles.css?v=20261008-1205">
+  <link rel="stylesheet" href="./styles.css?v=20261008-1235">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -78,11 +78,17 @@
           <button class="reset-filters" id="resetFiltersButton" type="button">Limpiar filtros</button>
         </div>
         <div class="filters-grid">
-          <label for="supplierFilter">Proveedor
-            <select id="supplierFilter" aria-label="Filtrar por proveedor">
-              <option value="">Todos los proveedores</option>
-            </select>
-          </label>
+          <div class="supplier-field">
+            <label for="supplierFilter">Proveedor</label>
+            <div class="supplier-combobox" id="supplierCombobox">
+              <input id="supplierFilter" type="search" placeholder="Todos los proveedores"
+                     aria-label="Buscar proveedor" autocomplete="off"
+                     role="combobox" aria-autocomplete="list" aria-haspopup="listbox"
+                     aria-controls="supplierSuggestions" aria-expanded="false">
+              <div class="supplier-suggestions hidden" id="supplierSuggestions"
+                   role="listbox" aria-label="Proveedores disponibles"></div>
+            </div>
+          </div>
           <label for="yearFilter">Año del pedido
             <select id="yearFilter" aria-label="Filtrar por año">
               <option value="">Todos los años</option>
@@ -142,6 +148,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261008-1205"></script>
+  <script type="module" src="./app.js?v=20261008-1235"></script>
 </body>
 </html>
