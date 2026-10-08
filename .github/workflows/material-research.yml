@@ -39,7 +39,7 @@ jobs:
           python3 - <<'PY'
           import os, socket, urllib.request
           print("HTTPS_PROXY configured:", bool(os.getenv("HTTPS_PROXY") or os.getenv("https_proxy")))
-          for host in ("example.com", "www.aiscan.com", "www.legrand.es"):
+          for host in ("example.com", "www.aiscan.com", "www.legrand.es", "pinazo.com"):
               try:
                   ips=socket.getaddrinfo(host,443,type=socket.SOCK_STREAM)
                   print(host,"IPv4",sum(x[0]==socket.AF_INET for x in ips),
@@ -47,7 +47,9 @@ jobs:
               except Exception as exc:
                   print(host,"DNS failure:",type(exc).__name__,str(exc)[:140])
           for url in ("https://example.com/",
-                      "https://www.aiscan.com/producto/cr/tubo-aiscan-cr-cr20/"):
+                      "https://www.aiscan.com/producto/cr/tubo-aiscan-cr-cr20/",
+                      "https://www.legrand.es/es/productos/magnetotermico-tx3-1pn-230v-16a-curva-2-modulos-403586",
+                      "https://pinazo.com/"):
               try:
                   req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0"})
                   with urllib.request.urlopen(req,timeout=7) as response:
