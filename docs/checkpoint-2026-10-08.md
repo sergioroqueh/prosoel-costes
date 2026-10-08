@@ -330,3 +330,8 @@ PVP, descuento, neto, total y archivo de origen.
 - Confirmar GitHub Pages deployment de V8.
 - Prueba humana: abrir Normalización / `CLP160APMB4C`, seleccionar `Contiene productos distintos: NO fusionar el grupo`, añadir justificación (38 W 1685 mm vs 44 W 1965 mm), marcar confirmación y pulsar Guardar. Ver mensaje, estado e historial.
 - Próximo módulo: consolidación de variantes y materiales canónicos **solo después de revisión técnica evidenciada y explícita**, nunca por simple coincidencia de códigos.
+
+### Despliegue V8 confirmado
+- GitHub Pages Actions run #47, commit `9c078b70`: `completed / success`.
+- V8 disponible en `https://sergioroqueh.github.io/prosoel-costes/` tras actualizar con `Ctrl+F5`.
+- Última comprobación: base de datos conserva 890 revisiones en estado `pending`, 0 decisiones persistidas, 0 entradas de auditoría, sin creación de materiales.
