@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex,nofollow">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https://kusbndefngttaiytcrui.supabase.co wss://kusbndefngttaiytcrui.supabase.co; img-src 'self' data:; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <title>PROSOEL Costes</title>
-  <link rel="stylesheet" href="./styles.css?v=20261008-v8">
+  <link rel="stylesheet" href="./styles.css?v=20261008-v9">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -67,6 +67,8 @@
                 aria-selected="true" aria-controls="costsWorkspace">Consultar precios</button>
         <button type="button" class="workspace-tab" id="reviewTab" role="tab"
                 aria-selected="false" aria-controls="reviewWorkspace">Normalización <span class="tab-pending">Revisión</span></button>
+        <button type="button" class="workspace-tab hidden" id="importTab" role="tab"
+                aria-selected="false" aria-controls="importWorkspace">Importar pedido</button>
       </nav>
       <div id="costsWorkspace" role="tabpanel" aria-labelledby="costsTab">
       <section class="search-panel">
@@ -182,6 +184,27 @@
           </aside>
         </div>
       </section>
+
+      <section id="importWorkspace" class="import-workspace hidden" role="tabpanel" aria-labelledby="importTab">
+        <header class="import-intro">
+          <h2>Incorporar un pedido nuevo</h2>
+          <p>Selecciona el Excel original de HOJA PEDIDO. El navegador leerá el archivo localmente y mostrará todos los datos antes de enviarlos a Supabase. No se almacenará el fichero XLSX original.</p>
+        </header>
+        <div class="import-card">
+          <label for="importFile">Archivo de pedido (.xlsx)</label>
+          <input id="importFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+          <p class="hint">Uno cada vez · Máximo 15 MB · Compatible con plantilla de un descuento y plantilla antigua de dos descuentos.</p>
+          <div id="importStatus" class="import-message" role="status" aria-live="polite">Selecciona un archivo para obtener su vista previa.</div>
+          <div id="importPreview" class="import-preview hidden"></div>
+          <div id="importConfirmPanel" class="import-confirm-panel hidden">
+            <label class="import-acknowledge"><input type="checkbox" id="importAcknowledged">
+              <span>He comprobado el número, año, proveedor, cantidades y precios, y autorizo incorporar este pedido al histórico.</span>
+            </label>
+            <button id="importSubmitButton" type="button" disabled>Confirmar importación</button>
+          </div>
+        </div>
+        <p class="import-notice">Seguridad: si el mismo archivo ya existe, se omite. Si coincide el número pero los archivos son distintos, la importación se detiene para revisión. Solo los administradores pueden confirmar.</p>
+      </section>
     </main>
   </div>
 
@@ -198,6 +221,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261008-v8"></script>
+  <script type="module" src="./app.js?v=20261008-v9"></script>
 </body>
 </html>
