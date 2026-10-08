@@ -1329,6 +1329,19 @@ function candidateDescriptionGroups(rows) {
 // Ayuda a la revisión, exclusivamente basada en las compras observadas.
 // No consulta Internet, no certifica fabricante y NUNCA aprueba una equivalencia.
 function suggestReviewDecision(row, notes) {
+  const inconsistencies = candidateTechnicalAlerts(row);
+  if (inconsistencies.some(([key]) => key !== "potencias_W")) {
+    const summary = inconsistencies.map(([key,values]) =>
+      technicalAlertLabels[key] + ": " + values.join(" / ")).join("; ");
+    return {
+      status:"needs_evidence",
+      title:"Contradicciones técnicas en los pedidos: no vincular aún",
+      reason:"La misma referencia de compra presenta información contradictoria (" +
+        summary + "). Comprobar cada línea de pedido y las fichas de fabricante antes " +
+        "de decidir si son productos distintos o errores de descripción.",
+      confidence:"Alerta extraída de las descripciones históricas. No demuestra por sí sola que existan dos artículos distintos.",
+    };
+  }
   const original=notes.map((x)=>x.description);
   const compact=(value)=>String(value).toUpperCase().normalize("NFKD")
     .replace(/[\u0300-\u036f]/g,"").replace(/\s+/g,"");
@@ -1383,6 +1396,7 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
   const suppliers = [...new Set(purchases.map((purchase) => purchase.supplier || "Sin proveedor"))];
   const pricesValid = purchases.filter(validComparisonPrice);
   const outliers = comparisonOutliers(purchases);
+  const detectedAlerts = candidateTechnicalAlerts(row);
   const advice = suggestReviewDecision(row, notes);
   const html = [];
   html.push('<div class="detail-header"><div><h2>' + escapeHtml(row.observed_reference) + '</h2>');
@@ -1394,8 +1408,23 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
   html.push('<div class="review-indicator"><strong>' + new Set(purchases.map((p)=>p.order_id)).size + '</strong><span>Pedidos</span></div>');
   html.push('<div class="review-indicator"><strong>' + notes.length + '</strong><span>Descripciones</span></div>');
   html.push('</div>');
+  html.push('<p class="comparison-note">Familia probable: <strong>' +
+    escapeHtml(reviewFamilyLabels[row.suggested_family] || "Sin clasificar") +
+    '</strong> · clasificación orientativa, no una equivalencia validada.</p>');
 
-  if (row.risk_level === "technical_conflict") {
+  if (detectedAlerts.length) {
+    html.push('<div class="review-warning severe">');
+    html.push('<strong>Incoherencias técnicas observadas en la referencia de compra.</strong>');
+    html.push('<ul class="review-alert-evidence">');
+    for (const [key,values] of detectedAlerts) {
+      html.push('<li><strong>' + escapeHtml(technicalAlertLabels[key]) +
+        ':</strong> ' + values.map(escapeHtml).join(' / ') + '</li>');
+    }
+    html.push('</ul>');
+    html.push('<p>Estas diferencias pueden ser variantes realmente distintas o errores al describir el pedido. ' +
+      'No consolides precios sin revisar las líneas y la documentación técnica.</p>');
+    html.push('</div>');
+  } else if (row.risk_level === "technical_conflict") {
     html.push('<div class="review-warning severe"><strong>Alerta: potencias diferentes bajo el mismo código.</strong> No unificar estos productos sin verificar modelo, potencia, longitud y demás características técnicas.</div>');
   } else if (notes.length>1) {
     html.push('<div class="review-warning"><strong>Descripciones diferentes.</strong> Podrían ser variantes tipográficas o modelos distintos. La identidad técnica todavía no está aprobada.</div>');
@@ -1452,7 +1481,7 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
     for (const [value, label] of options) {
       html.push('<option value="' + value + '"' +
         (value === row.review_status ? ' selected' : '') +
-        (value === "ready_for_mapping" && row.distinct_wattages > 1 ? ' disabled' : '') +
+        (value === "ready_for_mapping" && (row.distinct_wattages > 1 || detectedAlerts.length > 0) ? ' disabled' : '') +
         '>' + escapeHtml(label) + '</option>');
     }
     html.push('</select>');
@@ -1463,8 +1492,9 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
       '<span>He comprobado las descripciones y entiendo que esto todavía no fusiona materiales.</span></label>');
     html.push('<button class="review-save-button" id="reviewDecisionSave" type="button">Guardar revisión</button>');
     html.push('<div class="review-save-message" id="reviewSaveMessage" role="status" aria-live="polite"></div>');
-    if (row.risk_level === "technical_conflict") {
-      html.push('<p class="comparison-note">El sistema bloquea declarar este código listo para vincular mientras tenga potencias distintas.</p>');
+    if (detectedAlerts.length || row.distinct_wattages > 1) {
+      html.push('<p class="comparison-note">El sistema bloquea la vinculación mientras existan ' +
+        'contradicciones técnicas sin resolver. Puedes registrar que necesita evidencia o que contiene productos distintos.</p>');
     }
   } else {
     html.push('<p class="comparison-note">Puedes consultar todas las evidencias. Solo la cuenta administradora autorizada puede registrar decisiones.</p>');
@@ -1537,7 +1567,7 @@ async function showReviewCandidate(row) {
       p_reference: row.observed_reference, result_limit: 500,
     }),
     supabase.from("normalization_review_groups")
-      .select("reference_key,review_status,review_note,reviewed_by,reviewed_at,distinct_wattages,risk_level")
+      .select("reference_key,review_status,review_note,reviewed_by,reviewed_at,distinct_wattages,risk_level,suggested_family,family_signals,technical_alerts,evidence_refreshed_at")
       .eq("reference_key", row.reference_key).maybeSingle(),
     supabase.from("normalization_review_events")
       .select("id,previous_status,next_status,next_note,changed_by,changed_at")
@@ -1587,8 +1617,9 @@ async function saveReviewDecision(row) {
     noteField.focus();
     return;
   }
-  if (status === "ready_for_mapping" && row.distinct_wattages > 1) {
-    message.textContent = "Hay potencias diferentes. No es posible dar esta identidad por verificada.";
+  if (status === "ready_for_mapping" &&
+      (row.distinct_wattages > 1 || candidateTechnicalAlerts(row).length > 0)) {
+    message.textContent = "Hay señales técnicas contradictorias. No es posible dar esta identidad por verificada.";
     message.classList.add("is-error");
     return;
   }
