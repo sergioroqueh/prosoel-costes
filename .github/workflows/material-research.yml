@@ -1,0 +1,64 @@
+name: Research official material references
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/research_manufacturers.py"
+      - "tests/test_research_manufacturers.py"
+      - ".github/workflows/material-research.yml"
+  schedule:
+    # Weekly Monday 05:17 UTC (GitHub may delay).
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Preview without saving candidate evidence"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: material-research
+  cancel-in-progress: false
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python tests, no secrets and no network
+        run: python3 -m unittest discover -s tests -p "test_research_manufacturers.py" -v
+
+  researcher:
+    needs: tests
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_URL: https://kusbndefngttaiytcrui.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check research credentials
+        id: config
+        shell: bash
+        run: |
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Research not active: add SUPABASE_SERVICE_ROLE_KEY under GitHub Actions secrets."
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Research official sources (maximum 12 products)
+        if: steps.config.outputs.ready == 'true'
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
+            python3 scripts/research_manufacturers.py --limit 12 --scan 130 --dry-run
+          else
+            python3 scripts/research_manufacturers.py --limit 12 --scan 130
+          fi
