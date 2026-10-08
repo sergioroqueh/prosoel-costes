@@ -1341,7 +1341,7 @@ async function runReviewSearch({ append = false } = {}) {
 function candidateDescriptionGroups(rows) {
   const grouped = new Map();
   for (const row of rows) {
-    const description = String(row.description_original || "").trim() || "(Sin descripción)";
+    const description = String(row.description_source || row.description_original || "").trim() || "(Sin descripción)";
     const ref = grouped.get(description) || {
       description, lines: 0, orders: new Set(), suppliers: new Set(),
       wattages: new Set(),
@@ -1460,9 +1460,11 @@ function reviewPurchaseTableHtml(rows, notes) {
 
 function renderReviewCandidate(row, purchases, reviewEvents = []) {
   const notes = candidateDescriptionGroups(purchases);
-  const suppliers = [...new Set(purchases.map((purchase) => purchase.supplier || "Sin proveedor"))];
-  const pricesValid = purchases.filter(validComparisonPrice);
-  const outliers = comparisonOutliers(purchases);
+  const activePurchases = purchases.filter((purchase) => purchase.usable_for_prices &&
+    purchase.belongs_to_effective_reference);
+  const suppliers = [...new Set(activePurchases.map((purchase) => purchase.supplier || "Sin proveedor"))];
+  const pricesValid = activePurchases.filter(validComparisonPrice);
+  const outliers = comparisonOutliers(activePurchases);
   const detectedAlerts = candidateTechnicalAlerts(row);
   const advice = suggestReviewDecision(row, notes);
   const html = [];
@@ -1473,8 +1475,11 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
   html.push('<div class="review-indicators">');
   html.push('<div class="review-indicator"><strong>' + suppliers.length + '</strong><span>Proveedores</span></div>');
   html.push('<div class="review-indicator"><strong>' + new Set(purchases.map((p)=>p.order_id)).size + '</strong><span>Pedidos</span></div>');
-  html.push('<div class="review-indicator"><strong>' + notes.length + '</strong><span>Descripciones</span></div>');
+  html.push('<div class="review-indicator"><strong>' + notes.length + '</strong><span>Descripciones de origen</span></div>');
   html.push('</div>');
+  html.push('<p class="comparison-note">Líneas de origen: <strong>' + purchases.length +
+    '</strong> · Utilizables para precios de esta referencia: <strong>' +
+    activePurchases.length + '</strong>. Las excluidas y reasignadas siguen consultables, pero no entran en las estadísticas.</p>');
   const reviewedTime = row.reviewed_at ? new Date(row.reviewed_at).getTime() : NaN;
   const evidenceTime = row.evidence_refreshed_at ? new Date(row.evidence_refreshed_at).getTime() : NaN;
   if (row.review_status !== "pending" && Number.isFinite(reviewedTime) &&
@@ -1510,10 +1515,12 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
     html.push('<p class="comparison-note">' + outliers.size + ' posibles precios atípicos identificados; no se han corregido ni descartado del histórico.</p>');
   }
   html.push('<h3>Descripciones realmente observadas</h3>');
-  for(const item of notes.slice(0,20)){
+  for(const [index,item] of notes.slice(0,20).entries()){
     html.push('<div class="review-description-item"><p>' + escapeHtml(item.description) + '</p><span>'
-      + item.lines + ' líneas · ' + item.orders.size + ' pedidos · ' + [...item.suppliers].map(escapeHtml).join(', ')
-      + '</span></div>');
+      + item.lines + ' líneas · ' + item.orders.size + ' pedidos · ' +
+      [...item.suppliers].map(escapeHtml).join(', ') + '</span>');
+    html.push('<button type="button" class="review-group-jump" data-review-description-index="' +
+      index + '">Revisar estas ' + item.lines + ' líneas</button></div>');
   }
   if(notes.length>20) html.push('<p class="comparison-note">Hay ' + (notes.length-20) + ' descripciones adicionales en el histórico original.</p>');
 
@@ -1530,7 +1537,7 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
     html.push('<h3>Proveedores y precios observados</h3>');
   html.push('<div class="comparison-table-wrap"><table class="comparison-table"><thead><tr><th>Proveedor</th><th>Pedidos</th><th>Último neto</th><th>Mediana</th><th>Rango</th></tr></thead><tbody>');
   for(const supplier of suppliers.sort((a,b)=>a.localeCompare(b,"es"))) {
-    const lines = purchases.filter((p)=>(p.supplier||"Sin proveedor")===supplier);
+    const lines = activePurchases.filter((p)=>(p.supplier||"Sin proveedor")===supplier);
     const priced = lines.filter(validComparisonPrice);
     const chronological = priced.slice().sort((a,b)=>String(b.order_date||"").localeCompare(String(a.order_date||""))||Number(b.order_id)-Number(a.order_id));
     const summary = priceSummary(priced);
@@ -1540,7 +1547,8 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
       + '</td><td>' + (summary.min===null?'—':money(summary.min)+' – '+money(summary.max))+'</td></tr>');
   }
   html.push('</tbody></table></div>');
-  html.push('<p class="comparison-note">Precios de compras anteriores; no se consideran comparables entre variantes técnicas diferentes. Estadísticas solo de líneas validadas aritméticamente (' + pricesValid.length + ' de ' + purchases.length + ').</p>');
+  html.push('<p class="comparison-note">Precios históricos utilizables: ' + pricesValid.length +
+    ' de ' + activePurchases.length + ' líneas activas para esta referencia. No incluir líneas excluidas ni reasignadas.</p>');
   html.push('<section class="review-decision-panel" aria-label="Decisión de normalización">');
   html.push('<h3>Decisión de revisión</h3>');
   html.push('<p class="comparison-note">Esta decisión clasifica el <strong>grupo de compras</strong>; no modifica precios ni vincula materiales automáticamente. Cada cambio queda en la bitácora.</p>');
@@ -1593,8 +1601,14 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
   }
   html.push('</section>');
     html.push('<button id="reviewOpenSearch" type="button" class="review-open-search">Consultar esta referencia en el buscador</button>');
-  html.push('<details class="review-originals"><summary>Inspeccionar las ' + purchases.length + ' líneas de origen</summary>');
-  html.push(reviewPurchaseTableHtml(purchases));
+  html.push('<details id="reviewPurchaseDetails" class="review-originals"><summary>Revisar las ' +
+    purchases.length + ' líneas de origen y corregir compras concretas</summary>');
+  html.push('<div class="review-source-filter"><label for="reviewLineDescriptionFilter">Descripción que figura en el Excel</label>');
+  html.push('<select id="reviewLineDescriptionFilter"><option value="">Todas las descripciones</option>');
+  notes.forEach((note,index) => html.push('<option value="' + index + '">' + escapeHtml(note.description) +
+    ' (' + note.lines + ' líneas)</option>'));
+  html.push('</select><span id="reviewLinesShowing" class="muted"></span></div>');
+  html.push(reviewPurchaseTableHtml(purchases, notes));
   html.push('</details>');
   reviewDetail.innerHTML = html.join("");
 
@@ -1638,7 +1652,7 @@ async function showReviewCandidate(row) {
   const requestId = ++reviewDetailGeneration;
   reviewDetail.innerHTML = '<div class="empty-state">Consultando líneas originales y proveedores…</div>';
   const [history, details, events] = await Promise.all([
-    supabase.rpc("reference_purchase_history", {
+    supabase.rpc("purchase_reference_review_history", {
       p_reference: row.observed_reference, result_limit: 500,
     }),
     supabase.from("normalization_review_groups")
