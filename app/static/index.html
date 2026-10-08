@@ -20,9 +20,25 @@
       <label for="emailInput">Email</label>
       <input id="emailInput" name="email" type="email" autocomplete="username" required>
 
-      <button type="submit" id="loginButton">Recibir enlace de acceso</button>
-      <p class="login-help">Te enviaremos un enlace de acceso a tu correo. La sesión quedará guardada en este navegador.</p>
+      <label for="passwordInput">Contraseña</label>
+      <input id="passwordInput" name="password" type="password" autocomplete="current-password" required>
+
+      <button type="submit" id="loginButton">Entrar</button>
+      <button type="button" class="link-button" id="recoveryButton">Crear / recuperar contraseña</button>
+      <p class="login-help">Acceso exclusivo para usuarios autorizados de PROSOEL.</p>
       <p class="login-message" id="loginMessage"></p>
+
+      <div class="password-setup hidden" id="passwordSetup">
+        <hr>
+        <h2>Establecer contraseña</h2>
+        <p class="login-help">Has abierto un enlace válido de alta o recuperación. Define tu contraseña para entrar normalmente a partir de ahora.</p>
+        <label for="newPasswordInput">Nueva contraseña</label>
+        <input id="newPasswordInput" type="password" autocomplete="new-password" minlength="8">
+        <label for="confirmPasswordInput">Repetir contraseña</label>
+        <input id="confirmPasswordInput" type="password" autocomplete="new-password" minlength="8">
+        <button type="button" id="savePasswordButton">Guardar contraseña</button>
+        <p class="login-message" id="passwordSetupMessage"></p>
+      </div>
     </form>
   </section>
 
