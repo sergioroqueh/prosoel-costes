@@ -1117,6 +1117,246 @@ function wireOriginButtons() {
   });
 }
 
+// --- V7: revisión conservadora de candidatos de normalización ---
+// Esta vista SOLO lee evidencias. No permite aprobar, fusionar, ni corregir históricos.
+const reviewRiskLabels = {
+  technical_conflict: "Conflicto técnico",
+  variant_descriptions: "Varias descripciones",
+  cross_supplier: "Varios proveedores",
+};
+
+function activateWorkspace(which) {
+  const reviewing = which === "review";
+  costsWorkspace.classList.toggle("hidden", reviewing);
+  reviewWorkspace.classList.toggle("hidden", !reviewing);
+  costsTab.classList.toggle("is-active", !reviewing);
+  reviewTab.classList.toggle("is-active", reviewing);
+  costsTab.setAttribute("aria-selected", String(!reviewing));
+  reviewTab.setAttribute("aria-selected", String(reviewing));
+  if (reviewing && !reviewLoaded) runReviewSearch();
+}
+
+function renderReviewResults() {
+  reviewResults.className = "review-list";
+  reviewResults.replaceChildren();
+  reviewVisibleCount.textContent = "Mostrando " + reviewRows.length + " de " + reviewCount;
+  reviewTotal.textContent = reviewCount + (reviewCount === 1 ? " candidato" : " candidatos");
+  reviewFooter.classList.toggle("hidden", !reviewRows.length || reviewRows.length >= reviewCount);
+  reviewMoreButton.textContent = "Mostrar " + Math.min(30, Math.max(0, reviewCount-reviewRows.length)) + " más";
+  if (!reviewRows.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.textContent = "No hay candidatos que coincidan con estos filtros.";
+    reviewResults.appendChild(empty);
+    return;
+  }
+
+  reviewRows.forEach((row) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "review-result-card";
+    if (row.reference_key === reviewSelectedKey) button.classList.add("is-selected");
+    button.setAttribute("aria-label", "Revisar referencia " + row.observed_reference);
+    const head = document.createElement("div");
+    head.className = "review-result-head";
+    const code = document.createElement("strong");
+    code.className = "review-reference";
+    code.textContent = row.observed_reference;
+    const risk = document.createElement("span");
+    risk.className = "review-risk " + row.risk_level;
+    risk.textContent = reviewRiskLabels[row.risk_level] || "Revisar";
+    head.append(code, risk);
+    const description = document.createElement("div");
+    description.className = "review-result-desc";
+    description.textContent = row.sample_description;
+    const meta = document.createElement("div");
+    meta.className = "review-result-meta";
+    meta.textContent = row.supplier_count + " proveedores · " + row.purchase_count
+      + " pedidos · " + row.description_count + " descripciones";
+    button.append(head, description, meta);
+    button.addEventListener("click", () => {
+      reviewSelectedKey = row.reference_key;
+      reviewResults.querySelectorAll(".review-result-card").forEach((item) => item.classList.remove("is-selected"));
+      button.classList.add("is-selected");
+      showReviewCandidate(row);
+    });
+    reviewResults.appendChild(button);
+  });
+}
+
+async function runReviewSearch({ append = false } = {}) {
+  reviewLoaded = true;
+  const requestId = ++reviewSearchGeneration;
+  const query = reviewQuery.value.trim();
+  const risk = reviewRisk.value || null;
+  if (!append) {
+    ++reviewDetailGeneration;
+    reviewRows = [];
+    reviewCount = 0;
+    reviewSelectedKey = null;
+    reviewResults.className = "review-list";
+    reviewResults.innerHTML = '<div class="empty-state">Preparando cola de revisión…</div>';
+    reviewDetail.innerHTML = '<div class="empty-state">Selecciona un candidato para inspeccionar las compras.</div>';
+    reviewFooter.classList.add("hidden");
+  }
+  reviewMoreButton.disabled = true;
+  const { data, error } = await supabase.rpc("normalization_review_queue", {
+    p_query: query || null,
+    p_risk: risk,
+    result_limit: 30,
+    p_offset: append ? reviewRows.length : 0,
+  });
+  if (requestId !== reviewSearchGeneration) return;
+  reviewMoreButton.disabled = false;
+  if (error) {
+    console.error("Error obteniendo la cola de normalización", error);
+    if (!append) {
+      reviewResults.innerHTML = '<div class="empty-state">No se pudo cargar la cola de revisión.</div>';
+      reviewVisibleCount.textContent = "";
+      reviewTotal.textContent = "No disponible";
+    }
+    return;
+  }
+  const current = data || [];
+  reviewRows = append ? reviewRows.concat(current) : current;
+  reviewCount = current.length ? Number(current[0].total_count) : (append ? reviewCount : 0);
+  renderReviewResults();
+}
+
+function candidateDescriptionGroups(rows) {
+  const grouped = new Map();
+  for (const row of rows) {
+    const description = String(row.description_original || "").trim() || "(Sin descripción)";
+    const ref = grouped.get(description) || {
+      description, lines: 0, orders: new Set(), suppliers: new Set(),
+      wattages: new Set(),
+    };
+    ref.lines++;
+    ref.orders.add(row.order_id);
+    ref.suppliers.add(row.supplier || "Sin proveedor");
+    const power = description.match(/([0-9]+(?:[,.][0-9]+)?)\s*w(?![a-z])/i);
+    if (power) ref.wattages.add(power[1]);
+    grouped.set(description, ref);
+  }
+  return [...grouped.values()].sort((a,b) => b.lines-a.lines || a.description.localeCompare(b.description,"es"));
+}
+
+function reviewPurchaseTableHtml(rows) {
+  return historyTableHtml(rows)
+    .replaceAll('data-origin-index="', 'data-review-origin-index="')
+    .replaceAll('id="origin-row-', 'id="review-origin-row-');
+}
+
+function renderReviewCandidate(row, purchases) {
+  const notes = candidateDescriptionGroups(purchases);
+  const suppliers = [...new Set(purchases.map((purchase) => purchase.supplier || "Sin proveedor"))];
+  const pricesValid = purchases.filter(validComparisonPrice);
+  const outliers = comparisonOutliers(purchases);
+  const html = [];
+  html.push('<div class="detail-header"><div><h2>' + escapeHtml(row.observed_reference) + '</h2>');
+  html.push('<p class="detail-subtitle">Referencia de compra observada · Pendiente de revisión</p></div>');
+  html.push('<span class="review-risk ' + row.risk_level + '">' + escapeHtml(reviewRiskLabels[row.risk_level]||"Revisar") + '</span></div>');
+  html.push('<div class="review-indicators">');
+  html.push('<div class="review-indicator"><strong>' + suppliers.length + '</strong><span>Proveedores</span></div>');
+  html.push('<div class="review-indicator"><strong>' + new Set(purchases.map((p)=>p.order_id)).size + '</strong><span>Pedidos</span></div>');
+  html.push('<div class="review-indicator"><strong>' + notes.length + '</strong><span>Descripciones</span></div>');
+  html.push('</div>');
+
+  if (row.risk_level === "technical_conflict") {
+    html.push('<div class="review-warning severe"><strong>Alerta: potencias diferentes bajo el mismo código.</strong> No unificar estos productos sin verificar modelo, potencia, longitud y demás características técnicas.</div>');
+  } else if (notes.length>1) {
+    html.push('<div class="review-warning"><strong>Descripciones diferentes.</strong> Podrían ser variantes tipográficas o modelos distintos. La identidad técnica todavía no está aprobada.</div>');
+  } else {
+    html.push('<div class="review-warning"><strong>Coincidencia de código entre proveedores.</strong> Puede ser referencia de fabricante o una colisión de códigos internos: requiere confirmación.</div>');
+  }
+  if(outliers.size) {
+    html.push('<p class="comparison-note">' + outliers.size + ' posibles precios atípicos identificados; no se han corregido ni descartado del histórico.</p>');
+  }
+  html.push('<h3>Descripciones realmente observadas</h3>');
+  for(const item of notes.slice(0,20)){
+    html.push('<div class="review-description-item"><p>' + escapeHtml(item.description) + '</p><span>'
+      + item.lines + ' líneas · ' + item.orders.size + ' pedidos · ' + [...item.suppliers].map(escapeHtml).join(', ')
+      + '</span></div>');
+  }
+  if(notes.length>20) html.push('<p class="comparison-note">Hay ' + (notes.length-20) + ' descripciones adicionales en el histórico original.</p>');
+
+  html.push('<h3>Proveedores y precios observados</h3>');
+  html.push('<div class="comparison-table-wrap"><table class="comparison-table"><thead><tr><th>Proveedor</th><th>Pedidos</th><th>Último neto</th><th>Mediana</th><th>Rango</th></tr></thead><tbody>');
+  for(const supplier of suppliers.sort((a,b)=>a.localeCompare(b,"es"))) {
+    const lines = purchases.filter((p)=>(p.supplier||"Sin proveedor")===supplier);
+    const priced = lines.filter(validComparisonPrice);
+    const chronological = priced.slice().sort((a,b)=>String(b.order_date||"").localeCompare(String(a.order_date||""))||Number(b.order_id)-Number(a.order_id));
+    const summary = priceSummary(priced);
+    html.push('<tr><td>' + escapeHtml(supplier) + '</td><td>' + new Set(lines.map((p)=>p.order_id)).size
+      + '</td><td>' + money(chronological[0]?.net_unit_price)
+      + '</td><td>' + money(summary.median)
+      + '</td><td>' + (summary.min===null?'—':money(summary.min)+' – '+money(summary.max))+'</td></tr>');
+  }
+  html.push('</tbody></table></div>');
+  html.push('<p class="comparison-note">Precios de compras anteriores; no se consideran comparables entre variantes técnicas diferentes. Estadísticas solo de líneas validadas aritméticamente (' + pricesValid.length + ' de ' + purchases.length + ').</p>');
+  html.push('<button id="reviewOpenSearch" type="button" class="review-open-search">Consultar esta referencia en el buscador</button>');
+  html.push('<details class="review-originals"><summary>Inspeccionar las ' + purchases.length + ' líneas de origen</summary>');
+  html.push(reviewPurchaseTableHtml(purchases));
+  html.push('</details>');
+  reviewDetail.innerHTML = html.join("");
+
+  reviewDetail.querySelector("#reviewOpenSearch").addEventListener("click", () => {
+    selectedSupplierId = null;
+    supplierFilter.value = "";
+    closeSupplierSuggestions();
+    yearFilter.value = "";
+    sortFilter.value = "relevance";
+    searchInput.value = row.observed_reference;
+    activateWorkspace("costs");
+    runSearch();
+  });
+  reviewDetail.querySelectorAll("[data-review-origin-index]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const target = reviewDetail.querySelector("#review-origin-row-" + button.getAttribute("data-review-origin-index"));
+      if(target) target.classList.toggle("hidden");
+    });
+  });
+}
+
+async function showReviewCandidate(row) {
+  const requestId = ++reviewDetailGeneration;
+  reviewDetail.innerHTML = '<div class="empty-state">Consultando líneas originales y proveedores…</div>';
+  const { data, error } = await supabase.rpc("reference_purchase_history", {
+    p_reference: row.observed_reference,
+    result_limit: 500,
+  });
+  if (requestId !== reviewDetailGeneration) return;
+  if (error) {
+    console.error("Error consultando candidato de normalización", error);
+    reviewDetail.innerHTML = '<div class="empty-state">No se pudo cargar esta referencia.</div>';
+    return;
+  }
+  if (!(data || []).length) {
+    reviewDetail.innerHTML = '<div class="empty-state">No existen compras elegibles para esta referencia.</div>';
+    return;
+  }
+  renderReviewCandidate(row, data);
+}
+
+costsTab.addEventListener("click", () => activateWorkspace("costs"));
+reviewTab.addEventListener("click", () => activateWorkspace("review"));
+reviewMoreButton.addEventListener("click", () => runReviewSearch({ append: true }));
+reviewRisk.addEventListener("change", () => runReviewSearch());
+reviewQuery.addEventListener("input", () => {
+  if (reviewTypingTimeout !== null) clearTimeout(reviewTypingTimeout);
+  reviewTypingTimeout = setTimeout(() => {
+    reviewTypingTimeout = null;
+    runReviewSearch();
+  }, 250);
+});
+reviewQuery.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    if (reviewTypingTimeout !== null) clearTimeout(reviewTypingTimeout);
+    reviewTypingTimeout = null;
+    runReviewSearch();
+  }
+});
+
 searchButton.addEventListener("click", () => runSearch());
 searchInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") runSearch();
