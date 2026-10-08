@@ -1708,6 +1708,11 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
     if(bulkButton) {
       bulkButton.disabled=!state.allowed;
       bulkButton.title=state.message;
+      bulkButton.textContent=selected.length===1
+        ? "Revisar esta línea"
+        : selected.length>=2 && state.allowed
+          ? "Corregir "+selected.length+" líneas"
+          : "Corregir selección";
     }
     if(selectVisible) {
       selectVisible.checked=visible.length>0 && visible.every((input)=>input.checked);
