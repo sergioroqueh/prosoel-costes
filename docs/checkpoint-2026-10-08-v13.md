@@ -29,7 +29,7 @@ Restyling exclusivamente visual con la identidad PROSOEL, a petición del usuari
 
 ## Puesta en producción
 - GitHub Actions Pages se inicia automáticamente por los cambios bajo `app/static/**`.
-- Confirmar el último run `Deploy PROSOEL Costes to GitHub Pages`.
+- **Despliegue comprobado:** GitHub Actions Pages run **#94**, commit `1ad4579e`, estado `completed / success`.
 - URL: https://sergioroqueh.github.io/prosoel-costes/
 - Refrescar con Ctrl+F5; el navegador puede conservar el favicon antiguo en caché.
 
