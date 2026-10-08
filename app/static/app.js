@@ -1268,6 +1268,52 @@ function candidateDescriptionGroups(rows) {
   return [...grouped.values()].sort((a,b) => b.lines-a.lines || a.description.localeCompare(b.description,"es"));
 }
 
+// Ayuda a la revisión, exclusivamente basada en las compras observadas.
+// No consulta Internet, no certifica fabricante y NUNCA aprueba una equivalencia.
+function suggestReviewDecision(row, notes) {
+  const original=notes.map((x)=>x.description);
+  const compact=(value)=>String(value).toUpperCase().normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g,"").replace(/\s+/g,"");
+  const powers=[...new Set(original.flatMap((desc)=>
+    [...desc.matchAll(/([0-9]+(?:[,.][0-9]+)?)\s*w(?![a-z])/gi)].map((m)=>m[1]+" W")
+  ))].sort((a,b)=>Number.parseFloat(a)-Number.parseFloat(b));
+  const lengths=[...new Set(original.flatMap((desc)=>
+    [...desc.matchAll(/\b(\d{3,4})\s*mm\b/gi)].map((m)=>m[1]+" mm")
+  ))].sort((a,b)=>Number.parseFloat(a)-Number.parseFloat(b));
+  if(row.distinct_wattages>1 || powers.length>1){
+    return {
+      status:"distinct_products",
+      title:"Diferencias técnicas explícitas: NO unificar",
+      reason:"Una misma referencia de compra aparece con potencias distintas ("+
+        powers.join(", ")+")"+(lengths.length>1?" y longitudes distintas ("+lengths.join(", ")+")":"")+
+        ". Las compras describen variantes diferentes. Conservarlas separadas y comprobar documentación técnica antes de vincular materiales.",
+      confidence:"Señal fuerte: diferencias expresas en el propio pedido; sin verificación externa.",
+    };
+  }
+  if(original.length>1 && new Set(original.map(compact)).size===1) {
+    return {
+      status:"needs_evidence",
+      title:"Posible diferencia únicamente tipográfica",
+      reason:"Las descripciones solo difieren en espacios, saltos de línea o tildes tras una comparación conservadora. Falta confirmar fabricante y modelo antes de declarar que son un único artículo.",
+      confidence:"Pista textual. No es una equivalencia técnica validada.",
+    };
+  }
+  if(row.supplier_count>1 && original.length===1) {
+    return {
+      status:"needs_evidence",
+      title:"Código y descripción repetidos entre proveedores",
+      reason:"El mismo código y texto comercial aparecen en varios proveedores. Aún falta acreditar que es una referencia oficial del fabricante y no un código interno compartido o reutilizado.",
+      confidence:"Coincidencia comercial, pendiente de evidencia de fabricante.",
+    };
+  }
+  return {
+    status:"needs_evidence",
+    title:"Revisión documental recomendada",
+    reason:"Se observan distintas descripciones o proveedores para una referencia de compra. Hay que comparar fabricante, modelo y atributos técnicos relevantes antes de vincular o separar definitivamente las variantes.",
+    confidence:"Información histórica insuficiente para aprobar equivalencia.",
+  };
+}
+
 function reviewPurchaseTableHtml(rows) {
   return historyTableHtml(rows)
     .replaceAll('data-origin-index="', 'data-review-origin-index="')
@@ -1279,6 +1325,7 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
   const suppliers = [...new Set(purchases.map((purchase) => purchase.supplier || "Sin proveedor"))];
   const pricesValid = purchases.filter(validComparisonPrice);
   const outliers = comparisonOutliers(purchases);
+  const advice = suggestReviewDecision(row, notes);
   const html = [];
   html.push('<div class="detail-header"><div><h2>' + escapeHtml(row.observed_reference) + '</h2>');
   html.push('<p class="detail-subtitle">Referencia de compra observada · ' +
@@ -1308,7 +1355,17 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
   }
   if(notes.length>20) html.push('<p class="comparison-note">Hay ' + (notes.length-20) + ' descripciones adicionales en el histórico original.</p>');
 
-  html.push('<h3>Proveedores y precios observados</h3>');
+  html.push('<div class="review-assist-panel">');
+  html.push('<strong>Ayuda preliminar de PROSOEL Costes</strong>');
+  html.push('<h3>' + escapeHtml(advice.title) + '</h3>');
+  html.push('<p>' + escapeHtml(advice.reason) + '</p>');
+  html.push('<p class="review-assist-disclaimer">' + escapeHtml(advice.confidence) +
+    ' · Es una propuesta basada en el histórico, NO una decisión aprobada.</p>');
+  if(currentUserRole==="admin") {
+    html.push('<button id="reviewAssistButton" class="review-assist-button" type="button">Preparar justificación para revisar</button>');
+  }
+  html.push('</div>');
+    html.push('<h3>Proveedores y precios observados</h3>');
   html.push('<div class="comparison-table-wrap"><table class="comparison-table"><thead><tr><th>Proveedor</th><th>Pedidos</th><th>Último neto</th><th>Mediana</th><th>Rango</th></tr></thead><tbody>');
   for(const supplier of suppliers.sort((a,b)=>a.localeCompare(b,"es"))) {
     const lines = purchases.filter((p)=>(p.supplier||"Sin proveedor")===supplier);
@@ -1378,7 +1435,21 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
   html.push('</details>');
   reviewDetail.innerHTML = html.join("");
 
-  const saveButton = reviewDetail.querySelector("#reviewDecisionSave");
+  const assistButton = reviewDetail.querySelector("#reviewAssistButton");
+  if(assistButton) {
+    assistButton.addEventListener("click", () => {
+      const select=reviewDetail.querySelector("#reviewDecisionStatus");
+      const note=reviewDetail.querySelector("#reviewDecisionNote");
+      const checkbox=reviewDetail.querySelector("#reviewDecisionAcknowledge");
+      if(!select || !note || !checkbox) return;
+      if(![...select.options].some((option)=>option.value===advice.status && !option.disabled)) return;
+      select.value=advice.status;
+      note.value=advice.reason;
+      checkbox.checked=false;
+      note.focus();
+    });
+  }
+    const saveButton = reviewDetail.querySelector("#reviewDecisionSave");
   if (saveButton) {
     saveButton.addEventListener("click", () => saveReviewDecision(row));
   }
