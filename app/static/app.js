@@ -73,6 +73,7 @@ let reviewDetailGeneration = 0;
 let reviewLoaded = false;
 let reviewSelectedKey = null;
 let reviewTypingTimeout = null;
+let currentUserRole = "user";
 
 
 function money(value) {
@@ -299,6 +300,7 @@ async function verifyAccess(user) {
   }
 
   currentUser.textContent = data.display_name || data.email;
+  currentUserRole = data.role || "user";
   return true;
 }
 
@@ -449,6 +451,7 @@ supabase.auth.onAuthStateChange(async (event, session) => {
   }
 
   if (event === "SIGNED_OUT" || !session) {
+    currentUserRole = "user";
     showLogin();
     return;
   }
@@ -1119,6 +1122,12 @@ function wireOriginButtons() {
 
 // --- V7: revisión conservadora de candidatos de normalización ---
 // Esta vista SOLO lee evidencias. No permite aprobar, fusionar, ni corregir históricos.
+const reviewStatusLabels = {
+  pending: "Pendiente",
+  needs_evidence: "Necesita evidencia",
+  distinct_products: "Productos distintos",
+  ready_for_mapping: "Identidad para vincular",
+};
 const reviewRiskLabels = {
   technical_conflict: "Conflicto técnico",
   variant_descriptions: "Varias descripciones",
@@ -1172,7 +1181,8 @@ function renderReviewResults() {
     const meta = document.createElement("div");
     meta.className = "review-result-meta";
     meta.textContent = row.supplier_count + " proveedores · " + row.purchase_count
-      + " pedidos · " + row.description_count + " descripciones";
+      + " pedidos · " + row.description_count + " descripciones · "
+      + (reviewStatusLabels[row.review_status] || "Pendiente");
     button.append(head, description, meta);
     button.addEventListener("click", () => {
       reviewSelectedKey = row.reference_key;
@@ -1247,14 +1257,15 @@ function reviewPurchaseTableHtml(rows) {
     .replaceAll('id="origin-row-', 'id="review-origin-row-');
 }
 
-function renderReviewCandidate(row, purchases) {
+function renderReviewCandidate(row, purchases, reviewEvents = []) {
   const notes = candidateDescriptionGroups(purchases);
   const suppliers = [...new Set(purchases.map((purchase) => purchase.supplier || "Sin proveedor"))];
   const pricesValid = purchases.filter(validComparisonPrice);
   const outliers = comparisonOutliers(purchases);
   const html = [];
   html.push('<div class="detail-header"><div><h2>' + escapeHtml(row.observed_reference) + '</h2>');
-  html.push('<p class="detail-subtitle">Referencia de compra observada · Pendiente de revisión</p></div>');
+  html.push('<p class="detail-subtitle">Referencia de compra observada · ' +
+    escapeHtml(reviewStatusLabels[row.review_status] || "Pendiente") + '</p></div>');
   html.push('<span class="review-risk ' + row.risk_level + '">' + escapeHtml(reviewRiskLabels[row.risk_level]||"Revisar") + '</span></div>');
   html.push('<div class="review-indicators">');
   html.push('<div class="review-indicator"><strong>' + suppliers.length + '</strong><span>Proveedores</span></div>');
@@ -1294,13 +1305,67 @@ function renderReviewCandidate(row, purchases) {
   }
   html.push('</tbody></table></div>');
   html.push('<p class="comparison-note">Precios de compras anteriores; no se consideran comparables entre variantes técnicas diferentes. Estadísticas solo de líneas validadas aritméticamente (' + pricesValid.length + ' de ' + purchases.length + ').</p>');
-  html.push('<button id="reviewOpenSearch" type="button" class="review-open-search">Consultar esta referencia en el buscador</button>');
+  html.push('<section class="review-decision-panel" aria-label="Decisión de normalización">');
+  html.push('<h3>Decisión de revisión</h3>');
+  html.push('<p class="comparison-note">Esta decisión clasifica el <strong>grupo de compras</strong>; no modifica precios ni vincula materiales automáticamente. Cada cambio queda en la bitácora.</p>');
+  if (currentUserRole === "admin") {
+    html.push('<label class="review-decision-label" for="reviewDecisionStatus">Resultado de la revisión</label>');
+    html.push('<select id="reviewDecisionStatus" class="review-decision-select">');
+    const options = [
+      ["pending", "Mantener pendiente / reabrir"],
+      ["needs_evidence", "Necesita más evidencia"],
+      ["distinct_products", "Son productos distintos: no fusionar"],
+      ["ready_for_mapping", "Identidad técnica verificada: pendiente de vincular"],
+    ];
+    for (const [value, label] of options) {
+      html.push('<option value="' + value + '"' +
+        (value === row.review_status ? ' selected' : '') +
+        (value === "ready_for_mapping" && row.distinct_wattages > 1 ? ' disabled' : '') +
+        '>' + escapeHtml(label) + '</option>');
+    }
+    html.push('</select>');
+    html.push('<label class="review-decision-label" for="reviewDecisionNote">Justificación técnica / evidencia</label>');
+    html.push('<textarea id="reviewDecisionNote" class="review-decision-note" maxlength="2000" rows="4" placeholder="Explica las características, diferencias o la ficha que has comprobado…">' +
+      escapeHtml(row.review_note || "") + '</textarea>');
+    html.push('<label class="review-decision-ack"><input type="checkbox" id="reviewDecisionAcknowledge">' +
+      '<span>He comprobado las descripciones y entiendo que esto todavía no fusiona materiales.</span></label>');
+    html.push('<button class="review-save-button" id="reviewDecisionSave" type="button">Guardar revisión</button>');
+    html.push('<div class="review-save-message" id="reviewSaveMessage" role="status" aria-live="polite"></div>');
+    if (row.risk_level === "technical_conflict") {
+      html.push('<p class="comparison-note">El sistema bloquea declarar este código listo para vincular mientras tenga potencias distintas.</p>');
+    }
+  } else {
+    html.push('<p class="comparison-note">Puedes consultar todas las evidencias. Solo la cuenta administradora autorizada puede registrar decisiones.</p>');
+  }
+  if (row.reviewed_at) {
+    const displayTime = new Date(row.reviewed_at);
+    html.push('<p class="comparison-note">Última revisión: ' +
+      escapeHtml(Number.isFinite(displayTime.getTime()) ? displayTime.toLocaleString("es-ES") : row.reviewed_at) +
+      ' · ' + escapeHtml(row.reviewed_by || "Administrador") + '</p>');
+  }
+  if (reviewEvents.length) {
+    html.push('<details class="review-audit-history"><summary>Historial de decisiones (' + reviewEvents.length + ' recientes)</summary>');
+    for (const event of reviewEvents) {
+      const timestamp = new Date(event.changed_at);
+      html.push('<div class="review-audit-item"><strong>' +
+        escapeHtml(reviewStatusLabels[event.next_status] || event.next_status) + '</strong> · ' +
+        escapeHtml(Number.isFinite(timestamp.getTime()) ? timestamp.toLocaleString("es-ES") : event.changed_at) +
+        '<p>' + escapeHtml(event.next_note || "Sin observaciones") + '</p></div>');
+    }
+    html.push('</details>');
+  }
+  html.push('</section>');
+    html.push('<button id="reviewOpenSearch" type="button" class="review-open-search">Consultar esta referencia en el buscador</button>');
   html.push('<details class="review-originals"><summary>Inspeccionar las ' + purchases.length + ' líneas de origen</summary>');
   html.push(reviewPurchaseTableHtml(purchases));
   html.push('</details>');
   reviewDetail.innerHTML = html.join("");
 
-  reviewDetail.querySelector("#reviewOpenSearch").addEventListener("click", () => {
+  const saveButton = reviewDetail.querySelector("#reviewDecisionSave");
+  if (saveButton) {
+    saveButton.addEventListener("click", () => saveReviewDecision(row));
+  }
+    reviewDetail.querySelector("#reviewOpenSearch").addEventListener("click", () => {
     selectedSupplierId = null;
     supplierFilter.value = "";
     closeSupplierSuggestions();
@@ -1321,21 +1386,100 @@ function renderReviewCandidate(row, purchases) {
 async function showReviewCandidate(row) {
   const requestId = ++reviewDetailGeneration;
   reviewDetail.innerHTML = '<div class="empty-state">Consultando líneas originales y proveedores…</div>';
-  const { data, error } = await supabase.rpc("reference_purchase_history", {
-    p_reference: row.observed_reference,
-    result_limit: 500,
-  });
+  const [history, details, events] = await Promise.all([
+    supabase.rpc("reference_purchase_history", {
+      p_reference: row.observed_reference, result_limit: 500,
+    }),
+    supabase.from("normalization_review_groups")
+      .select("reference_key,review_status,review_note,reviewed_by,reviewed_at,distinct_wattages,risk_level")
+      .eq("reference_key", row.reference_key).maybeSingle(),
+    supabase.from("normalization_review_events")
+      .select("id,previous_status,next_status,next_note,changed_by,changed_at")
+      .eq("reference_key", row.reference_key).order("changed_at",{ascending:false}).limit(12),
+  ]);
   if (requestId !== reviewDetailGeneration) return;
-  if (error) {
-    console.error("Error consultando candidato de normalización", error);
+  if (history.error || details.error || !details.data) {
+    console.error("Error consultando candidato de normalización", history.error || details.error);
     reviewDetail.innerHTML = '<div class="empty-state">No se pudo cargar esta referencia.</div>';
     return;
   }
-  if (!(data || []).length) {
+  if (!(history.data || []).length) {
     reviewDetail.innerHTML = '<div class="empty-state">No existen compras elegibles para esta referencia.</div>';
     return;
   }
-  renderReviewCandidate(row, data);
+  if (events.error) console.warn("Historial de decisiones no disponible", events.error);
+  const freshRow = { ...row, ...details.data };
+  const listed = reviewRows.find((item) => item.reference_key === row.reference_key);
+  if (listed) Object.assign(listed, { review_status: freshRow.review_status });
+  renderReviewCandidate(freshRow, history.data, events.data || []);
+}
+
+
+async function saveReviewDecision(row) {
+  const button = reviewDetail.querySelector("#reviewDecisionSave");
+  const statusField = reviewDetail.querySelector("#reviewDecisionStatus");
+  const noteField = reviewDetail.querySelector("#reviewDecisionNote");
+  const acknowledgment = reviewDetail.querySelector("#reviewDecisionAcknowledge");
+  const message = reviewDetail.querySelector("#reviewSaveMessage");
+  if (!button || !statusField || !noteField || !acknowledgment || !message) return;
+  if (currentUserRole !== "admin") return;
+
+  const status = statusField.value;
+  const note = noteField.value.trim();
+  message.classList.remove("is-error");
+  message.textContent = "";
+
+  if (!acknowledgment.checked) {
+    message.textContent = "Marca la casilla de comprobación antes de guardar.";
+    message.classList.add("is-error");
+    return;
+  }
+  const minNote = status === "pending" ? 0 : status === "needs_evidence" ? 12 : 25;
+  if (note.length < minNote) {
+    message.textContent = "Explica tu decisión con al menos " + minNote + " caracteres.";
+    message.classList.add("is-error");
+    noteField.focus();
+    return;
+  }
+  if (status === "ready_for_mapping" && row.distinct_wattages > 1) {
+    message.textContent = "Hay potencias diferentes. No es posible dar esta identidad por verificada.";
+    message.classList.add("is-error");
+    return;
+  }
+  if (status === row.review_status && note === String(row.review_note || "").trim()) {
+    message.textContent = "No hay cambios que guardar.";
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Guardando…";
+  // Optimistic lock: evita sobrescribir una decisión modificada por otra sesión.
+  let command = supabase.from("normalization_review_groups")
+    .update({ review_status: status, review_note: note || null })
+    .eq("reference_key", row.reference_key)
+    .eq("review_status", row.review_status);
+  if (row.reviewed_at) command = command.eq("reviewed_at", row.reviewed_at);
+  else command = command.is("reviewed_at", null);
+  const { data, error } = await command
+    .select("reference_key,review_status,review_note,reviewed_by,reviewed_at").maybeSingle();
+  if (!button.isConnected) return;
+  button.disabled = false;
+  button.textContent = "Guardar revisión";
+  if (error || !data) {
+    console.error("No se pudo guardar la revisión", error);
+    message.textContent = error?.message || "La revisión cambió en otra sesión. Vuelve a abrirla y comprueba los datos.";
+    message.classList.add("is-error");
+    return;
+  }
+  Object.assign(row, data);
+  const current = reviewRows.find((item) => item.reference_key === row.reference_key);
+  if (current) Object.assign(current, data);
+  renderReviewResults();
+  const selected = reviewRows.find((item) => item.reference_key === row.reference_key);
+  if (selected) reviewSelectedKey = selected.reference_key;
+  await showReviewCandidate(row);
+  const savedMessage = reviewDetail.querySelector("#reviewSaveMessage");
+  if (savedMessage) savedMessage.textContent = "Decisión guardada y registrada en la bitácora.";
 }
 
 costsTab.addEventListener("click", () => activateWorkspace("costs"));
