@@ -56,6 +56,46 @@ class OfficialResearchTests(unittest.TestCase):
             "https://www.legrand.es/es/productos/magnetotermico-tx3-1pn-230v-16a-curva-2-modulos-403586",page)
         self.assertTrue(candidate["p_description_match"])
         self.assertTrue(candidate["p_code_match"])
+    def test_transient_network_error_keeps_queue_pending(self):
+        from urllib.error import URLError
+        source = item("CR20","Tubo Aiscan-CR diametro 20 negro")
+        events = []
+        def mocked_api(endpoint,key,name,payload):
+            events.append(name)
+            if name == "material_research_priority":
+                return [source]
+            raise AssertionError("An unreachable manufacturer must not write: "+name)
+        with patch.dict("os.environ",{"SUPABASE_URL":"https://test.supabase.co",
+                                     "SUPABASE_SERVICE_ROLE_KEY":"fake-test-only",
+                                     "BRAVE_SEARCH_API_KEY":""}):
+            with patch.object(research,"api_rpc",side_effect=mocked_api):
+                with patch.object(research,"open_safe_official",
+                                  side_effect=URLError("Network is unreachable")):
+                    with patch.object(research.time,"sleep",return_value=None):
+                        self.assertEqual(research.run(limit=1,scan=1,dry_run=False),2)
+        self.assertEqual(events,["material_research_priority"])
+
+    def test_confirmed_404_can_mark_absent_only_in_live_mode(self):
+        from urllib.error import HTTPError
+        source=item("CR20","Tubo Aiscan-CR diametro 20 negro")
+        events=[]
+        def mocked_api(endpoint,key,name,payload):
+            events.append(name)
+            if name=="material_research_priority":
+                return [source]
+            if name=="material_research_mark_attempt":
+                return {"result":"recorded"}
+            raise AssertionError(name)
+        with patch.dict("os.environ",{"SUPABASE_URL":"https://test.supabase.co",
+                                     "SUPABASE_SERVICE_ROLE_KEY":"fake-test-only",
+                                     "BRAVE_SEARCH_API_KEY":""}):
+            with patch.object(research,"api_rpc",side_effect=mocked_api):
+                with patch.object(research,"open_safe_official",
+                                  side_effect=HTTPError("https://www.aiscan.com/x",404,"Not Found",{},None)):
+                    with patch.object(research.time,"sleep",return_value=None):
+                        self.assertEqual(research.run(limit=1,scan=1,dry_run=False),0)
+        self.assertEqual(events,["material_research_priority","material_research_mark_attempt"])
+
     def test_skip_without_service_secret(self):
         with patch.dict("os.environ",{"SUPABASE_URL":"","SUPABASE_SERVICE_ROLE_KEY":""}):
             self.assertEqual(research.run(limit=2,dry_run=True),0)
