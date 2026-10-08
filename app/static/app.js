@@ -36,6 +36,18 @@ const resultCount = document.getElementById("resultCount");
 const detailPanel = document.getElementById("detailPanel");
 const orderCounter = document.getElementById("orderCounter");
 const resultTemplate = document.getElementById("resultTemplate");
+const supplierFilter = document.getElementById("supplierFilter");
+const yearFilter = document.getElementById("yearFilter");
+const sortFilter = document.getElementById("sortFilter");
+const resetFiltersButton = document.getElementById("resetFiltersButton");
+const moreResultsButton = document.getElementById("moreResultsButton");
+const resultsFooter = document.getElementById("resultsFooter");
+
+let searchGeneration = 0;
+let detailGeneration = 0;
+let visibleRows = [];
+let totalResults = 0;
+
 
 function money(value) {
   if (value === null || value === undefined || Number.isNaN(Number(value))) return "—";
@@ -52,6 +64,40 @@ function number(value, digits = 2) {
   return new Intl.NumberFormat("es-ES", {
     maximumFractionDigits: digits,
   }).format(Number(value));
+}
+
+// Los descuentos originales permanecen conservados en Supabase y en la procedencia.
+function displayDiscount(raw) {
+  const text = String(raw ?? "").trim();
+  if (!text) return "—";
+  if (text.toUpperCase() === "NETO") return "Neto";
+  if (/[|;/]/.test(text)) return text;
+  const numeric = Number(text.replace("%", "").replace(",", "."));
+  if (!Number.isFinite(numeric) || numeric < 0 || numeric > 100) return text;
+  if (text.includes("%")) return number(numeric, 2) + " %";
+  if (numeric <= 1) return number(numeric * 100, 2) + " %";
+  return number(numeric, 2) + " %";
+}
+
+function selectedFilters() {
+  return {
+    supplierId: supplierFilter.value ? Number(supplierFilter.value) : null,
+    year: yearFilter.value ? Number(yearFilter.value) : null,
+    sort: sortFilter.value || "relevance",
+  };
+}
+
+async function loadSuppliers() {
+  const { data, error } = await supabase.from("suppliers").select("id,name").order("name");
+  if (error) {
+    console.error("No se pudieron cargar los proveedores", error);
+    supplierFilter.disabled = true;
+    supplierFilter.title = "Filtro de proveedores no disponible";
+    return;
+  }
+  supplierFilter.disabled = false;
+  supplierFilter.replaceChildren(new Option("Todos los proveedores", ""));
+  for (const item of data || []) supplierFilter.add(new Option(item.name, String(item.id)));
 }
 
 function escapeHtml(value) {
@@ -127,6 +173,7 @@ async function bootstrapSession() {
 
   if (!(await verifyAccess(user))) return;
 
+  await loadSuppliers();
   await loadCounter();
 }
 
@@ -158,6 +205,7 @@ loginForm.addEventListener("submit", async (event) => {
   if (!(await verifyAccess(data.user))) return;
 
   passwordInput.value = "";
+  await loadSuppliers();
   await loadCounter();
   searchInput.focus();
 });
@@ -228,6 +276,7 @@ savePasswordButton.addEventListener("click", async () => {
 
   if (!(await verifyAccess(data.user))) return;
 
+  await loadSuppliers();
   await loadCounter();
   searchInput.focus();
 });
