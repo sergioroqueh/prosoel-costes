@@ -131,3 +131,11 @@ PVP, descuento, neto, total y archivo de origen.
 2. Probar cambio de proveedor/año y trazabilidad de línea seleccionada.
 3. Mejorar facetas técnicas (potencia/IP/CCT) cuando haya datos normalizados y fiables.
 4. Auditar casos de precio y descuentos incoherentes sin sobrescribir originales.
+
+### Cierre V3 — despliegue y seguridad
+- GitHub Actions Pages: run 21, commit `b1ca8bb9`, estado `success`. La web desplegada incluye los filtros.
+- Privilegios comprobados: `anon` no ejecuta las RPC nuevas; `authenticated` sí, con RLS + `private.has_app_access()`.
+- Migración `supabase/migrations/20261008_005_restrict_rls_event_trigger.sql`: revocada la capacidad de ejecutar `public.rls_auto_enable()` desde `PUBLIC`, `anon` y `authenticated` (antes advertencia de seguridad). El event trigger `ensure_rls` permanece activo. Auditor posterior sin las advertencias de función accesible.
+- Resto de avisos Supabase: `import_stage_orders` tiene RLS sin policies deliberadamente, ya que la carga es administrativa y no permite uso desde la web; protección de contraseñas filtradas desactivada (revisar ajuste Auth si el plan lo permite).
+- Prueba de ordenación: referencia exacta `10101240` primera; precio ascendente y fecha reciente responden correctamente. La ficha del año 2024 devuelve 1 compra y en 2026 cero.
+- Próximo punto de prueba manual: abrir `https://sergioroqueh.github.io/prosoel-costes/`, pulsar `Ctrl+F5`, buscar `DOWNLIGHT 12W`, filtrar `GRUPO RIAS`, elegir 2024, ordenar y abrir procedencia. Si el cambio no aparece, verificar caché y última ejecución de GitHub Pages.
