@@ -335,3 +335,54 @@ PVP, descuento, neto, total y archivo de origen.
 - GitHub Pages Actions run #47, commit `9c078b70`: `completed / success`.
 - V8 disponible en `https://sergioroqueh.github.io/prosoel-costes/` tras actualizar con `Ctrl+F5`.
 - Última comprobación: base de datos conserva 890 revisiones en estado `pending`, 0 decisiones persistidas, 0 entradas de auditoría, sin creación de materiales.
+
+## Actualización V9 — altas diarias de pedidos desde la web + ayuda de normalización
+
+### Objetivo del usuario
+- Evitar tener que subir pedidos nuevos a ChatGPT ni instalar Git/Python en el ordenador del trabajo.
+- Hacer más viable la revisión de 890 grupos de referencias: asistencia en la justificación, sin decisiones automáticas ni inventar equivalencias.
+
+### Importación web (desarrollada y desplegada)
+- Nueva pestaña **Importar pedido**, visible únicamente para la cuenta autorizada con rol `admin`.
+- `app/static/order_import.js`: lectura local de un XLSX con APIs del navegador (ZIP + Deflate-raw + XML + SHA256 WebCrypto), sin dependencias externas de Excel.
+- Reconoce hoja `HOJA PEDIDO`, plantilla actual de descuento único y variante antigua de dos descuentos.
+- Extrae proveedor, obra, fecha, referencia/número, líneas, descuentos, PVP, neto, total, clasificación conservadora y hash SHA-256 del archivo original.
+- Vista previa con total declarado frente a suma de líneas, primeras 50 líneas, advertencias y confirmación explícita.
+- Antes de confirmar: consulta en Supabase si existe el mismo SHA-256 o el mismo año+número+subnúmero con un archivo distinto. En ambos casos bloquea la importación.
+- Durante la confirmación: RPC `public.import_new_prosoel_order`; operación transaccional y protegida por rol admin, registra el fichero en `order_import_audit`, crea proveedor/obra/variante si procede, pedido y líneas originales. No almacena el XLSX.
+- La cola de Normalización se actualiza **solo** para las referencias afectadas; ningún material canónico se crea y no se sobrescriben decisiones de revisión.
+- Ficheros SQL versionados:
+  - `supabase/migrations/20261008_010_browser_order_import.sql`;
+  - `supabase/migrations/20261008_011_import_refresh_review_queue.sql`.
+- Frontend en `app/static/index.html`, `app/static/app.js`, `app/static/styles.css`, parser `app/static/order_import.js`.
+- Caché de frontend actualizado a `v=20261008-v9b`.
+- Guía de uso: `docs/importacion-pedidos-nuevos.md`.
+
+### Normalización asistida
+- Se ha incorporado la sección **Ayuda preliminar de PROSOEL Costes**, generada con las líneas históricas:
+  - potencia distinta bajo mismo código → sugerir `distinct_products`;
+  - solo diferencias de espacios/tildes → advertir que pueden ser variantes tipográficas;
+  - código/descripción repetidos entre proveedores → requerir confirmación de fabricante.
+- Botón **Preparar justificación para revisar**: introduce propuesta en el formulario pero **no marca la conformidad ni ejecuta Guardar**.
+- Filtro de candidatos por estado (todos/pendiente/necesita evidencia/productos distintos/listo para vincular).
+- RPC de lectura `public.normalization_review_queue_v2`, migración `supabase/migrations/20261008_012_review_queue_status_filter.sql`; sin cambios en historial ni permisos de revisión.
+
+### Pruebas realizadas
+- SQL bajo transacción revertida: alta de pedido simulado con 2 líneas y conflicto de potencias; se generaron pedido, líneas, auditoría y grupo `technical_conflict` pendiente; después rollback.
+- Duplicado exacto: SQL devuelve `duplicate` y 0 líneas para un SHA del histórico.
+- Número repetido con otro SHA: SQL devuelve `number_conflict` y 0 líneas.
+- Cuenta no administradora: RPC de escritura rechaza el acceso.
+- Lector JS: comprobadas las cabeceras de plantilla actual y doble descuento, fecha Excel 2024/2026, conversión decimal, normalización de referencia y clasificación RAEE/portes (pruebas de funciones con celdas de muestra).
+- Sugerencias de revisión: casos 38/44 W, diferencia tipográfica y referencia repetida en proveedores: estados/textos orientativos correctos.
+- Sintaxis del parser y del JS principal PASS; controles HTML y CSS presentes.
+- Supabase tras pruebas: **2.863 pedidos**, **11.538 líneas**, **890 candidatos**, 0 revisiones aprobadas, 0 pedidos diarios grabados y 0 materiales canónicos. Las transacciones de ensayo no persisten.
+- `anon` carece de ejecución sobre RPC de importación y cola V2. Avisos del Security Advisor sin cambios: staging de solo lectura administrativa sin policies y protección de contraseñas filtradas pendiente de valorar.
+- GitHub Pages: workflow #58 para los cambios frontend `0abe1607` completado con `success`.
+
+### Primera prueba recomendada y límites
+- **Importante: todavía no se ha ejecutado una prueba completa de la lectura nativa XLSX en la sesión de navegador del usuario.**
+- Para hacerlo sin escribir datos: abrir PROSOEL Costes → pestaña `Importar pedido` → elegir un XLSX **ya importado** del histórico (no ZIP) → debe aparecer su vista previa y `Archivo duplicado`, sin permitir confirmar.
+- Si pasa, probar un XLSX nuevo guardado y recalculado desde Excel; revisar la vista previa y confirmarlo.
+- No proclamar importación real de archivo nuevo hasta que el usuario confirme y se verifiquen los recuentos.
+- Se admiten XLSX individuales hasta 15 MB, ≤250 líneas, solo plantillas reconocidas, navegador moderno.
+- Mantener siempre los dos usuarios existentes. Sin autoresolución de identidades técnicas, ni sobrescritura de precios históricos.
