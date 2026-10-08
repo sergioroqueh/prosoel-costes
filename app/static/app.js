@@ -1,5 +1,6 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./config.js";
+import { readProsoelXlsx } from "./order_import.js?v=20261008-v9";
 
 const supabase = createClient(
   SUPABASE_URL,
@@ -57,6 +58,14 @@ const reviewVisibleCount = document.getElementById("reviewVisibleCount");
 const reviewDetail = document.getElementById("reviewDetail");
 const reviewMoreButton = document.getElementById("reviewMoreButton");
 const reviewFooter = document.getElementById("reviewFooter");
+const importTab = document.getElementById("importTab");
+const importWorkspace = document.getElementById("importWorkspace");
+const importFile = document.getElementById("importFile");
+const importStatus = document.getElementById("importStatus");
+const importPreview = document.getElementById("importPreview");
+const importConfirmPanel = document.getElementById("importConfirmPanel");
+const importAcknowledged = document.getElementById("importAcknowledged");
+const importSubmitButton = document.getElementById("importSubmitButton");
 
 let searchGeneration = 0;
 let detailGeneration = 0;
@@ -74,6 +83,8 @@ let reviewLoaded = false;
 let reviewSelectedKey = null;
 let reviewTypingTimeout = null;
 let currentUserRole = "user";
+let currentImport = null;
+let importSelectionGeneration = 0;
 
 
 function money(value) {
@@ -301,6 +312,7 @@ async function verifyAccess(user) {
 
   currentUser.textContent = data.display_name || data.email;
   currentUserRole = data.role || "user";
+  importTab.classList.toggle("hidden",currentUserRole!=="admin");
   return true;
 }
 
@@ -1136,12 +1148,17 @@ const reviewRiskLabels = {
 
 function activateWorkspace(which) {
   const reviewing = which === "review";
-  costsWorkspace.classList.toggle("hidden", reviewing);
+  const importing = which === "import" && currentUserRole === "admin";
+  const costs = !reviewing && !importing;
+  costsWorkspace.classList.toggle("hidden", !costs);
   reviewWorkspace.classList.toggle("hidden", !reviewing);
-  costsTab.classList.toggle("is-active", !reviewing);
+  importWorkspace.classList.toggle("hidden", !importing);
+  costsTab.classList.toggle("is-active", costs);
   reviewTab.classList.toggle("is-active", reviewing);
-  costsTab.setAttribute("aria-selected", String(!reviewing));
+  importTab.classList.toggle("is-active", importing);
+  costsTab.setAttribute("aria-selected", String(costs));
   reviewTab.setAttribute("aria-selected", String(reviewing));
+  importTab.setAttribute("aria-selected", String(importing));
   if (reviewing && !reviewLoaded) runReviewSearch();
 }
 
@@ -1484,6 +1501,7 @@ async function saveReviewDecision(row) {
 
 costsTab.addEventListener("click", () => activateWorkspace("costs"));
 reviewTab.addEventListener("click", () => activateWorkspace("review"));
+importTab.addEventListener("click", () => activateWorkspace("import"));
 reviewMoreButton.addEventListener("click", () => runReviewSearch({ append: true }));
 reviewRisk.addEventListener("change", () => runReviewSearch());
 reviewQuery.addEventListener("input", () => {
