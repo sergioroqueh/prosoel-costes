@@ -4,56 +4,84 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PROSOEL Costes</title>
-  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <header class="topbar">
-    <div>
-      <div class="eyebrow">PROSOEL</div>
-      <h1>Costes y referencias</h1>
-    </div>
-    <div class="counter" id="orderCounter">
-      <span class="muted">Pedidos</span>
-      <strong>—</strong>
-    </div>
-  </header>
-
-  <main>
-    <section class="search-panel">
-      <label for="searchInput">¿Qué material buscas?</label>
-      <div class="search-row">
-        <input
-          id="searchInput"
-          type="search"
-          autocomplete="off"
-          placeholder="Ej.: diferencial 4P 40A 300mA, RZ1-K 5G6, toma RJ45 Cat 6..."
-        >
-        <button id="searchButton" type="button">Buscar</button>
-      </div>
-      <p class="hint">
-        No hace falta conocer la referencia exacta. Puedes buscar por descripción,
-        fabricante, modelo, sección, potencia o código.
-      </p>
-    </section>
-
-    <section class="layout">
-      <div class="results-panel">
-        <div class="section-title">
-          <h2>Resultados</h2>
-          <span id="resultCount" class="muted"></span>
-        </div>
-        <div id="results" class="results empty-state">
-          Escribe una descripción o referencia para empezar.
-        </div>
+  <section class="auth-shell" id="authView">
+    <form class="login-card" id="loginForm">
+      <div class="brand-block">
+        <div class="eyebrow">PROSOEL</div>
+        <h1>Costes y referencias</h1>
+        <p>Acceso interno</p>
       </div>
 
-      <aside class="detail-panel" id="detailPanel">
-        <div class="empty-state">
-          Selecciona un material para ver precios, compras y trazabilidad.
+      <label for="emailInput">Email</label>
+      <input id="emailInput" name="email" type="email" autocomplete="username" required>
+
+      <label for="passwordInput">Contraseña</label>
+      <input id="passwordInput" name="password" type="password" autocomplete="current-password" required>
+
+      <button type="submit" id="loginButton">Entrar</button>
+      <p class="login-message" id="loginMessage"></p>
+    </form>
+  </section>
+
+  <div id="appView" class="hidden">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">PROSOEL</div>
+        <h1>Costes y referencias</h1>
+      </div>
+
+      <div class="top-actions">
+        <div class="counter" id="orderCounter">
+          <span class="muted">Pedidos</span>
+          <strong>—</strong>
         </div>
-      </aside>
-    </section>
-  </main>
+        <div class="user-box">
+          <span id="currentUser"></span>
+          <button type="button" class="secondary-button" id="logoutButton">Salir</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="search-panel">
+        <label for="searchInput">¿Qué material buscas?</label>
+        <div class="search-row">
+          <input
+            id="searchInput"
+            type="search"
+            autocomplete="off"
+            placeholder="Ej.: diferencial 4P 40A 300mA, RZ1-K 5G6, toma RJ45 Cat 6..."
+          >
+          <button id="searchButton" type="button">Buscar</button>
+        </div>
+        <p class="hint">
+          No hace falta conocer la referencia exacta. Puedes buscar por descripción,
+          fabricante, modelo, sección, potencia o código.
+        </p>
+      </section>
+
+      <section class="layout">
+        <div class="results-panel">
+          <div class="section-title">
+            <h2>Resultados</h2>
+            <span id="resultCount" class="muted"></span>
+          </div>
+          <div id="results" class="results empty-state">
+            Escribe una descripción o referencia para empezar.
+          </div>
+        </div>
+
+        <aside class="detail-panel" id="detailPanel">
+          <div class="empty-state">
+            Selecciona un material para ver precios, compras y trazabilidad.
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
 
   <template id="resultTemplate">
     <button class="result-card" type="button">
@@ -68,6 +96,6 @@
     </button>
   </template>
 
-  <script src="/static/app.js" defer></script>
+  <script type="module" src="./app.js"></script>
 </body>
 </html>
