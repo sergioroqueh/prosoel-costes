@@ -2228,15 +2228,21 @@ function importAuditMetric(label,value,detail="") {
 // Las cifras no significan que se haya investigado ya una ficha oficial externa.
 async function loadEnrichmentSummary() {
   if (currentUserRole !== "admin") return;
-  const { data, error } = await supabase.rpc("material_enrichment_overview");
-  if (error || !data?.length) {
+  const [queueSummary, researchSummary] = await Promise.all([
+    supabase.rpc("material_enrichment_overview"),
+    supabase.rpc("material_research_stats"),
+  ]);
+  if (queueSummary.error || !queueSummary.data?.length) {
     enrichmentSummaryMetrics.textContent="No se pudo consultar la preparación del catálogo.";
     return;
   }
-  const item=data[0];
+  const item=queueSummary.data[0];
+  const evidence=researchSummary.data?.[0];
   const metrics=[
     ["Referencias detectadas",item.total_candidates],
-    ["Sin ficha externa contrastada",item.awaiting_evidence],
+    ["Pendientes de investigar",item.awaiting_evidence],
+    ["Fuentes oficiales propuestas",evidence?.evidence_sources],
+    ["Incoherencias documentales",evidence?.incompatible_descriptions],
     ["Nombres de ayuda publicados",item.with_verified_description],
   ];
   enrichmentSummaryMetrics.replaceChildren();
