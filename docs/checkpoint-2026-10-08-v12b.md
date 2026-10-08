@@ -24,3 +24,10 @@ Abrir la web → Ctrl+F5 → Normalización → CR20 → Descripción Ø25 → �
 Marcar **solo una casilla**: debe aparecer **Revisar esta línea** habilitado.
 Marcar dos o tres: debe aparecer **Corregir 2 líneas** / **Corregir 3 líneas**, sin seleccionar las siete.
 Comprobar el formulario, sin guardar todavía correcciones no verificadas.
+
+## Actualización V12c
+- El botón pasa dinámicamente a **Revisar esta línea** con 1 seleccionada, o **Corregir N líneas** para 2–30 selecciones homogéneas.
+- Bajo la barra se explica que «Seleccionar las líneas visibles» es opcional.
+- Versión de recursos web `v=20261008-v12c` para evitar confusiones de caché.
+- Sintaxis JS validada, casos de selección 0/1/2 compatibles/2 incompatibles/30/31 comprobados.
+- GitHub Pages recuperó un error transitorio al consultar el artefacto de despliegue; ejecución #89 confirmó una publicación correcta de la lógica. Último despliegue V12c se debe confirmar en Actions (#91).
