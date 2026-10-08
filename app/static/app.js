@@ -838,11 +838,24 @@ function renderHistoricalDetail(result, rows) {
   html.push("<p>Este resultado aún no está consolidado, pero puedes comprobar cada compra y cada precio de origen.</p>");
   html.push("</div>");
 
+  if (result.reference) {
+    html.push('<div class="compare-entry">');
+    html.push('<div><strong>Comparativa por referencia de compra</strong><p>Busca este mismo código en todos los proveedores. No implica equivalencia técnica certificada.</p></div>');
+    html.push('<button class="action-button" id="compareReferenceButton" type="button">Comparar proveedores y evolución</button>');
+    html.push('</div>');
+    html.push('<div id="referenceComparison" aria-live="polite"></div>');
+  }
+
   html.push('<div class="section-title"><h3>Procedencia</h3><span class="muted">' + rows.length + " líneas</span></div>");
   html.push(historyTableHtml(rows));
 
   detailPanel.innerHTML = html.join("");
   wireOriginButtons();
+  const compareButton = detailPanel.querySelector("#compareReferenceButton");
+  if (compareButton) {
+    const activeDetail = detailGeneration;
+    compareButton.addEventListener("click", () => showReferenceComparison(result.reference, activeDetail));
+  }
 }
 
 function statHtml(label, value) {
