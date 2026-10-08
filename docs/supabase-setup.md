@@ -38,7 +38,7 @@ En Supabase Auth:
 5. En **URL Configuration**, usar como Site URL y Redirect URL:
    `https://sergioroqueh.github.io/prosoel-costes/`
 
-La web usa acceso por **magic link** de Supabase, no contraseña en GitHub Pages.
+La web usa **email + contraseña** de Supabase. Para alta inicial o recuperación puede enviarse un enlace de recuperación que vuelve a GitHub Pages y permite establecer una nueva contraseña.
 
 Ejemplo:
 
@@ -109,3 +109,21 @@ de compras siguen protegidos por Auth + RLS + allowlist.
 
 GitHub Pages es público. No se incluyen secretos, pedidos ni precios en el
 repositorio desplegado.
+
+
+### Si el enlace de acceso vuelve al login
+
+La primera versión usaba magic link como inicio de sesión principal. Se sustituyó
+por email + contraseña porque en GitHub Pages el callback podía terminar en un
+bucle de login si la sesión del enlace no quedaba materializada correctamente.
+
+La interfaz actual:
+
+- inicia sesión con `signInWithPassword`;
+- permite `Crear / recuperar contraseña`;
+- procesa callbacks de recuperación/invitación;
+- soporta callbacks PKCE con parámetro `code`;
+- guarda la sesión localmente en el navegador.
+
+Para usuarios ya creados sin contraseña, usar el botón
+`Crear / recuperar contraseña` de la propia web.
