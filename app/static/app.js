@@ -111,6 +111,7 @@ const purchaseEditStatus = document.getElementById("purchaseEditStatus");
 const purchaseEditSubmit = document.getElementById("purchaseEditSubmit");
 const importTab = document.getElementById("importTab");
 const importWorkspace = document.getElementById("importWorkspace");
+const enrichmentSummaryMetrics = document.getElementById("enrichmentSummaryMetrics");
 const importFile = document.getElementById("importFile");
 const importStatus = document.getElementById("importStatus");
 const importPreview = document.getElementById("importPreview");
@@ -2191,8 +2192,37 @@ function importAuditMetric(label,value,detail="") {
     (detail?'<small>'+escapeHtml(detail)+'</small>':'')+'</div>';
 }
 
+// La cola de enriquecimiento se actualiza al insertar un artículo comercial nuevo.
+// Las cifras no significan que se haya investigado ya una ficha oficial externa.
+async function loadEnrichmentSummary() {
+  if (currentUserRole !== "admin") return;
+  const { data, error } = await supabase.rpc("material_enrichment_overview");
+  if (error || !data?.length) {
+    enrichmentSummaryMetrics.textContent="No se pudo consultar la preparación del catálogo.";
+    return;
+  }
+  const item=data[0];
+  const metrics=[
+    ["Referencias detectadas",item.total_candidates],
+    ["Pendientes de documentar",item.awaiting_evidence],
+    ["Descripciones contrastadas",item.with_verified_description],
+  ];
+  enrichmentSummaryMetrics.replaceChildren();
+  for(const [label,value] of metrics) {
+    const box=document.createElement("div");
+    box.className="enrichment-summary-metric";
+    const strong=document.createElement("strong");
+    strong.textContent=Number(value||0).toLocaleString("es-ES");
+    const small=document.createElement("span");
+    small.textContent=label;
+    box.append(strong,small);
+    enrichmentSummaryMetrics.appendChild(box);
+  }
+}
+
 async function loadImportDashboard() {
   if(currentUserRole!=="admin")return;
+  loadEnrichmentSummary();
   const requestId=++importAuditGeneration;
   importAuditLoaded=true;
   const year=Number(importAuditYear.value);
