@@ -52,6 +52,7 @@ const costsWorkspace = document.getElementById("costsWorkspace");
 const reviewWorkspace = document.getElementById("reviewWorkspace");
 const reviewQuery = document.getElementById("reviewQuery");
 const reviewRisk = document.getElementById("reviewRisk");
+const reviewStatusFilter = document.getElementById("reviewStatusFilter");
 const reviewTotal = document.getElementById("reviewTotal");
 const reviewResults = document.getElementById("reviewResults");
 const reviewVisibleCount = document.getElementById("reviewVisibleCount");
@@ -1216,6 +1217,7 @@ async function runReviewSearch({ append = false } = {}) {
   const requestId = ++reviewSearchGeneration;
   const query = reviewQuery.value.trim();
   const risk = reviewRisk.value || null;
+  const reviewStatus = reviewStatusFilter.value || null;
   if (!append) {
     ++reviewDetailGeneration;
     reviewRows = [];
@@ -1227,9 +1229,10 @@ async function runReviewSearch({ append = false } = {}) {
     reviewFooter.classList.add("hidden");
   }
   reviewMoreButton.disabled = true;
-  const { data, error } = await supabase.rpc("normalization_review_queue", {
+  const { data, error } = await supabase.rpc("normalization_review_queue_v2", {
     p_query: query || null,
     p_risk: risk,
+    p_status: reviewStatus,
     result_limit: 30,
     p_offset: append ? reviewRows.length : 0,
   });
@@ -1575,6 +1578,7 @@ reviewTab.addEventListener("click", () => activateWorkspace("review"));
 importTab.addEventListener("click", () => activateWorkspace("import"));
 reviewMoreButton.addEventListener("click", () => runReviewSearch({ append: true }));
 reviewRisk.addEventListener("change", () => runReviewSearch());
+reviewStatusFilter.addEventListener("change", () => runReviewSearch());
 reviewQuery.addEventListener("input", () => {
   if (reviewTypingTimeout !== null) clearTimeout(reviewTypingTimeout);
   reviewTypingTimeout = setTimeout(() => {
