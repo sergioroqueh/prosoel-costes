@@ -67,6 +67,14 @@ const importPreview = document.getElementById("importPreview");
 const importConfirmPanel = document.getElementById("importConfirmPanel");
 const importAcknowledged = document.getElementById("importAcknowledged");
 const importSubmitButton = document.getElementById("importSubmitButton");
+const importAuditYear = document.getElementById("importAuditYear");
+const importAuditRefresh = document.getElementById("importAuditRefresh");
+const importAuditStatus = document.getElementById("importAuditStatus");
+const importAuditMetrics = document.getElementById("importAuditMetrics");
+const importGapCount = document.getElementById("importGapCount");
+const importGapDescription = document.getElementById("importGapDescription");
+const importGaps = document.getElementById("importGaps");
+const importAuditRows = document.getElementById("importAuditRows");
 
 let searchGeneration = 0;
 let detailGeneration = 0;
@@ -86,6 +94,8 @@ let reviewTypingTimeout = null;
 let currentUserRole = "user";
 let currentImport = null;
 let importSelectionGeneration = 0;
+let importAuditGeneration = 0;
+let importAuditLoaded = false;
 
 
 function money(value) {
@@ -1161,6 +1171,7 @@ function activateWorkspace(which) {
   reviewTab.setAttribute("aria-selected", String(reviewing));
   importTab.setAttribute("aria-selected", String(importing));
   if (reviewing && !reviewLoaded) runReviewSearch();
+  if (importing && !importAuditLoaded) loadImportDashboard();
 }
 
 function renderReviewResults() {
@@ -1594,6 +1605,140 @@ reviewQuery.addEventListener("keydown", (event) => {
   }
 });
 
+// --- V10: auditoría de pedidos recientes y posibles huecos de numeración.
+// La comprobación numérica no permite inferir que un pedido se haya perdido.
+function importAuditMetric(label,value,detail="") {
+  return '<div class="import-audit-stat"><span>'+escapeHtml(label)+'</span><strong>'+
+    escapeHtml(String(value))+'</strong>'+
+    (detail?'<small>'+escapeHtml(detail)+'</small>':'')+'</div>';
+}
+
+async function loadImportDashboard() {
+  if(currentUserRole!=="admin")return;
+  const requestId=++importAuditGeneration;
+  importAuditLoaded=true;
+  const year=Number(importAuditYear.value);
+  importAuditRefresh.disabled=true;
+  importAuditStatus.textContent="Comprobando histórico y numeración de "+year+"…";
+  importAuditStatus.classList.remove("is-error");
+  try {
+    const [allOrders,allLines,yearOrders,flaggedOrders,reviewPending,counter,imports] = await Promise.all([
+      supabase.from("orders").select("id",{count:"exact",head:true}),
+      supabase.from("order_lines").select("id",{count:"exact",head:true}),
+      supabase.from("orders").select("id",{count:"exact",head:true}).eq("order_year",year),
+      supabase.from("orders").select("id",{count:"exact",head:true})
+        .eq("order_year",year).neq("validation_status","valid"),
+      supabase.from("normalization_review_groups")
+        .select("reference_key",{count:"exact",head:true}).eq("review_status","pending"),
+      supabase.rpc("order_counter",{p_year:year}),
+      supabase.from("order_import_audit")
+        .select("id,created_at,line_count,source_filename,order:orders!inner(id,order_year,order_number,order_subnumber,order_reference,order_date,declared_total,validation_status,supplier:suppliers(name))")
+        .eq("order.order_year",year)
+        .order("created_at",{ascending:false})
+        .limit(20),
+    ]);
+    if(requestId!==importAuditGeneration)return;
+    const all=[allOrders,allLines,yearOrders,flaggedOrders,reviewPending,counter,imports];
+    const firstError=all.find((x)=>x.error)?.error;
+    if(firstError)throw firstError;
+    const last=counter.data?.[0]?.last_registered;
+    const lastNum=last===null||last===undefined?null:Number(last);
+    let possibleGaps=[];
+    let start=null;
+    if(lastNum!==null&&Number.isFinite(lastNum)&&lastNum>=1){
+      start=Math.max(1,lastNum-99);
+      const numbers=await supabase.from("orders").select("order_number")
+        .eq("order_year",year).gte("order_number",start).lte("order_number",lastNum)
+        .limit(1000);
+      if(requestId!==importAuditGeneration)return;
+      if(numbers.error)throw numbers.error;
+      const found=new Set((numbers.data||[]).map((o)=>Number(o.order_number)));
+      for(let n=start;n<=lastNum;n++)if(!found.has(n))possibleGaps.push(n);
+    }
+    const recent=imports.data||[];
+    // El listado indica pedidos creados mediante el flujo web (V9 en adelante).
+    importAuditMetrics.innerHTML=[
+      importAuditMetric("Pedidos en la base",number(allOrders.count,0),"Todos los años"),
+      importAuditMetric("Líneas históricas",number(allLines.count,0),"Todos los años"),
+      importAuditMetric("Pedidos de "+year,number(yearOrders.count,0),"Incluye subpedidos"),
+      importAuditMetric("Último número registrado",lastNum===null?"—":String(year).slice(-2)+"/"+lastNum,"Siguiente: "+(lastNum===null?"—":String(year).slice(-2)+"/"+(lastNum+1))),
+      importAuditMetric("Pedidos con aviso de totales",number(flaggedOrders.count,0),"Del año seleccionado"),
+      importAuditMetric("Normalizaciones pendientes",number(reviewPending.count,0),"Todas las referencias"),
+    ].join("");
+    importGapCount.textContent=possibleGaps.length+" posibles huecos";
+    importGapDescription.textContent=start===null
+      ?"Todavía no hay pedidos numerados para este año."
+      :"Se comprueban los números del "+String(year).slice(-2)+"/"+start+
+       " al "+String(year).slice(-2)+"/"+lastNum+
+       ". Son ausencias numéricas, no errores confirmados. Puede haber anulaciones, reservas o pedidos sin incorporar.";
+    importGaps.replaceChildren();
+    if(!possibleGaps.length){
+      const p=document.createElement("p");
+      p.className="import-gaps-empty";
+      p.textContent="No se observan números sin pedido en este tramo.";
+      importGaps.appendChild(p);
+    }else{
+      for(const n of possibleGaps){
+        const tag=document.createElement("span");
+        tag.className="import-gap-token";
+        tag.textContent=String(year).slice(-2)+"/"+n;
+        importGaps.appendChild(tag);
+      }
+    }
+    importAuditRows.replaceChildren();
+    if(!recent.length){
+      const tr=document.createElement("tr");
+      const td=document.createElement("td");
+      td.colSpan=8;
+      td.textContent="No hay importaciones registradas mediante la web para "+year+".";
+      tr.appendChild(td);
+      importAuditRows.appendChild(tr);
+    }
+    for(const entry of recent){
+      const o=entry.order||{};
+      const supplier=o.supplier?.name||"—";
+      const orderNum=o.order_number?String(year).slice(-2)+"/"+o.order_number+
+        (o.order_subnumber?"."+o.order_subnumber:""):(o.order_reference||"—");
+      const date=new Date(entry.created_at);
+      const imported=Number.isFinite(date.getTime())?date.toLocaleString("es-ES"):"—";
+      const cells=[
+        imported,
+        orderNum,
+        o.order_date||"—",
+        supplier,
+        entry.source_filename||"—",
+        String(entry.line_count??"—"),
+        money(o.declared_total),
+        o.validation_status==="valid"?"Correcto":o.validation_status==="incomplete_prices"
+          ?"Precios incompletos":o.validation_status==="total_mismatch"
+          ?"No cuadra":"Pendiente de revisar",
+      ];
+      const tr=document.createElement("tr");
+      if(o.validation_status!=="valid")tr.classList.add("import-audit-flag");
+      cells.forEach((value)=>{
+        const td=document.createElement("td");
+        td.textContent=value;
+        tr.appendChild(td);
+      });
+      importAuditRows.appendChild(tr);
+    }
+    importAuditStatus.textContent="Control actualizado. "+recent.length+
+      " importaciones web recientes consultadas; "+possibleGaps.length+
+      " posibles huecos numéricos en el tramo analizado.";
+    importAuditRefresh.disabled=false;
+  } catch(error) {
+    if(requestId!==importAuditGeneration)return;
+    console.error("Control de importación no disponible",error);
+    importAuditStatus.textContent="No se pudo actualizar el control: "+
+      (error?.message||"consulta no disponible")+". Puedes volver a intentarlo.";
+    importAuditStatus.classList.add("is-error");
+    importAuditRefresh.disabled=false;
+    importAuditLoaded=false;
+  }
+}
+importAuditRefresh.addEventListener("click",loadImportDashboard);
+importAuditYear.addEventListener("change",loadImportDashboard);
+
 // --- V9: alta controlada de pedidos nuevos (solo administradores).
 function importMessage(message, isError=false) {
   importStatus.textContent=message;
@@ -1722,7 +1867,7 @@ async function commitNewOrder(){
     importConfirmPanel.classList.add("hidden");
     importFile.value="";
     reviewLoaded=false; // Refrescar la cola al volver a Normalización.
-    await Promise.all([loadCounter(),loadSuppliers()]);
+    await Promise.all([loadCounter(),loadSuppliers(),loadImportDashboard()]);
   }else{
     importMessage(outcome.result==="duplicate"
       ?"El mismo archivo ya figura en el histórico. No se ha duplicado."
