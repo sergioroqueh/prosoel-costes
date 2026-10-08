@@ -53,6 +53,9 @@ const reviewWorkspace = document.getElementById("reviewWorkspace");
 const reviewQuery = document.getElementById("reviewQuery");
 const reviewRisk = document.getElementById("reviewRisk");
 const reviewStatusFilter = document.getElementById("reviewStatusFilter");
+const reviewFamilyFilter = document.getElementById("reviewFamilyFilter");
+const reviewSort = document.getElementById("reviewSort");
+const reviewAlertsOnly = document.getElementById("reviewAlertsOnly");
 const reviewTotal = document.getElementById("reviewTotal");
 const reviewResults = document.getElementById("reviewResults");
 const reviewVisibleCount = document.getElementById("reviewVisibleCount");
@@ -1152,6 +1155,25 @@ const reviewStatusLabels = {
   distinct_products: "Contiene productos distintos",
   ready_for_mapping: "Pendiente de vincular",
 };
+const reviewFamilyLabels = {
+  aparamenta: "Aparamenta", cables: "Cables y conductores",
+  canalizaciones: "Tubos y canalizaciones", iluminacion: "Iluminación",
+  mecanismos: "Mecanismos", telecomunicaciones: "Telecomunicaciones",
+  envolventes_cajas: "Envolventes y cajas", puesta_tierra: "Puesta a tierra",
+  fijaciones: "Fijación y accesorios", mixta: "Familias incompatibles",
+  sin_clasificar: "Sin clasificar",
+};
+const technicalAlertLabels = {
+  familias: "Familias distintas",
+  potencias_W: "Potencias (W)",
+  diametros_mm: "Diámetros (mm)",
+  secciones_mm2: "Secciones (mm²)",
+  intensidades_A: "Intensidades (A)",
+};
+function candidateTechnicalAlerts(row) {
+  return Object.entries(row?.technical_alerts || {})
+    .filter(([key,values]) => Object.hasOwn(technicalAlertLabels,key) && Array.isArray(values) && values.length>1);
+}
 const reviewRiskLabels = {
   technical_conflict: "Conflicto técnico",
   variant_descriptions: "Varias descripciones",
@@ -1230,6 +1252,9 @@ async function runReviewSearch({ append = false } = {}) {
   const query = reviewQuery.value.trim();
   const risk = reviewRisk.value || null;
   const reviewStatus = reviewStatusFilter.value || null;
+  const family = reviewFamilyFilter.value || null;
+  const sort = reviewSort.value || "impact";
+  const alertsOnly = reviewAlertsOnly.checked;
   if (!append) {
     ++reviewDetailGeneration;
     reviewRows = [];
@@ -1241,10 +1266,13 @@ async function runReviewSearch({ append = false } = {}) {
     reviewFooter.classList.add("hidden");
   }
   reviewMoreButton.disabled = true;
-  const { data, error } = await supabase.rpc("normalization_review_queue_v2", {
+  const { data, error } = await supabase.rpc("normalization_review_queue_v3", {
     p_query: query || null,
     p_risk: risk,
     p_status: reviewStatus,
+    p_family: family,
+    p_alerts_only: alertsOnly,
+    p_sort: sort,
     result_limit: 30,
     p_offset: append ? reviewRows.length : 0,
   });
@@ -1591,6 +1619,9 @@ importTab.addEventListener("click", () => activateWorkspace("import"));
 reviewMoreButton.addEventListener("click", () => runReviewSearch({ append: true }));
 reviewRisk.addEventListener("change", () => runReviewSearch());
 reviewStatusFilter.addEventListener("change", () => runReviewSearch());
+reviewFamilyFilter.addEventListener("change", () => runReviewSearch());
+reviewSort.addEventListener("change", () => runReviewSearch());
+reviewAlertsOnly.addEventListener("change", () => runReviewSearch());
 reviewQuery.addEventListener("input", () => {
   if (reviewTypingTimeout !== null) clearTimeout(reviewTypingTimeout);
   reviewTypingTimeout = setTimeout(() => {
