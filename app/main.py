@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Query
@@ -96,7 +96,7 @@ def historical_prices(
 
 @app.get("/api/orders/counter")
 def order_counter(
-    year: int = Query(default_factory=lambda: datetime.now().year, ge=2000, le=2100),
+    year: int | None = Query(None, ge=2000, le=2100),
     connection: Connection = Depends(get_connection),
 ) -> dict:
-    return get_order_counter(connection, year)
+    return get_order_counter(connection, year or date.today().year)
