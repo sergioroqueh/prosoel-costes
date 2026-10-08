@@ -4412,6 +4412,222 @@
       "sources": [
         "https://www.matmax.es/hilos-y-cables/productos/interflex/mnf4015-sondaflex-mnf-nylon-cabezal-terminal-diametro-4-amarillo-15m-0059126681"
       ]
+    },
+    {
+      "observed": [
+        "111403"
+      ],
+      "canonical": "111403",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "INDEX / Técnicas Expansivas GPZ201010, guía perfil perforada cincada 20x10x1 mm, 2 m.",
+      "sources": [
+        "https://ferreteriaibermadrid.es/ofertas/13405-guia-perfil-20x10x1mm-perforada-index-cinc-gpz201010-index.html"
+      ]
+    },
+    {
+      "observed": [
+        "A9F79616"
+      ],
+      "canonical": "A9F79616",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Acti9 iC60N 1P+N 16A curva C, 6000A/10kA.",
+      "sources": [
+        "https://www.se.com/es/es/product/A9F79616/interruptor-magnetot%C3%A9rmico-acti9-ic60n-1p%2Bn-16-a-curva-c-6000-a-10-ka/"
+      ]
+    },
+    {
+      "observed": [
+        "113574"
+      ],
+      "canonical": "113574",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Fontana tuerca hexagonal DIN 934 clase 8.8 cincada M8, caja 200 uds.",
+      "sources": [
+        "https://www.ferrokey.eu/tuerca-hexagonal-din-934-88-cincada-m-8-200-uds-fontana_113574.html"
+      ]
+    },
+    {
+      "observed": [
+        "113350"
+      ],
+      "canonical": "113350",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Fontana arandela plana DIN 9021 cincada M8, caja 250 uds.",
+      "sources": [
+        "https://www.ferrokey.eu/arandela-plana-din-9021-cincada-m-8-250-uds-fontana_113350.html"
+      ]
+    },
+    {
+      "observed": [
+        "LS990SWM"
+      ],
+      "canonical": "LS 990 SWM",
+      "relation": "confirmed_exact_format_alias",
+      "confidence": "very_high",
+      "note": "JUNG LS990 tecla simple negro mate; el histórico compacta el código eliminando espacios.",
+      "sources": [
+        "https://www.jung-group.com/es-ES/p/Tecla-simple-negro-mate/LS-990-SWM"
+      ]
+    },
+    {
+      "observed": [
+        "18516"
+      ],
+      "canonical": "18516",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "BJC Iris pulsador 10A 250V.",
+      "sources": [
+        "https://bjc.es/product/pulsador-10-a-250-v-2/"
+      ]
+    },
+    {
+      "observed": [
+        "069602L"
+      ],
+      "canonical": "069602L",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Plexo caja de superficie con membranas 2 elementos H/V, antracita, IP55.",
+      "sources": [
+        "https://www.legrand.fr/pro/catalogue/boitier-saillie-etanche-plexo-2-postes-horizontaux-et-verticaux-sans-cloison-avec-4-embouts-a-membrane-anthracite"
+      ]
+    },
+    {
+      "observed": [
+        "400405"
+      ],
+      "canonical": "400405",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand XL3 repartidor modular escalonado 4P 100A, 6 salidas, 4 módulos.",
+      "sources": [
+        "https://www.legrand.fr/pro/catalogue/repartiteur-modulaire-a-barreaux-etages-tetrapolaire-100a-6-departs-4-modules"
+      ]
+    },
+    {
+      "observed": [
+        "407728"
+      ],
+      "canonical": "407728",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand DX3 magnetotérmico 1P+N 16A curva C, 6000/10kA, 1 módulo.",
+      "sources": [
+        "https://www.legrand.es/es/productos/magnetotermico-dx3-600010ka-1pn-230v-16a-curva-1-modulo-407728"
+      ]
+    },
+    {
+      "observed": [
+        "82630-30"
+      ],
+      "canonical": "82630-30",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Simon 82 marco de 3 elementos blanco.",
+      "sources": [
+        "https://www.simonelectric.com/es-es/82630-30-marco-3-elementos-blanco-simon-82"
+      ]
+    },
+    {
+      "observed": [
+        "0102040"
+      ],
+      "canonical": "0102040",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Temper fusible NH-00 80A 500/690Vac clase gG, con indicador de fusión.",
+      "sources": [
+        "https://grupotemper.com/producto/ac-00-de-80a-gg"
+      ]
+    },
+    {
+      "observed": [
+        "JX39136LED"
+      ],
+      "canonical": "JX39136LED",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "ROBLAN JX39 pantalla estanca vacía 1xT8 LED 120 cm, IP65, tubos no incluidos.",
+      "sources": [
+        "https://roblan.com/es/productos/jx39-led/JX39136LED/"
+      ]
+    },
+    {
+      "observed": [
+        "JX39236LED"
+      ],
+      "canonical": "JX39236LED",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "ROBLAN JX39 pantalla estanca vacía 2xT8 LED 120 cm, IP65, tubos no incluidos.",
+      "sources": [
+        "https://roblan.com/es/productos/ficha-tecnica/jx39236led/"
+      ]
+    },
+    {
+      "observed": [
+        "864173"
+      ],
+      "canonical": "864173",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Legrand Niloé Step placa/marco de 3 elementos, blanco mate, montaje horizontal o vertical.",
+      "sources": [
+        "https://www.clientes.valektra.es/catalogo/producto/688260/1"
+      ]
+    },
+    {
+      "observed": [
+        "R9F12610"
+      ],
+      "canonical": "R9F12610",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Schneider Resi9 magnetotérmico 1P+N 10A, 6000A, 230V.",
+      "sources": [
+        "https://www.se.com/es/es/product/R9F12610/interruptor-magnetot%C3%A9rmico-resi9-1p%2Bn-10-a-6000-a-230-v/"
+      ]
+    },
+    {
+      "observed": [
+        "CCPGSC/A01"
+      ],
+      "canonical": "CCPGSC/A01",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Cablecel pigtail SC/APC OS2 monomodo 1 m, G657A2.",
+      "sources": [
+        "https://www.cablecel.com/productos/ftth-ict2/pigtail-sc-apc-fibra-optica-sm-g657a2/pigtail-sc-apc-os2-9-125-monomodo-1mt-g657a2/"
+      ]
+    },
+    {
+      "observed": [
+        "20302900"
+      ],
+      "canonical": "20302900",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "General Cable Exzhellent RZ1-K (AS) 0,6/1kV 3G2,5 mm².",
+      "sources": [
+        "https://www.ilumitec.es/cable-unipolar-libre-halogenos-3x2-5-mm2-rz1k"
+      ]
+    },
+    {
+      "observed": [
+        "020MARM025"
+      ],
+      "canonical": "020MARM025",
+      "relation": "confirmed_exact",
+      "confidence": "very_high",
+      "note": "Napoleón Armengol manguito electrogalvanizado ARMET M25, longitud 55 mm.",
+      "sources": [
+        "https://napoleon-armengol.com/wp-content/uploads/2023/11/ARMENGOL_ETPA-020MARM-v1.pdf"
+      ]
     }
   ],
   "updated_at": "2026-10-08"
