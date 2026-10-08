@@ -1901,3 +1901,52 @@ button, input, select, textarea { accent-color: var(--prosoel-blue); }
   .cable-fields { grid-template-columns: 1fr; }
   .cable-fields label:first-child { grid-column: auto; }
 }
+
+/* V15 — estado de identificación y documentación asistida al importar pedidos. */
+.enrichment-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px 28px;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--prosoel-border,#d5dfeb);
+  border-left: 3px solid var(--prosoel-blue,#134079);
+  background: #fff;
+  border-radius: 10px;
+  padding: 14px 17px;
+  margin-bottom: 14px;
+}
+.enrichment-summary > div:first-child { flex: 1 1 320px; }
+.enrichment-summary h3 { font-size: 14px; margin: 0 0 6px; color: var(--prosoel-blue,#134079); }
+.enrichment-summary p {
+  margin: 0;
+  color: #4e627a;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.enrichment-summary-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  flex: 1 1 360px;
+  justify-content: flex-end;
+  color: #59718b;
+  font-size: 12px;
+}
+.enrichment-summary-metric {
+  flex: 1 1 105px;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #f0f5fa;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 95px;
+  max-width: 160px;
+}
+.enrichment-summary-metric strong { font-size: 19px; color: #173b69; }
+.enrichment-summary-metric span { font-size: 10px; line-height: 1.4; color: #63758a; }
+@media(max-width:850px) {
+  .enrichment-summary-metrics { justify-content: flex-start; }
+}
