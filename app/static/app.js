@@ -1152,6 +1152,17 @@ function originHtml(row) {
   parts.push("<strong>Descuento:</strong> " + escapeHtml(displayDiscount(row.discount_raw)) + " (valor original: " + escapeHtml(row.discount_raw ?? "—") + ")");
   parts.push("<strong>Neto unitario:</strong> " + money(row.net_unit_price));
   parts.push("<strong>Total:</strong> " + money(row.total_price));
+  if (row.description_source && row.description_source !== row.description_original) {
+    parts.push("<strong>Descripción que figura en el Excel:</strong> " + escapeHtml(row.description_source));
+    parts.push("<strong>Descripción técnica corregida:</strong> " + escapeHtml(row.description_original));
+  }
+  if (row.supplier_reference_source && row.supplier_reference_source !== row.supplier_reference) {
+    parts.push("<strong>Referencia que figura en el Excel:</strong> " + escapeHtml(row.supplier_reference_source));
+  }
+  if (row.line_excluded) parts.push("<strong>Excluida esta línea de los cálculos:</strong> Sí");
+  if (row.order_excluded) parts.push("<strong>Excluido el pedido completo:</strong> Sí");
+  if (row.line_review_reason) parts.push("<strong>Motivo de revisión:</strong> " + escapeHtml(row.line_review_reason));
+  if (row.order_review_reason) parts.push("<strong>Motivo de exclusión del pedido:</strong> " + escapeHtml(row.order_review_reason));
   parts.push("<strong>Archivo origen:</strong> " + escapeHtml(row.source_filename || "—"));
   return parts.join("<br>");
 }
@@ -1404,10 +1415,47 @@ function suggestReviewDecision(row, notes) {
   };
 }
 
-function reviewPurchaseTableHtml(rows) {
-  return historyTableHtml(rows)
-    .replaceAll('data-origin-index="', 'data-review-origin-index="')
-    .replaceAll('id="origin-row-', 'id="review-origin-row-');
+function reviewPurchaseTableHtml(rows, notes) {
+  if (!rows.length) return '<div class="empty-state">No hay compras originales para esta referencia.</div>';
+  const indexedNotes = new Map(notes.map((note, index) => [note.description, index]));
+  const html = [];
+  html.push('<div class="review-edit-table-wrap"><table class="history-table review-edit-table"><thead><tr>');
+  html.push('<th>Pedido</th><th>Proveedor</th><th>Descripción que venía en el Excel</th><th>Neto</th><th>Estado en catálogo</th><th>Acciones</th>');
+  html.push('</tr></thead><tbody>');
+  rows.forEach((item, index) => {
+    const original = item.description_source || item.description_original || "";
+    const groupIndex = indexedNotes.get(original);
+    const changed = item.corrected_reference !== null || item.corrected_description !== null;
+    const excluded = item.line_excluded || item.order_excluded;
+    const state = item.order_excluded ? "Pedido excluido" :
+      item.line_excluded ? "Línea excluida" :
+      !item.belongs_to_effective_reference ? "Reasignada a otra referencia" :
+      changed ? "Corregida" : "Sin corregir";
+    html.push('<tr class="review-purchase-row' + (excluded ? ' review-purchase-excluded' : '') +
+      '" data-review-row-group="' + String(groupIndex??-1) + '">');
+    html.push('<td>' + escapeHtml(orderLabel(item)) + '<div class="review-row-date">' +
+      escapeHtml(item.order_date || "—") + '</div></td>');
+    html.push('<td>' + escapeHtml(item.supplier || "—") + '</td>');
+    html.push('<td><strong>' + escapeHtml(item.supplier_reference_source || "Sin referencia") +
+      '</strong><div class="review-source-description">' + escapeHtml(original) + '</div>');
+    if (changed) html.push('<div class="review-effective-note">Para el catálogo: ' +
+      escapeHtml(item.supplier_reference || "Sin referencia") + ' · ' +
+      escapeHtml(item.description_original || "—") + '</div>');
+    html.push('</td>');
+    html.push('<td>' + money(item.net_unit_price) + '</td>');
+    html.push('<td><span class="review-line-status' + (excluded ? ' is-excluded' : changed ? ' is-corrected' : '') +
+      '">' + escapeHtml(state) + '</span></td>');
+    html.push('<td class="review-line-actions"><button type="button" class="origin-link" data-review-origin-index="' +
+      index + '">Origen</button>');
+    if (currentUserRole === "admin") html.push('<button type="button" class="review-line-edit-button" data-edit-review-line-index="' +
+      index + '">Revisar</button>');
+    html.push('</td></tr>');
+    html.push('<tr class="review-line-origin-row hidden" data-review-row-group="' +
+      String(groupIndex??-1) + '" id="review-origin-row-' + index +
+      '"><td colspan="6"><div class="origin-detail">' + originHtml(item) + '</div></td></tr>');
+  });
+  html.push('</tbody></table></div>');
+  return html.join("");
 }
 
 function renderReviewCandidate(row, purchases, reviewEvents = []) {
