@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PROSOEL Costes</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">PROSOEL</div>
+      <h1>Costes y referencias</h1>
+    </div>
+    <div class="counter" id="orderCounter">
+      <span class="muted">Pedidos</span>
+      <strong>—</strong>
+    </div>
+  </header>
+
+  <main>
+    <section class="search-panel">
+      <label for="searchInput">¿Qué material buscas?</label>
+      <div class="search-row">
+        <input
+          id="searchInput"
+          type="search"
+          autocomplete="off"
+          placeholder="Ej.: diferencial 4P 40A 300mA, RZ1-K 5G6, toma RJ45 Cat 6..."
+        >
+        <button id="searchButton" type="button">Buscar</button>
+      </div>
+      <p class="hint">
+        No hace falta conocer la referencia exacta. Puedes buscar por descripción,
+        fabricante, modelo, sección, potencia o código.
+      </p>
+    </section>
+
+    <section class="layout">
+      <div class="results-panel">
+        <div class="section-title">
+          <h2>Resultados</h2>
+          <span id="resultCount" class="muted"></span>
+        </div>
+        <div id="results" class="results empty-state">
+          Escribe una descripción o referencia para empezar.
+        </div>
+      </div>
+
+      <aside class="detail-panel" id="detailPanel">
+        <div class="empty-state">
+          Selecciona un material para ver precios, compras y trazabilidad.
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <template id="resultTemplate">
+    <button class="result-card" type="button">
+      <div class="result-main">
+        <div class="result-title"></div>
+        <div class="result-meta"></div>
+      </div>
+      <div class="result-side">
+        <div class="result-price"></div>
+        <div class="purchase-badge"></div>
+      </div>
+    </button>
+  </template>
+
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
