@@ -1188,3 +1188,39 @@ main {
 .review-audit-history summary { cursor: pointer; font-size: 12px; font-weight: 750; }
 .review-audit-item { border-bottom: 1px solid #e4eaf0; padding: 9px 0; color: #425670; font-size: 12px; }
 .review-audit-item p { margin: 5px 0 0; font-size: 12px; white-space: pre-line; }
+
+/* V9: alta diaria de pedidos Excel, admin, vista previa sin almacenar XLSX. */
+.import-workspace {max-width: 1180px; margin: 0 auto;}
+.import-intro {background: #fff; border: 1px solid #e1e5ea; border-radius: 13px; padding: 20px 22px; margin-bottom: 13px;}
+.import-intro h2 {font-size: 21px; margin: 0 0 7px;}
+.import-intro p {font-size: 13px; color: #63728a; margin: 0; line-height: 1.55; max-width: 900px;}
+.import-card {background: #fff; border: 1px solid #dde4ed; border-radius: 13px; padding: 21px; box-shadow: 0 3px 14px rgba(16,34,61,.06);}
+.import-card > label {display:block; font-size:13px; font-weight:750; margin-bottom:9px;}
+.import-card > input[type="file"] {display:block; width:100%; background:#f7f9fc; border:1px dashed #aac0d7; border-radius:8px; padding:13px; box-sizing:border-box; cursor:pointer; font-size:13px;}
+.import-card > input[type="file"]:focus-visible, #importSubmitButton:focus-visible {outline:3px solid #8badd4; outline-offset:2px;}
+.import-message {margin: 14px 0; border-left: 3px solid #6c95bd; border-radius: 5px; padding: 9px 12px; background:#edf4fc; color:#264e79; font-size:13px;}
+.import-message.is-error {background:#fff1ee; color:#9a3c31; border-left-color:#b94f3f;}
+.import-preview {border-top:1px solid #e1e6ec; padding-top:15px; margin-top:13px;}
+.import-preview h3 {font-size:16px; overflow-wrap:anywhere; margin:0 0 14px;}
+.import-metrics {display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:14px;}
+.import-metric {background:#f5f7fa; padding:11px 12px; border-radius:8px; min-width:0;}
+.import-metric span {display:block; color:#66768a; font-size:11px; margin-bottom:5px;}
+.import-metric strong {display:block; font-size:14px; overflow-wrap:anywhere;}
+.import-digest {font-size:11px; color:#61738c; overflow-wrap:anywhere;}
+.import-warning-block {background:#ffefed; border:1px solid #efbab1; border-radius:9px; padding:12px; color:#9b2e29; font-size:13px;}
+.import-warnings {background:#fff7e7; border:1px solid #f0dcaa; border-radius:9px; padding:12px 14px; font-size:12px; color:#70521d; margin:12px 0;}
+.import-warnings ul {padding-left:19px; margin:8px 0 0;}
+.import-warnings li {padding:3px 0;}
+.import-table-scroll {max-width:100%; overflow-x:auto; border:1px solid #e2e8ef; border-radius:8px; margin-top:14px;}
+.import-lines-table {width:100%; min-width:900px; border-collapse:collapse; font-size:12px;}
+.import-lines-table th,.import-lines-table td {border-bottom:1px solid #e8ecf1; padding:9px 8px; text-align:left; vertical-align:top;}
+.import-lines-table th {font-size:10px; text-transform:uppercase; background:#f1f5fa; color:#596b80;}
+.import-lines-table td:nth-child(3) {min-width:230px; max-width:500px; white-space:pre-line;}
+.import-confirm-panel {border-top:1px solid #d9e3eb; margin-top:18px; padding-top:18px;}
+.import-acknowledge {display:flex; align-items:flex-start; gap:10px; font-size:13px; line-height:1.5; color:#384d68; cursor:pointer; margin-bottom:16px;}
+.import-acknowledge input {width:17px; height:17px; flex-shrink:0; margin-top:2px; accent-color:#244d80;}
+#importSubmitButton {background:#244d80; color:#fff; border:0; border-radius:8px; padding:12px 20px; font-size:13px; font-weight:800; cursor:pointer;}
+#importSubmitButton:disabled {opacity:.5; cursor:not-allowed;}
+.import-notice {font-size:12px; color:#68788e; line-height:1.55; margin-top:12px;}
+@media(max-width:900px) {.import-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:520px) {.import-metrics{grid-template-columns:1fr;} .import-card{padding:14px;} .import-intro{padding:14px;}}
