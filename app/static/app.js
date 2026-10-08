@@ -160,7 +160,6 @@ function showSupplierSuggestions() {
     button.setAttribute("role", "option");
     button.setAttribute("aria-selected", String(candidate.id === selectedSupplierId));
     button.textContent = candidate.name;
-    button.addEventListener("pointerdown", (event) => event.preventDefault());
     button.addEventListener("click", () => selectSupplier(candidate));
     supplierSuggestions.appendChild(button);
   });
@@ -220,10 +219,10 @@ supplierFilter.addEventListener("keydown", (event) => {
 document.addEventListener("pointerdown", (event) => {
   if (!supplierCombobox.contains(event.target)) closeSupplierSuggestions();
 });
-supplierFilter.addEventListener("blur", () => {
-  // La selección es explícita: escribir letras no aplica un proveedor parcial.
-  // Tras abandonar el campo se recupera el proveedor elegido o "Todos".
-  closeSupplierSuggestions();
+supplierCombobox.addEventListener("focusout", (event) => {
+  // Mantener el menú durante el click/tap sobre una sugerencia;
+  // cerrar al salir del componente por Tab o al tocar otro control.
+  if (!supplierCombobox.contains(event.relatedTarget)) closeSupplierSuggestions();
 });
 
 function escapeHtml(value) {
