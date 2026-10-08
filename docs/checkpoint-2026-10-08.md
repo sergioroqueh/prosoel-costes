@@ -227,3 +227,26 @@ PVP, descuento, neto, total y archivo de origen.
 - Auditoría de seguridad posterior sin advertencias nuevas: solo quedan aviso INFO de staging con RLS sin policy (intencional) y aviso Auth de protección contra contraseñas filtradas, anterior.
 - Pruebas con filas reales de `A9F79425`: función web genera SVG, 6 pedidos, 3 proveedores, 1 precio atípico y detalle histórico; comprobación aislada PASS.
 - Falta validación manual de experiencia real tras abrir la aplicación con `Ctrl+F5`; ninguna prueba de interfaz autenticada completa mediante navegador remoto.
+
+## Actualización V6 — Vista de procedencia única y filtros alineados
+
+### Motivo (feedback de usuario con capturas)
+- La comparativa tenía "Ver las 7 líneas originales y su procedencia" y, debajo, otra sección "Procedencia" con las mismas compras; la vista resultaba repetitiva.
+- El campo editable de proveedor no quedaba alineado verticalmente con Año y Ordenar por.
+
+### Correcciones realizadas
+- `app/static/app.js`: unificada la procedencia en **una sola tabla** `#provenanceRows`, siempre debajo del gráfico.
+  - Al abrir la ficha muestra las líneas de la variante seleccionada y respeta los filtros de búsqueda.
+  - Al pulsar "Comparar proveedores y evolución", el gráfico y la tabla resumen conservan su sitio, mientras que la única tabla "Procedencia" pasa a mostrar **todas las compras de la referencia original**, incluidas otras descripciones, proveedores o años.
+  - Se actualizan `#provenanceCount` y `#provenanceScope` para advertir expresamente que, tras la comparación, se muestra el histórico global del código de compra y que no se asume equivalencia técnica.
+  - Se conserva cada enlace "Ver origen" de cada pedido y se reconectan sus eventos tras reemplazar la tabla.
+  - Eliminados el acordeón duplicado, la función `comparisonHistoryHtml` y sus handlers de procedencia redundantes.
+- `app/static/index.html`: los filtros Proveedor/Año/Ordenar por tienen ahora exactamente la misma estructura (`.filter-field` + `label` + control). Caché de CSS/JS actualizada a `v=20261008-v6`.
+- `app/static/styles.css`: etiquetas de 16 px de altura y campos de 40 px de altura, espaciados y alineados uniformemente en escritorio y móvil; eliminado CSS del acordeón duplicado; leyenda aclaratoria bajo Procedencia.
+- **No se han modificado tablas de Supabase, normalización, referencias, precios, descuentos ni permisos**.
+
+### Verificaciones
+- Sintaxis JavaScript PASS, 3 filtros presentes con `filter-field` y CSS unificado.
+- Prueba de interacción aislada con las siete líneas reales `A9F79425`: al comparar hay 1 gráfico, no existe acordeón duplicado, la tabla única muestra 7 líneas, contador `7 líneas`, leyenda de alcance global y `wireOriginButtons()` se ejecuta. PASS.
+- Pendiente validación visual final en navegador real del usuario (incluida alineación, expansión "Ver origen" y vista móvil).
+- Última publicación de Pages: comprobar que la ejecución del commit HTML `77ef6f5d` termina con éxito (o commit posterior en `app/static`).
