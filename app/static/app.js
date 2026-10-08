@@ -635,6 +635,7 @@ function renderResults(rows, total) {
 }
 
 async function openMaterial(materialId) {
+  const requestId = ++detailGeneration;
   detailPanel.innerHTML = '<div class="empty-state">Cargando ficha y procedencia de precios…</div>';
 
   const [summaryResponse, pricesResponse, variantsResponse] = await Promise.all([
@@ -650,6 +651,7 @@ async function openMaterial(materialId) {
       .order("supplier_reference", { ascending: true }),
   ]);
 
+  if (requestId !== detailGeneration) return;
   if (summaryResponse.error || pricesResponse.error) {
     console.error(summaryResponse.error || pricesResponse.error);
     detailPanel.innerHTML = '<div class="empty-state">No se pudo cargar la ficha del material.</div>';
@@ -856,6 +858,176 @@ function renderHistoricalDetail(result, rows) {
     const activeDetail = detailGeneration;
     compareButton.addEventListener("click", () => showReferenceComparison(result.reference, activeDetail));
   }
+}
+
+// Comparación solo por coincidencia literal del código de compra.
+// No presupone que sea una referencia oficial de fabricante ni una equivalencia técnica.
+function validComparisonPrice(row) {
+  const price = Number(row.net_unit_price);
+  return row.price_validation_status === "valid"
+    && row.net_unit_price !== null
+    && Number.isFinite(price)
+    && price > 0;
+}
+
+function comparisonOutliers(rows) {
+  const values = rows.filter(validComparisonPrice).map((row) => row);
+  if (values.length < 4) return new Set();
+  const median = priceSummary(values).median;
+  if (!median || median <= 0) return new Set();
+  return new Set(values
+    .filter((row) => Number(row.net_unit_price) > median * 2.2
+      || Number(row.net_unit_price) < median * 0.45)
+    .map((row) => row.order_line_id));
+}
+
+function makePriceTimeline(rows, outliers) {
+  const plotted = rows.filter((row) => validComparisonPrice(row) && row.order_date
+    && Number.isFinite(Date.parse(row.order_date + "T00:00:00Z")));
+  if (!plotted.length) {
+    return '<p class="comparison-note">No hay precios validados y fechados suficientes para representar la evolución.</p>';
+  }
+  const width = 690, height = 252, left = 67, right = 19, top = 24, bottom = 42;
+  const t = (row) => Date.parse(row.order_date + "T00:00:00Z");
+  const times = plotted.map(t);
+  const amounts = plotted.map((row) => Number(row.net_unit_price));
+  const from = Math.min(...times), to = Math.max(...times);
+  const low = Math.max(0, Math.min(...amounts) * 0.88);
+  const high = Math.max(...amounts) * 1.10;
+  const yMax = Math.max(high, low + 0.01);
+  const x = (row) => from === to ? (left + width - right) / 2
+    : left + ((t(row) - from) / (to - from)) * (width - left - right);
+  const y = (row) => height - bottom - ((Number(row.net_unit_price) - low)
+    / (yMax - low)) * (height - top - bottom);
+  const palette = ["#244d80", "#29816f", "#865db9", "#c0782b", "#3483ad", "#ab5b79", "#687e38"];
+  const suppliersInOrder = [...new Set(plotted.map((row) => row.supplier || "Sin proveedor"))].sort((a,b) => a.localeCompare(b,"es"));
+  const providers = suppliersInOrder.map((name,index) => ({ name, color: palette[index % palette.length] }));
+  const lines = [];
+  lines.push('<svg viewBox="0 0 ' + width + ' ' + height + '" class="price-timeline" role="img" aria-label="Evolución histórica del precio neto unitario según fecha y proveedor">');
+  lines.push('<title>Evolución de precios netos por proveedor</title>');
+  for (let i = 0; i < 4; i++) {
+    const v = low + (yMax - low) * (i / 3);
+    const yy = height - bottom - ((v - low) / (yMax - low)) * (height - top - bottom);
+    lines.push('<line x1="' + left + '" y1="' + yy + '" x2="' + (width-right) + '" y2="' + yy + '" stroke="#e3e9f0" stroke-width="1"/>');
+    lines.push('<text x="' + (left-7) + '" y="' + (yy+4) + '" text-anchor="end" font-size="11" fill="#536173">' + escapeHtml(number(v,2)) + '</text>');
+  }
+  const dateLabel = (stamp) => new Intl.DateTimeFormat("es-ES",{month:"2-digit",year:"2-digit",timeZone:"UTC"}).format(new Date(stamp));
+  lines.push('<text x="' + left + '" y="' + (height-12) + '" font-size="11" fill="#536173">' + escapeHtml(dateLabel(from)) + '</text>');
+  lines.push('<text x="' + (width-right) + '" y="' + (height-12) + '" text-anchor="end" font-size="11" fill="#536173">' + escapeHtml(dateLabel(to)) + '</text>');
+  lines.push('<text x="' + left + '" y="13" font-size="11" fill="#536173">Neto €/ud</text>');
+  for (const provider of providers) {
+    const entries = plotted.filter((row) => (row.supplier || "Sin proveedor") === provider.name)
+      .sort((a,b) => t(a) - t(b) || Number(a.order_id) - Number(b.order_id));
+    if (entries.length > 1) {
+      lines.push('<polyline fill="none" stroke="' + provider.color + '" stroke-width="2" stroke-opacity=".75" points="'
+        + entries.map((row) => x(row).toFixed(2) + "," + y(row).toFixed(2)).join(" ") + '"/>');
+    }
+    for (const row of entries) {
+      const unusual = outliers.has(row.order_line_id);
+      lines.push('<circle cx="' + x(row).toFixed(2) + '" cy="' + y(row).toFixed(2)
+        + '" r="' + (unusual ? 5.5 : 4) + '" fill="' + (unusual ? "#b45309" : provider.color)
+        + '" stroke="#fff" stroke-width="1.5"><title>'
+        + escapeHtml(provider.name + " · " + row.order_date + " · " + money(row.net_unit_price)
+          + " · Pedido " + orderLabel(row) + (unusual ? " · Posible precio atípico" : ""))
+        + '</title></circle>');
+    }
+  }
+  lines.push('</svg>');
+  lines.push('<div class="comparison-legend">' + providers.map((provider) =>
+    '<span><i style="background:' + provider.color + '"></i>' + escapeHtml(provider.name) + '</span>'
+  ).join("") + '</div>');
+  return lines.join("");
+}
+
+function comparisonHistoryHtml(rows) {
+  // Prefijos propios: la procedencia principal y la comparativa coexisten en la ficha.
+  return historyTableHtml(rows)
+    .replaceAll('data-origin-index="', 'data-comparison-index="')
+    .replaceAll('id="origin-row-', 'id="comparison-origin-row-');
+}
+
+function renderReferenceComparison(container, reference, rows) {
+  if (!rows.length) {
+    container.innerHTML = '<p class="comparison-note">No hay compras históricas para esta referencia.</p>';
+    return;
+  }
+  const valid = rows.filter(validComparisonPrice);
+  const invalidCount = rows.length - valid.length;
+  const outliers = comparisonOutliers(rows);
+  const names = [...new Set(rows.map((row) => row.supplier || "Sin proveedor"))];
+  const numberOfOrders = new Set(rows.map((row) => row.order_id)).size;
+  const descCount = new Set(rows.map((row) => String(row.description_original || "")
+    .replace(/\s+/g," ").trim().toLocaleUpperCase("es-ES"))).size;
+  const groups = names.map((name) => {
+    const selected = rows.filter((row) => (row.supplier || "Sin proveedor") === name);
+    const priced = selected.filter(validComparisonPrice);
+    const sorted = priced.slice().sort((a,b) =>
+      String(b.order_date || "").localeCompare(String(a.order_date || ""))
+        || Number(b.order_id) - Number(a.order_id));
+    return { name, selected, priced, latest: sorted[0] || null,
+      summary: priceSummary(priced),
+      purchases: new Set(selected.map((row) => row.order_id)).size };
+  }).sort((a,b) => String(b.latest?.order_date||"").localeCompare(String(a.latest?.order_date||""))
+    || a.name.localeCompare(b.name,"es"));
+  const html = [];
+  html.push('<section class="comparison-panel">');
+  html.push('<h3>Comparativa histórica por código: ' + escapeHtml(reference) + '</h3>');
+  html.push('<p class="comparison-note">Coincidencia de <strong>referencia de compra</strong> en ' +
+    numberOfOrders + ' pedidos y ' + groups.length + ' proveedores. Son precios anteriores, no ofertas vigentes. La coincidencia del código no prueba equivalencia técnica.</p>');
+  if (descCount > 1) {
+    html.push('<p class="comparison-warning">Hay ' + descCount + ' descripciones originales distintas para este código. Revisa el modelo y las características antes de comparar.</p>');
+  }
+  if (invalidCount) {
+    html.push('<p class="comparison-warning">' + invalidCount + ' líneas con validación de precio pendiente o incorrecta se muestran en el histórico, pero no entran en estadísticas ni gráfico.</p>');
+  }
+  if (outliers.size) {
+    html.push('<p class="comparison-warning">' + outliers.size + ' precios potencialmente atípicos (más del 220 % o menos del 45 % de la mediana). Se incluyen, señalados en el gráfico; requieren revisión.</p>');
+  }
+  html.push('<div class="comparison-table-wrap"><table class="comparison-table"><thead><tr><th>Proveedor</th><th>Pedidos</th><th>Último neto</th><th>Última fecha</th><th>Mediana</th><th>Rango</th></tr></thead><tbody>');
+  for (const g of groups) {
+    html.push('<tr><td><strong>' + escapeHtml(g.name) + '</strong></td><td>' + g.purchases + '</td><td>' +
+      money(g.latest?.net_unit_price) + '</td><td>' + escapeHtml(g.latest?.order_date || "—")
+      + '</td><td>' + money(g.summary.median) + '</td><td>' +
+      (g.summary.min === null ? "—" : money(g.summary.min) + " – " + money(g.summary.max))
+      + '</td></tr>');
+  }
+  html.push('</tbody></table></div>');
+  html.push('<h4>Evolución de precios de compra</h4>');
+  html.push(makePriceTimeline(rows,outliers));
+  html.push('<p class="comparison-note">Cada punto corresponde a una línea de compra validada aritméticamente. Un precio diferente puede deberse a cantidad, descuento, fecha o condiciones comerciales.</p>');
+  html.push('<details class="comparison-details"><summary>Ver las ' + rows.length + ' líneas originales y su procedencia</summary>');
+  html.push(comparisonHistoryHtml(rows));
+  html.push('</details></section>');
+  container.innerHTML = html.join("");
+  container.querySelectorAll("[data-comparison-index]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const target = container.querySelector("#comparison-origin-row-" + button.getAttribute("data-comparison-index"));
+      if (target) target.classList.toggle("hidden");
+    });
+  });
+}
+
+async function showReferenceComparison(reference, detailRequestId) {
+  const button = detailPanel.querySelector("#compareReferenceButton");
+  const area = detailPanel.querySelector("#referenceComparison");
+  if (!button || !area || detailRequestId !== detailGeneration) return;
+  button.disabled = true;
+  button.textContent = "Consultando todos los proveedores…";
+  area.innerHTML = '<div class="comparison-loading">Recuperando compras por referencia exacta…</div>';
+  const { data, error } = await supabase.rpc("reference_purchase_history", {
+    p_reference: reference,
+    result_limit: 500,
+  });
+  if (detailRequestId !== detailGeneration || !area.isConnected) return;
+  if (error) {
+    console.error("Error comparando referencia", error);
+    area.innerHTML = '<p class="comparison-warning">No se pudo recuperar la comparativa. Puedes intentarlo de nuevo.</p>';
+    button.disabled = false;
+    button.textContent = "Reintentar comparativa";
+    return;
+  }
+  renderReferenceComparison(area, reference, data || []);
+  button.textContent = "Comparativa cargada";
 }
 
 function statHtml(label, value) {
