@@ -532,3 +532,31 @@ main {
   line-height: 1.45;
   text-align: center;
 }
+
+
+.login-card .link-button {
+  margin-top: 10px;
+  min-height: 36px;
+  background: transparent;
+  color: #244d80;
+  border: 1px solid #b9c9db;
+}
+
+.login-card .link-button:hover {
+  background: #f3f7fb;
+}
+
+.password-setup {
+  margin-top: 20px;
+}
+
+.password-setup hr {
+  border: 0;
+  border-top: 1px solid #e2e6eb;
+  margin: 18px 0;
+}
+
+.password-setup h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
