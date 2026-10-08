@@ -185,3 +185,37 @@ PVP, descuento, neto, total y archivo de origen.
 - Cambios `app/static/app.js` commit `edb18f50`; HTML usa caché `v=20261008-1255`, commit `afd65d4e`.
 - SQL V4: migración aplicada y versionada; referencia `A9K17425` primera bajo precio ascendente, descendente, fecha reciente y código `A9K 17425` con espacio.
 - Validación posterior: 2.863 pedidos, 11.538 líneas; consulta anónima de RPC denegada.
+
+## Actualización 2026-10-08 — Comparativa por referencia y evolución V5
+
+### Diagnóstico a partir de la captura del usuario
+- La consulta escrita fue `A9F79425`; estaba seleccionado proveedor `CADIELSA`.
+- `A9F79425` **sí existe**, pero no en CADIELSA: 7 líneas / 6 pedidos / 3 proveedores (**GRUPO RIAS** 4 pedidos, **GUARCONSA** 1, **RELUZ** 1).
+- `A9K17425` es otra referencia, distinta: se compró 3 veces a CADIELSA, además de compras a otros proveedores.
+- El resultado aproximado `A9K17425` bajo el filtro CADIELSA NO es la referencia exacta buscada; no debe llamarse coincidencia exacta.
+- No se altera el buscador aproximado por potencias (falsos positivos tolerados como resultados relacionados, nunca equivalentes confirmados).
+
+### Funcionalidad implantada
+- Función SQL `public.reference_purchase_history(p_reference,result_limit)`, migración `supabase/migrations/20261008_007_reference_comparison.sql`:
+  - consulta únicamente la **referencia original** exacta ignorando espacios y mayúsculas;
+  - datos por línea: pedido, fecha, proveedor, obra, cantidad, PVP, descuento, neto, importe total, validación, descripción, fichero origen;
+  - exclusivamente para authenticated con `private.has_app_access()`, `security invoker` y RLS; sin disponibilidad para anon;
+  - no fusiona variantes ni modifica importes.
+- En el listado: si la consulta parece código y hay proveedor/año seleccionados, se avisa cuando esa referencia exacta está en otros proveedores/años. Botón «Ver referencia exacta sin filtros» limpia proveedor, año y orden, vuelve a buscar.
+- En cada ficha histórica con referencia: botón «Comparar proveedores y evolución» con tabla por proveedor: pedidos distintos, último neto y fecha, mediana, mínimo y máximo, gráfico cronológico por proveedor y acceso a todas las líneas originales por «Ver origen».
+- Se advierte que la misma referencia de compra no certifica identidad técnica, fabricante ni precio actual; diferencias en descripciones se notifican.
+- Estadísticas y gráfico incluyen únicamente líneas con precio neto positivo y `price_validation_status='valid'`; los demás registros siguen visibles en la tabla original.
+- Se marca como potencialmente atípico, sin excluirlo, el precio neto >2,2 veces o <0,45 veces la mediana cuando hay ≥4 líneas validadas.
+- Versión publicada en `app/static/index.html`: caché `v=20261008-v5`. CSS y JS integrados; sin bibliotecas nuevas.
+
+### Pruebas efectuadas
+- SQL autenticado `A9F79425`: 7 líneas, 6 pedidos, 3 proveedores. `A9K17425`: 12 líneas (no mezcladas).
+- Función `reference_purchase_history('A9F 79425')` también devuelve 7 líneas (variaciones de espacio), pero no cambia códigos con dígitos distintos.
+- Usuario autenticado fuera de `app_users`: 0 líneas visibles.
+- `anon` sin permiso EXECUTE; authenticated autorizado puede ejecutar.
+- Se reconoce 1 importe atípico en `A9F79425`: 92,81 €/ud registrado en GRUPO RIAS. Validación aritmética de origen marcada `valid`, pero revisión comercial pendiente.
+- Test aislado de JavaScript con filas reales: gráfico SVG generado, 6 pedidos, 3 proveedores, aviso de atípico y enlace al histórico; PASS.
+- Test de aviso exacto: para CADIELSA visible; GRUPO RIAS u «Todos los proveedores» oculto; PASS.
+- Sintaxis JS comprobada PASS.
+- Pendiente: prueba humana de la interfaz en navegador (incluyendo comparación, Tooltip/«Ver origen» y móvil), comprobar éxito del despliegue GitHub Pages para commit `89141fb2`.
+- Comprobar en pantalla `A9F79425` con CADIELSA, después «Ver referencia exacta sin filtros», elegir uno de los resultados exactos y pulsar «Comparar proveedores y evolución».
