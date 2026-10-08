@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex,nofollow">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https://kusbndefngttaiytcrui.supabase.co wss://kusbndefngttaiytcrui.supabase.co; img-src 'self' data:; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <title>PROSOEL Costes</title>
-  <link rel="stylesheet" href="./styles.css?v=20261008-v9b">
+  <link rel="stylesheet" href="./styles.css?v=20261008-v10">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -213,6 +213,43 @@
           </div>
         </div>
         <p class="import-notice">Seguridad: si el mismo archivo ya existe, se omite. Si coincide el número pero los archivos son distintos, la importación se detiene para revisión. Solo los administradores pueden confirmar.</p>
+        <section class="import-audit-panel" aria-labelledby="auditHeading">
+          <div class="import-audit-head">
+            <div>
+              <h2 id="auditHeading">Control de importaciones</h2>
+              <p>Seguimiento del histórico. Los posibles huecos son números sin archivo registrado, no pedidos necesariamente pendientes.</p>
+            </div>
+            <div class="import-audit-actions">
+              <label for="importAuditYear">Año
+                <select id="importAuditYear">
+                  <option value="2026">2026</option>
+                  <option value="2025">2025</option>
+                  <option value="2024">2024</option>
+                </select>
+              </label>
+              <button id="importAuditRefresh" type="button">Actualizar</button>
+            </div>
+          </div>
+          <p id="importAuditStatus" class="import-audit-status" role="status" aria-live="polite">Selecciona Actualizar para cargar el control.</p>
+          <div class="import-audit-metrics" id="importAuditMetrics"></div>
+          <div class="import-gap-panel">
+            <div class="section-title"><h3>Comprobación de numeración</h3><span id="importGapCount" class="muted"></span></div>
+            <p id="importGapDescription" class="import-audit-explanation"></p>
+            <div id="importGaps" class="import-gap-numbers"></div>
+          </div>
+          <div class="import-audit-table-head">
+            <h3>Pedidos incorporados desde la web</h3>
+            <span class="muted">Últimos 20 del año elegido</span>
+          </div>
+          <div class="import-table-scroll">
+            <table class="import-lines-table" aria-label="Pedidos incorporados desde la web">
+              <thead>
+                <tr><th>Importado</th><th>Pedido</th><th>Fecha pedido</th><th>Proveedor</th><th>Archivo origen</th><th>Líneas</th><th>Importe</th><th>Validación</th></tr>
+              </thead>
+              <tbody id="importAuditRows"><tr><td colspan="8">Sin consultar.</td></tr></tbody>
+            </table>
+          </div>
+        </section>
       </section>
     </main>
   </div>
@@ -230,6 +267,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261008-v9b"></script>
+  <script type="module" src="./app.js?v=20261008-v10"></script>
 </body>
 </html>
