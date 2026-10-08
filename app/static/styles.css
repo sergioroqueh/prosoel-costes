@@ -1112,3 +1112,79 @@ main {
   .review-result-head { align-items: start; }
   .review-risk { white-space: normal; }
 }
+
+/* V8: decisiones manuales; ninguna acción modifica el catálogo consolidado. */
+.review-decision-panel {
+  margin: 22px 0 10px;
+  padding: 16px;
+  background: #f8fafc;
+  border: 1px solid #cfdae6;
+  border-radius: 12px;
+}
+.review-decision-panel h3 { margin: 0 0 8px; }
+.review-decision-label {
+  display: block;
+  margin: 14px 0 7px;
+  color: #2f425d;
+  font-size: 12px;
+  font-weight: 750;
+}
+.review-decision-select, .review-decision-note {
+  display: block;
+  width: 100%;
+  border: 1px solid #bfccdb;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #1d3046;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+.review-decision-select { min-height: 42px; }
+.review-decision-note { resize: vertical; min-height: 90px; line-height: 1.5; }
+.review-decision-select:focus-visible, .review-decision-note:focus-visible,
+.review-save-button:focus-visible { outline: 3px solid #8badd4; outline-offset: 2px; }
+.review-decision-ack {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 12px;
+  color: #536175;
+  line-height: 1.5;
+  margin: 14px 0;
+  cursor: pointer;
+}
+.review-decision-ack input {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  accent-color: #234d81;
+}
+.review-save-button {
+  border: 0;
+  border-radius: 9px;
+  background: #244d80;
+  color: #fff;
+  padding: 11px 15px;
+  font-weight: 750;
+  font-size: 13px;
+  cursor: pointer;
+}
+.review-save-button:disabled { opacity: .6; cursor: progress; }
+.review-save-message {
+  color: #236b51;
+  font-size: 12px;
+  margin-top: 10px;
+  min-height: 18px;
+}
+.review-save-message.is-error { color: #9d3832; }
+.review-audit-history {
+  margin-top: 15px;
+  border-top: 1px solid #e0e6ed;
+  padding-top: 12px;
+}
+.review-audit-history summary { cursor: pointer; font-size: 12px; font-weight: 750; }
+.review-audit-item { border-bottom: 1px solid #e4eaf0; padding: 9px 0; color: #425670; font-size: 12px; }
+.review-audit-item p { margin: 5px 0 0; font-size: 12px; white-space: pre-line; }
