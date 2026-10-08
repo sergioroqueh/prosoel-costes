@@ -1623,3 +1623,26 @@ main {
  .purchase-review-dialog-inner {padding:16px;}
  .purchase-review-modal-head h2 {font-size:17px;}
 }
+
+.purchase-edit-history-details {
+  margin:11px 0 14px;
+  padding:11px 12px;
+  background:#f7f9fc;
+  border:1px solid #d6e2ed;
+  border-radius:9px;
+}
+.purchase-edit-history-details summary {
+  color:#335474;
+  font-size:12px;
+  font-weight:750;
+  cursor:pointer;
+}
+.purchase-edit-history {font-size:12px;color:#4a5d72;line-height:1.5;margin-top:9px;}
+.purchase-review-history-entry {border-top:1px solid #dae4ee;padding:10px 2px;}
+.purchase-review-history-entry strong {color:#23466d;}
+.purchase-review-history-entry p {
+ margin:4px 0;
+ font-size:11px;
+ white-space:pre-line;
+ overflow-wrap:anywhere;
+}
