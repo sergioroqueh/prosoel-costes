@@ -8,6 +8,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import Connection, Engine
 
 
+def _normalize_database_url(value: str) -> str:
+    if value.startswith("postgresql://"):
+        return "postgresql+psycopg://" + value.removeprefix("postgresql://")
+    if value.startswith("postgres://"):
+        return "postgresql+psycopg://" + value.removeprefix("postgres://")
+    return value
+
+
 @lru_cache(maxsize=1)
 def get_engine() -> Engine:
     database_url = os.getenv("DATABASE_URL")
@@ -18,7 +26,7 @@ def get_engine() -> Engine:
         )
 
     return create_engine(
-        database_url,
+        _normalize_database_url(database_url),
         pool_pre_ping=True,
         future=True,
     )
