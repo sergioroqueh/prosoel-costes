@@ -20,6 +20,12 @@ const loginButton = document.getElementById("loginButton");
 const loginMessage = document.getElementById("loginMessage");
 const emailInput = document.getElementById("emailInput");
 const passwordInput = document.getElementById("passwordInput");
+const recoveryButton = document.getElementById("recoveryButton");
+const passwordSetup = document.getElementById("passwordSetup");
+const newPasswordInput = document.getElementById("newPasswordInput");
+const confirmPasswordInput = document.getElementById("confirmPasswordInput");
+const savePasswordButton = document.getElementById("savePasswordButton");
+const passwordSetupMessage = document.getElementById("passwordSetupMessage");
 const logoutButton = document.getElementById("logoutButton");
 const currentUser = document.getElementById("currentUser");
 
@@ -96,6 +102,16 @@ async function verifyAccess(user) {
 }
 
 async function bootstrapSession() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+
+  if (code) {
+    const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+    if (!exchangeError) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }
+
   const { data, error } = await supabase.auth.getSession();
   if (error || !data.session) {
     showLogin();
@@ -118,25 +134,98 @@ loginForm.addEventListener("submit", async (event) => {
   loginMessage.textContent = "";
 
   const email = emailInput.value.trim();
-  const redirectTo = window.location.origin + window.location.pathname;
+  const password = passwordInput.value;
 
-  const { error } = await supabase.auth.signInWithOtp({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
-    options: {
-      emailRedirectTo: redirectTo,
-      shouldCreateUser: false,
-    },
+    password,
   });
 
   loginButton.disabled = false;
-  loginButton.textContent = "Recibir enlace de acceso";
+  loginButton.textContent = "Entrar";
 
-  if (error) {
-    loginMessage.textContent = "No se pudo enviar el enlace. Comprueba que el correo está autorizado.";
+  if (error || !data.user) {
+    loginMessage.textContent = "Email o contraseña incorrectos.";
     return;
   }
 
-  loginMessage.textContent = "Enlace enviado. Revisa tu correo y vuelve desde ese enlace.";
+  showApp(data.user);
+
+  if (!(await verifyAccess(data.user))) return;
+
+  passwordInput.value = "";
+  await loadCounter();
+  searchInput.focus();
+});
+
+recoveryButton.addEventListener("click", async () => {
+  const email = emailInput.value.trim();
+
+  if (!email) {
+    loginMessage.textContent = "Escribe primero tu email.";
+    emailInput.focus();
+    return;
+  }
+
+  recoveryButton.disabled = true;
+  recoveryButton.textContent = "Enviando…";
+  loginMessage.textContent = "";
+
+  const redirectTo = window.location.origin + window.location.pathname;
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo,
+  });
+
+  recoveryButton.disabled = false;
+  recoveryButton.textContent = "Crear / recuperar contraseña";
+
+  if (error) {
+    loginMessage.textContent = "No se pudo enviar el correo de recuperación.";
+    return;
+  }
+
+  loginMessage.textContent = "Correo enviado. Abre el enlace recibido para definir tu contraseña.";
+});
+
+savePasswordButton.addEventListener("click", async () => {
+  passwordSetupMessage.textContent = "";
+
+  const password = newPasswordInput.value;
+  const confirmation = confirmPasswordInput.value;
+
+  if (password.length < 8) {
+    passwordSetupMessage.textContent = "La contraseña debe tener al menos 8 caracteres.";
+    return;
+  }
+
+  if (password !== confirmation) {
+    passwordSetupMessage.textContent = "Las contraseñas no coinciden.";
+    return;
+  }
+
+  savePasswordButton.disabled = true;
+  savePasswordButton.textContent = "Guardando…";
+
+  const { data, error } = await supabase.auth.updateUser({ password });
+
+  savePasswordButton.disabled = false;
+  savePasswordButton.textContent = "Guardar contraseña";
+
+  if (error || !data.user) {
+    passwordSetupMessage.textContent = "No se pudo guardar la contraseña. Solicita un nuevo enlace.";
+    return;
+  }
+
+  passwordSetup.classList.add("hidden");
+  newPasswordInput.value = "";
+  confirmPasswordInput.value = "";
+
+  showApp(data.user);
+
+  if (!(await verifyAccess(data.user))) return;
+
+  await loadCounter();
+  searchInput.focus();
 });
 
 logoutButton.addEventListener("click", async () => {
@@ -148,8 +237,32 @@ logoutButton.addEventListener("click", async () => {
 });
 
 supabase.auth.onAuthStateChange(async (event, session) => {
+  if (event === "PASSWORD_RECOVERY") {
+    showLogin();
+    passwordSetup.classList.remove("hidden");
+    passwordSetupMessage.textContent = "";
+    return;
+  }
+
   if (event === "SIGNED_OUT" || !session) {
     showLogin();
+    return;
+  }
+
+  if (event === "SIGNED_IN" && session?.user) {
+    const params = new URLSearchParams(window.location.search);
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const isInviteOrRecovery =
+      params.get("type") === "invite" ||
+      params.get("type") === "recovery" ||
+      hash.get("type") === "invite" ||
+      hash.get("type") === "recovery";
+
+    if (isInviteOrRecovery) {
+      showLogin();
+      passwordSetup.classList.remove("hidden");
+      return;
+    }
   }
 });
 
