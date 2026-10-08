@@ -560,3 +560,11 @@ main {
   margin: 0 0 6px;
   font-size: 18px;
 }
+
+
+/* Asegura que la vista de login desaparece por completo tras autenticar.
+   .auth-shell define display:grid y estaba ganando a .hidden por orden CSS. */
+.auth-shell.hidden,
+#appView.hidden {
+  display: none !important;
+}
