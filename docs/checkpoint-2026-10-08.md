@@ -139,3 +139,36 @@ PVP, descuento, neto, total y archivo de origen.
 - Resto de avisos Supabase: `import_stage_orders` tiene RLS sin policies deliberadamente, ya que la carga es administrativa y no permite uso desde la web; protección de contraseñas filtradas desactivada (revisar ajuste Auth si el plan lo permite).
 - Prueba de ordenación: referencia exacta `10101240` primera; precio ascendente y fecha reciente responden correctamente. La ficha del año 2024 devuelve 1 compra y en 2026 cero.
 - Próximo punto de prueba manual: abrir `https://sergioroqueh.github.io/prosoel-costes/`, pulsar `Ctrl+F5`, buscar `DOWNLIGHT 12W`, filtrar `GRUPO RIAS`, elegir 2024, ordenar y abrir procedencia. Si el cambio no aparece, verificar caché y última ejecución de GitHub Pages.
+
+## Actualización 2026-10-08 — Proveedor editable y búsqueda exacta V4
+
+### Cambios en producción
+- Sustituido el `select` de proveedores (67 entradas) por campo editable accesible con lista desplegable:
+  - placeholder predeterminado **Todos los proveedores** (identificador `null`).
+  - escritura parcial en cualquier posición del nombre; por ejemplo `RI` permite localizar `GRUPO RIAS`.
+  - sugerencias con coincidencias, navegación con flechas, Enter para elegir, Escape para cerrar y clic/táctil.
+  - opción para volver a todos vaciando el campo o mediante «Limpiar filtros».
+  - el proveedor solo cambia al elegirlo; teclear letras no aplica filtros ambiguos.
+  - CSS adaptable a móvil, sin librerías ni permisos adicionales.
+- Cambios en `app/static/index.html`, `app/static/styles.css` y `app/static/app.js`.
+- Caché de JS/CSS actualizada a `v=20261008-1235`.
+- GitHub Pages Actions run 24 (commit `340aa89f`) **success**, web desplegada.
+- Migración `supabase/migrations/20261008_006_exact_reference_priority.sql` aplicada y guardada:
+  - una coincidencia exacta de referencia de compra se muestra primero incluso ordenando por precio o fecha.
+  - se ignoran solo los espacios en la comparación del código, sin cambiar puntuación/dígitos ni la referencia original.
+  - **no se ha endurecido la clasificación de potencia**: los 50 W pueden aparecer al buscar 18 W si el usuario ordena por precio y también coinciden de forma aproximada.
+  - no se han fusionado variantes ni modificado precios.
+
+### Validaciones
+- Código JavaScript: comprobación de sintaxis PASS.
+- IDs de interfaz `supplierFilter`, `supplierCombobox`, `supplierSuggestions`, `yearFilter`, `sortFilter` presentes.
+- SQL autenticado de `search_costs_filtered`:
+  - `A9K17425` sale en primer lugar en precio ascendente, descendente y por fecha reciente.
+  - `A9K 17425` con espacio devuelve `A9K17425` primero.
+  - `DOWNLIGHT 18W` + menor precio mantiene la coincidencia aproximada ECOALUM 50 W al inicio (comportamiento aceptado, sin declarar equivalencia técnica).
+- Recuentos preservados: 2.863 pedidos, 11.538 líneas.
+- Pendiente: prueba manual del combobox en navegador real desde la sesión del usuario. Abrir web, Ctrl+F5, buscar `A9K 17425` / `DOWNLIGHT 18W`, filtrar proveedor escribiendo `RI`, seleccionar `GRUPO RIAS`, volver a Todos; confirmar interacción en escritorio y móvil.
+
+### Próxima fase
+- Comparativa histórica entre proveedores y evolución de precios con trazabilidad y advertencias sobre equivalencia técnica.
+- Mantener solamente los dos usuarios existentes, no exponer datos de pedidos en GitHub y no alterar valores históricos.
