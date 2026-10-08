@@ -1408,6 +1408,14 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
   html.push('<div class="review-indicator"><strong>' + new Set(purchases.map((p)=>p.order_id)).size + '</strong><span>Pedidos</span></div>');
   html.push('<div class="review-indicator"><strong>' + notes.length + '</strong><span>Descripciones</span></div>');
   html.push('</div>');
+  const reviewedTime = row.reviewed_at ? new Date(row.reviewed_at).getTime() : NaN;
+  const evidenceTime = row.evidence_refreshed_at ? new Date(row.evidence_refreshed_at).getTime() : NaN;
+  if (row.review_status !== "pending" && Number.isFinite(reviewedTime) &&
+      Number.isFinite(evidenceTime) && evidenceTime > reviewedTime + 1000) {
+    html.push('<div class="review-warning severe"><strong>Revisar decisión anterior:</strong> ' +
+      'se han observado nuevos datos técnicos desde la última revisión. ' +
+      'La clasificación anterior no debe reutilizarse sin comprobar las nuevas compras.</div>');
+  }
   html.push('<p class="comparison-note">Familia probable: <strong>' +
     escapeHtml(reviewFamilyLabels[row.suggested_family] || "Sin clasificar") +
     '</strong> · clasificación orientativa, no una equivalencia validada.</p>');
