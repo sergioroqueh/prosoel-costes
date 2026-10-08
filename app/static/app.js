@@ -1422,6 +1422,32 @@ function suggestReviewDecision(row, notes) {
   };
 }
 
+// La misma acción admite UNA línea o un subconjunto homogéneo de 2 a 30.
+// "Seleccionar las líneas visibles" es un atajo opcional.
+function reviewCorrectionSelectionState(selection) {
+  if(!selection.length) return {
+    allowed:false,
+    message:"0 seleccionadas · marca una o varias líneas para corregir",
+  };
+  if(selection.length>30) return {
+    allowed:false,
+    message:selection.length+" seleccionadas · máximo 30 por operación",
+  };
+  if(selection.length===1) return {
+    allowed:true,
+    message:"1 seleccionada · corrección individual",
+  };
+  const sameOrigin=selection.every((line)=>
+    line.supplier_reference_source===selection[0].supplier_reference_source &&
+    line.description_source===selection[0].description_source);
+  return {
+    allowed:sameOrigin,
+    message:sameOrigin
+      ? selection.length+" seleccionadas · corrección conjunta"
+      : selection.length+" seleccionadas · mezcla de descripciones originales: revisa cada grupo por separado",
+  };
+}
+
 function reviewPurchaseTableHtml(rows, notes) {
   if (!rows.length) return '<div class="empty-state">No hay compras originales para esta referencia.</div>';
   const indexedNotes = new Map(notes.map((note, index) => [note.description, index]));
@@ -1674,11 +1700,15 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
   function updateBulkSelection() {
     const selected=selectedLines();
     const visible=checkboxes().filter((input)=>!input.closest("tr").classList.contains("hidden"));
-    const sameOrigin=selected.every((line)=>
-      line.supplier_reference_source===selected[0]?.supplier_reference_source &&
-      line.description_source===selected[0]?.description_source);
-    if(selectedCounter) selectedCounter.textContent=selected.length+" seleccionadas (máximo 30)";
-    if(bulkButton) bulkButton.disabled=selected.length<2 || selected.length>30 || !sameOrigin;
+    const state=reviewCorrectionSelectionState(selected);
+    if(selectedCounter) {
+      selectedCounter.textContent=state.message;
+      selectedCounter.title=state.message;
+    }
+    if(bulkButton) {
+      bulkButton.disabled=!state.allowed;
+      bulkButton.title=state.message;
+    }
     if(selectVisible) {
       selectVisible.checked=visible.length>0 && visible.every((input)=>input.checked);
       selectVisible.indeterminate=visible.some((input)=>input.checked) && !selectVisible.checked;
@@ -1718,7 +1748,10 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
   }
   if(bulkButton) bulkButton.addEventListener("click",()=>{
     const selection=selectedLines();
-    if(selection.length>=2 && selection.length<=30) openPurchaseBulkEditor(selection,row);
+    const state=reviewCorrectionSelectionState(selection);
+    if(!state.allowed) return;
+    if(selection.length===1) openPurchaseReviewEditor(selection[0],row);
+    else openPurchaseBulkEditor(selection,row);
   });
   reviewDetail.querySelectorAll("[data-review-description-index]").forEach((button) => {
     button.addEventListener("click", () => {
