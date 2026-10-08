@@ -37,6 +37,8 @@ const detailPanel = document.getElementById("detailPanel");
 const orderCounter = document.getElementById("orderCounter");
 const resultTemplate = document.getElementById("resultTemplate");
 const supplierFilter = document.getElementById("supplierFilter");
+const supplierCombobox = document.getElementById("supplierCombobox");
+const supplierSuggestions = document.getElementById("supplierSuggestions");
 const yearFilter = document.getElementById("yearFilter");
 const sortFilter = document.getElementById("sortFilter");
 const resetFiltersButton = document.getElementById("resetFiltersButton");
@@ -47,6 +49,10 @@ let searchGeneration = 0;
 let detailGeneration = 0;
 let visibleRows = [];
 let totalResults = 0;
+let suppliers = [];
+let selectedSupplierId = null; // null = Todos los proveedores
+let supplierCandidates = [];
+let highlightedSupplierIndex = -1;
 
 
 function money(value) {
@@ -81,10 +87,93 @@ function displayDiscount(raw) {
 
 function selectedFilters() {
   return {
-    supplierId: supplierFilter.value ? Number(supplierFilter.value) : null,
+    supplierId: selectedSupplierId,
     year: yearFilter.value ? Number(yearFilter.value) : null,
     sort: sortFilter.value || "relevance",
   };
+}
+
+function normalizeSupplierName(value) {
+  return String(value || "").normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim().toLocaleLowerCase("es-ES");
+}
+
+function supplierLabel(id) {
+  return suppliers.find((entry) => entry.id === id)?.name || "";
+}
+
+function closeSupplierSuggestions({ restore = true } = {}) {
+  supplierSuggestions.classList.add("hidden");
+  supplierFilter.setAttribute("aria-expanded", "false");
+  supplierFilter.removeAttribute("aria-activedescendant");
+  highlightedSupplierIndex = -1;
+  supplierCandidates = [];
+  if (restore) supplierFilter.value = selectedSupplierId === null ? "" : supplierLabel(selectedSupplierId);
+}
+
+function highlightSupplierOption(index) {
+  if (!supplierCandidates.length) return;
+  highlightedSupplierIndex = (index + supplierCandidates.length) % supplierCandidates.length;
+  supplierSuggestions.querySelectorAll(".supplier-option").forEach((button, i) => {
+    button.classList.toggle("is-active", i === highlightedSupplierIndex);
+  });
+  const active = supplierSuggestions.querySelectorAll(".supplier-option")[highlightedSupplierIndex];
+  if (active) {
+    supplierFilter.setAttribute("aria-activedescendant", active.id);
+    active.scrollIntoView({ block: "nearest" });
+  }
+}
+
+function selectSupplier(option) {
+  const previousId = selectedSupplierId;
+  selectedSupplierId = option.id;
+  supplierFilter.value = option.id === null ? "" : option.name;
+  closeSupplierSuggestions({ restore: false });
+  if (previousId !== selectedSupplierId && searchInput.value.trim().length >= 2) {
+    runSearch();
+  }
+}
+
+function showSupplierSuggestions() {
+  if (supplierFilter.disabled) return;
+  const query = normalizeSupplierName(supplierFilter.value);
+  const matches = suppliers
+    .filter((entry) => normalizeSupplierName(entry.name).includes(query))
+    .sort((a, b) => {
+      const aStart = normalizeSupplierName(a.name).startsWith(query) ? 0 : 1;
+      const bStart = normalizeSupplierName(b.name).startsWith(query) ? 0 : 1;
+      return aStart - bStart || a.name.localeCompare(b.name, "es");
+    })
+    .slice(0, 12);
+
+  supplierCandidates = query
+    ? matches.map((entry) => ({ id: entry.id, name: entry.name }))
+    : [{ id: null, name: "Todos los proveedores" }, ...matches.map((entry) => ({ id: entry.id, name: entry.name }))];
+
+  supplierSuggestions.replaceChildren();
+  supplierCandidates.forEach((candidate, index) => {
+    const button = document.createElement("button");
+    button.id = "supplier-choice-" + index;
+    button.type = "button";
+    button.className = "supplier-option";
+    button.setAttribute("role", "option");
+    button.setAttribute("aria-selected", String(candidate.id === selectedSupplierId));
+    button.textContent = candidate.name;
+    button.addEventListener("pointerdown", (event) => event.preventDefault());
+    button.addEventListener("click", () => selectSupplier(candidate));
+    supplierSuggestions.appendChild(button);
+  });
+  if (!supplierCandidates.length) {
+    const note = document.createElement("div");
+    note.className = "supplier-no-match";
+    note.textContent = "No hay proveedores que coincidan. Prueba con otras letras.";
+    supplierSuggestions.appendChild(note);
+  }
+  highlightedSupplierIndex = -1;
+  supplierFilter.removeAttribute("aria-activedescendant");
+  supplierSuggestions.classList.remove("hidden");
+  supplierFilter.setAttribute("aria-expanded", "true");
 }
 
 async function loadSuppliers() {
@@ -92,13 +181,50 @@ async function loadSuppliers() {
   if (error) {
     console.error("No se pudieron cargar los proveedores", error);
     supplierFilter.disabled = true;
-    supplierFilter.title = "Filtro de proveedores no disponible";
+    supplierFilter.placeholder = "Proveedores no disponibles";
+    closeSupplierSuggestions();
     return;
   }
+  suppliers = (data || []).map((item) => ({ id: Number(item.id), name: item.name }));
   supplierFilter.disabled = false;
-  supplierFilter.replaceChildren(new Option("Todos los proveedores", ""));
-  for (const item of data || []) supplierFilter.add(new Option(item.name, String(item.id)));
+  supplierFilter.placeholder = "Todos los proveedores";
+  supplierFilter.value = selectedSupplierId === null ? "" : supplierLabel(selectedSupplierId);
 }
+
+supplierFilter.addEventListener("focus", showSupplierSuggestions);
+supplierFilter.addEventListener("input", () => {
+  if (!supplierFilter.value.trim() && selectedSupplierId !== null) {
+    selectSupplier({ id: null, name: "Todos los proveedores" });
+  }
+  showSupplierSuggestions();
+});
+supplierFilter.addEventListener("keydown", (event) => {
+  const expanded = supplierFilter.getAttribute("aria-expanded") === "true";
+  if (event.key === "Escape") {
+    closeSupplierSuggestions();
+    event.preventDefault();
+  } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+    event.preventDefault();
+    if (!expanded) {
+      showSupplierSuggestions();
+      highlightSupplierOption(event.key === "ArrowDown" ? 0 : supplierCandidates.length - 1);
+    } else {
+      highlightSupplierOption(highlightedSupplierIndex + (event.key === "ArrowDown" ? 1 : -1));
+    }
+  } else if (event.key === "Enter" && expanded && supplierCandidates.length) {
+    event.preventDefault();
+    const selection = highlightedSupplierIndex < 0 ? 0 : highlightedSupplierIndex;
+    selectSupplier(supplierCandidates[selection]);
+  }
+});
+document.addEventListener("pointerdown", (event) => {
+  if (!supplierCombobox.contains(event.target)) closeSupplierSuggestions();
+});
+supplierFilter.addEventListener("blur", () => {
+  // La selección es explícita: escribir letras no aplica un proveedor parcial.
+  // Tras abandonar el campo se recupera el proveedor elegido o "Todos".
+  closeSupplierSuggestions();
+});
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -726,13 +852,15 @@ searchButton.addEventListener("click", () => runSearch());
 searchInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") runSearch();
 });
-for (const input of [supplierFilter, yearFilter, sortFilter]) {
+for (const input of [yearFilter, sortFilter]) {
   input.addEventListener("change", () => {
     if (searchInput.value.trim().length >= 2) runSearch();
   });
 }
 resetFiltersButton.addEventListener("click", () => {
+  selectedSupplierId = null;
   supplierFilter.value = "";
+  closeSupplierSuggestions();
   yearFilter.value = "";
   sortFilter.value = "relevance";
   if (searchInput.value.trim().length >= 2) runSearch();
