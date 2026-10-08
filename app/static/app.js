@@ -73,12 +73,16 @@ function orderLabel(row) {
 }
 
 function showLogin(message = "") {
+  authView.hidden = false;
+  appView.hidden = true;
   authView.classList.remove("hidden");
   appView.classList.add("hidden");
   loginMessage.textContent = message;
 }
 
 function showApp(user) {
+  authView.hidden = true;
+  appView.hidden = false;
   authView.classList.add("hidden");
   appView.classList.remove("hidden");
   currentUser.textContent = user.email || "Usuario";
