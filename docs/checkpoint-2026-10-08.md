@@ -82,3 +82,22 @@ Todo precio mostrado debe conservar trazabilidad completa hasta su línea histó
 
 pedido, proveedor, fecha, obra, cantidad, referencia, descripción original,
 PVP, descuento, neto, total y archivo de origen.
+
+## Actualización 2026-10-08 — histórico completo y búsqueda V2
+
+- Carga Supabase verificada: 2.863 pedidos (2024: 1.104, 2025: 957, 2026: 802), 11.538 líneas (4.440 / 3.724 / 3.374).
+- Tablas actuales: 67 proveedores, 345 obras, 5.108 variantes comerciales, 0 materiales consolidados (fase siguiente).
+- 0 registros pendientes en `import_stage_orders` y 0 líneas sin `commercial_item_id`.
+- 233 líneas clasificados como tasas/portes/servicios y excluidas de catálogo.
+- Validaciones: 186 pedidos y 180 líneas requieren revisión. Conservar importes originales.
+- Se probaron precios y trazabilidad desde la interfaz GitHub Pages (captura del usuario, ejemplo DOWNLIGHT 12 W).
+- Aplicada y versionada la migración `supabase/migrations/20261008_003_search_ranking_v2.sql`:
+  - prioridad fuerte a coincidencia exacta de referencia;
+  - prioridad a potencia W coincidente (12 W / 12W), penalización por potencia distinta expresada;
+  - ligera bonificación por coincidencia de descripción sin espacios;
+  - preservación de resultados históricos, contadores de pedidos y datos de precio.
+- Confirmación de SQL en Supabase: función `public.search_costs` contiene ranking de referencias y potencia.
+- Pendiente: prueba manual en navegador de `DOWNLIGHT 12 W`, `403608`, `DOWNLIGHT 18 W`; evaluar falsos positivos y rendimiento.
+- Pendiente: filtros por fabricante/proveedor/año, formato de descuentos para la interfaz, gráfico histórico y catálogo normalizado.
+- Regla permanente: solo 2 usuarios autorizados, sin altas nuevas; no almacenar archivos originales en GitHub/Supabase; conservar trazabilidad.
+- Nota: el bloque anterior sobre base vacía queda supersedido por esta actualización.
