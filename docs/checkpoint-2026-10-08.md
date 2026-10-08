@@ -178,3 +178,10 @@ PVP, descuento, neto, total y archivo de origen.
 - Versión de caché JS/CSS actualizada a `v=20261008-1245`.
 - La última versión es la que incorpora commits `b2f7c2dc` (autocompletado) y `5bcc7689` (caché).
 - Esperar confirmación de GitHub Pages run 26, después prueba humana en el navegador.
+
+### Precisión UX del selector V4 (cierre)
+- Mejorada ordenación de sugerencias por coincidencia inicial de nombre > inicial de palabra > coincidencia interior.
+- Prueba real de los 67 proveedores: al escribir `RI`, `GRUPO RIAS` aparece en **posición 3 de 12 coincidencias**, no enterrado en el desplegable.
+- Cambios `app/static/app.js` commit `edb18f50`; HTML usa caché `v=20261008-1255`, commit `afd65d4e`.
+- SQL V4: migración aplicada y versionada; referencia `A9K17425` primera bajo precio ascendente, descendente, fecha reciente y código `A9K 17425` con espacio.
+- Validación posterior: 2.863 pedidos, 11.538 líneas; consulta anónima de RPC denegada.
