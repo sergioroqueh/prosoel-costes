@@ -1666,3 +1666,5 @@ main {
 .review-line-checkbox {width:16px;height:16px;accent-color:#244d80;cursor:pointer;}
 .review-line-checkbox:focus-visible,.review-bulk-actions :is(button,input):focus-visible {outline:3px solid #8badd4;outline-offset:2px;}
 @media(max-width:620px){.review-bulk-actions button{width:100%;margin-left:0;}}
+
+.review-select-tip { margin: 0; padding: 7px 13px 10px; font-size: 11px; color: #536a82; line-height: 1.55; background: #f5f8fc; border-bottom: 1px solid #dce5ef; }
