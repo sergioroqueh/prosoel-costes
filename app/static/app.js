@@ -1646,6 +1646,45 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
       if(target) target.classList.toggle("hidden");
     });
   });
+
+  const sourceSelector = reviewDetail.querySelector("#reviewLineDescriptionFilter");
+  const details = reviewDetail.querySelector("#reviewPurchaseDetails");
+  function applyDescriptionFilter() {
+    if (!sourceSelector) return;
+    const chosen = sourceSelector.value;
+    let count = 0;
+    reviewDetail.querySelectorAll("[data-review-row-group]").forEach((tr) => {
+      const visible = chosen === "" || tr.getAttribute("data-review-row-group") === chosen;
+      const isExpanded = tr.classList.contains("review-line-origin-row");
+      if (isExpanded) tr.classList.add("hidden");
+      else {
+        tr.classList.toggle("hidden",!visible);
+        if(visible)count++;
+      }
+    });
+    const showing = reviewDetail.querySelector("#reviewLinesShowing");
+    if(showing) showing.textContent = count + " líneas";
+  }
+  if(sourceSelector) {
+    sourceSelector.addEventListener("change",applyDescriptionFilter);
+    applyDescriptionFilter();
+  }
+  reviewDetail.querySelectorAll("[data-review-description-index]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if(!sourceSelector || !details)return;
+      sourceSelector.value=button.getAttribute("data-review-description-index");
+      details.open=true;
+      applyDescriptionFilter();
+      details.scrollIntoView?.({behavior:"smooth",block:"start"});
+    });
+  });
+  reviewDetail.querySelectorAll("[data-edit-review-line-index]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if(currentUserRole!=="admin")return;
+      const index=Number(button.getAttribute("data-edit-review-line-index"));
+      if(Number.isInteger(index) && purchases[index]) openPurchaseReviewEditor(purchases[index],row);
+    });
+  });
 }
 
 async function showReviewCandidate(row) {
