@@ -1648,6 +1648,8 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
     html.push('<div class="review-bulk-actions"><label><input type="checkbox" id="reviewSelectVisible">' +
       ' Seleccionar las líneas visibles</label><span id="reviewSelectedCount">0 seleccionadas</span>' +
       '<button type="button" id="reviewBulkButton" disabled>Corregir selección</button></div>');
+    html.push('<p class="review-select-tip">Puedes marcar solo una, varias o todas las líneas. ' +
+      'No hace falta seleccionar las siete. Una selección individual abre el editor de esa compra.</p>');
   }
   html.push(reviewPurchaseTableHtml(purchases, notes));
   html.push('</details>');
