@@ -118,28 +118,25 @@ loginForm.addEventListener("submit", async (event) => {
   loginMessage.textContent = "";
 
   const email = emailInput.value.trim();
-  const password = passwordInput.value;
+  const redirectTo = window.location.origin + window.location.pathname;
 
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { error } = await supabase.auth.signInWithOtp({
     email,
-    password,
+    options: {
+      emailRedirectTo: redirectTo,
+      shouldCreateUser: false,
+    },
   });
 
   loginButton.disabled = false;
-  loginButton.textContent = "Entrar";
+  loginButton.textContent = "Recibir enlace de acceso";
 
-  if (error || !data.user) {
-    loginMessage.textContent = "Email o contraseña incorrectos.";
+  if (error) {
+    loginMessage.textContent = "No se pudo enviar el enlace. Comprueba que el correo está autorizado.";
     return;
   }
 
-  showApp(data.user);
-
-  if (!(await verifyAccess(data.user))) return;
-
-  passwordInput.value = "";
-  await loadCounter();
-  searchInput.focus();
+  loginMessage.textContent = "Enlace enviado. Revisa tu correo y vuelve desde ese enlace.";
 });
 
 logoutButton.addEventListener("click", async () => {
