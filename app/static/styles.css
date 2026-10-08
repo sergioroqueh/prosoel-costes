@@ -837,6 +837,13 @@ main {
   gap: 6px;
   font-size: 11px;
 }
+.comparison-legend .legend-color-0 { background: #244d80; }
+.comparison-legend .legend-color-1 { background: #29816f; }
+.comparison-legend .legend-color-2 { background: #865db9; }
+.comparison-legend .legend-color-3 { background: #c0782b; }
+.comparison-legend .legend-color-4 { background: #3483ad; }
+.comparison-legend .legend-color-5 { background: #ab5b79; }
+.comparison-legend .legend-color-6 { background: #687e38; }
 .comparison-legend i {
   display: inline-block;
   width: 10px;
