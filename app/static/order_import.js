@@ -148,7 +148,7 @@ async function readOrderCells(zip) {
       value=Number.isInteger(pos)&&pos>=0&&pos<strings.length?strings[pos]:null;
     } else if(v) {
       const raw=v.textContent;
-      value=cellType==="str"||cellType==="e"?raw:asDecimal(raw);
+      value=cellType==="str"||cellType==="e"||cellType==="d"?raw:asDecimal(raw);
       if(value===null && cellType==="str") value=raw;
     }
     if(value!==null && value!==undefined) {
@@ -159,7 +159,7 @@ async function readOrderCells(zip) {
   return {
     get(row,col) { return cells.get(col+String(row))??null; },
     rows:[...rowNumbers].sort((a,b)=>a-b),
-    date1904:descendants(book,"workbookPr").some((x)=>x.getAttribute("date1904")==="1"),
+    date1904:descendants(book,"workbookPr").some((x)=>["1","true"].includes(x.getAttribute("date1904"))),
   };
 }
 function findHeader(ws) {
