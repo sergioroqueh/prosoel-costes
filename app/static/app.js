@@ -112,6 +112,7 @@ let reviewLoaded = false;
 let reviewSelectedKey = null;
 let reviewTypingTimeout = null;
 let purchaseLineInEditor = null;
+let purchaseLinesInBulk = null;
 let purchaseCandidateInEditor = null;
 let purchaseEditIsSaving = false;
 let currentUserRole = "user";
@@ -1426,7 +1427,7 @@ function reviewPurchaseTableHtml(rows, notes) {
   const indexedNotes = new Map(notes.map((note, index) => [note.description, index]));
   const html = [];
   html.push('<div class="review-edit-table-wrap"><table class="history-table review-edit-table"><thead><tr>');
-  html.push('<th>Pedido</th><th>Proveedor</th><th>Descripción que venía en el Excel</th><th>Neto</th><th>Estado en catálogo</th><th>Acciones</th>');
+  html.push('<th>Sel.</th><th>Pedido</th><th>Proveedor</th><th>Descripción que venía en el Excel</th><th>Neto</th><th>Estado en catálogo</th><th>Acciones</th>');
   html.push('</tr></thead><tbody>');
   rows.forEach((item, index) => {
     const original = item.description_source || item.description_original || "";
@@ -1439,6 +1440,9 @@ function reviewPurchaseTableHtml(rows, notes) {
       changed ? "Corregida" : "Sin corregir";
     html.push('<tr class="review-purchase-row' + (excluded ? ' review-purchase-excluded' : '') +
       '" data-review-row-group="' + String(groupIndex??-1) + '">');
+    if(currentUserRole==="admin") html.push('<td><input type="checkbox" class="review-line-checkbox" data-review-line-checkbox-index="' +
+      index + '" aria-label="Seleccionar línea del pedido ' + escapeHtml(orderLabel(item)) + '"></td>');
+    else html.push('<td>—</td>');
     html.push('<td>' + escapeHtml(orderLabel(item)) + '<div class="review-row-date">' +
       escapeHtml(item.order_date || "—") + '</div></td>');
     html.push('<td>' + escapeHtml(item.supplier || "—") + '</td>');
@@ -1458,7 +1462,7 @@ function reviewPurchaseTableHtml(rows, notes) {
     html.push('</td></tr>');
     html.push('<tr class="review-line-origin-row hidden" data-review-row-group="' +
       String(groupIndex??-1) + '" id="review-origin-row-' + index +
-      '"><td colspan="6"><div class="origin-detail">' + originHtml(item) + '</div></td></tr>');
+      '"><td colspan="7"><div class="origin-detail">' + originHtml(item) + '</div></td></tr>');
   });
   html.push('</tbody></table></div>');
   return html.join("");
@@ -1614,6 +1618,11 @@ function renderReviewCandidate(row, purchases, reviewEvents = []) {
   notes.forEach((note,index) => html.push('<option value="' + index + '">' + escapeHtml(note.description) +
     ' (' + note.lines + ' líneas)</option>'));
   html.push('</select><span id="reviewLinesShowing" class="muted"></span></div>');
+  if(currentUserRole==="admin") {
+    html.push('<div class="review-bulk-actions"><label><input type="checkbox" id="reviewSelectVisible">' +
+      ' Seleccionar las líneas visibles</label><span id="reviewSelectedCount">0 seleccionadas</span>' +
+      '<button type="button" id="reviewBulkButton" disabled>Corregir selección</button></div>');
+  }
   html.push(reviewPurchaseTableHtml(purchases, notes));
   html.push('</details>');
   reviewDetail.innerHTML = html.join("");
