@@ -342,36 +342,69 @@ async function loadCounter() {
     " · Huecos: " + (row.pending_gaps ?? 0);
 }
 
-async function runSearch() {
+async function runSearch({ append = false } = {}) {
   const query = searchInput.value.trim();
-  if (query.length < 2) return;
+  if (query.length < 2) {
+    ++searchGeneration;
+    visibleRows = [];
+    totalResults = 0;
+    resultCount.textContent = "";
+    resultsFooter.classList.add("hidden");
+    resultsNode.innerHTML = '<div class="empty-state">Escribe al menos dos caracteres.</div>';
+    return;
+  }
+  const requestId = ++searchGeneration;
+  const filters = selectedFilters();
 
+  if (!append) {
+    ++detailGeneration;
+    visibleRows = [];
+    totalResults = 0;
+    detailPanel.innerHTML = '<div class="empty-state">Selecciona un material para ver el detalle de sus compras.</div>';
+    resultsNode.className = "results";
+    resultsNode.innerHTML = '<div class="empty-state">Buscando en el histórico completo…</div>';
+    resultsFooter.classList.add("hidden");
+  }
   searchButton.disabled = true;
   searchButton.textContent = "Buscando…";
-  resultsNode.className = "results";
-  resultsNode.innerHTML = '<div class="empty-state">Buscando en histórico y catálogo…</div>';
+  moreResultsButton.disabled = true;
 
-  const { data, error } = await supabase.rpc("search_costs", {
+  const { data, error } = await supabase.rpc("search_costs_filtered", {
     search_query: query,
     result_limit: 30,
+    p_supplier_id: filters.supplierId,
+    p_year: filters.year,
+    p_sort: filters.sort,
+    p_offset: append ? visibleRows.length : 0,
   });
+  if (requestId !== searchGeneration) return;
 
   searchButton.disabled = false;
   searchButton.textContent = "Buscar";
+  moreResultsButton.disabled = false;
 
   if (error) {
-    console.error(error);
-    resultsNode.innerHTML = '<div class="empty-state">No se pudo ejecutar la búsqueda.</div>';
-    resultCount.textContent = "";
+    console.error("Error de búsqueda", error);
+    if (!append) {
+      resultsNode.innerHTML = '<div class="empty-state">No se pudo ejecutar la búsqueda. Inténtalo de nuevo.</div>';
+      resultCount.textContent = "";
+    }
     return;
   }
 
-  renderResults(data || []);
+  const newRows = data || [];
+  visibleRows = append ? visibleRows.concat(newRows) : newRows;
+  totalResults = newRows.length ? Number(newRows[0].total_count) : (append ? totalResults : 0);
+  renderResults(visibleRows, totalResults);
 }
 
-function renderResults(rows) {
+function renderResults(rows, total) {
   resultsNode.innerHTML = "";
-  resultCount.textContent = rows.length + (rows.length === 1 ? " resultado" : " resultados");
+  resultCount.textContent = total === rows.length
+    ? total + (total === 1 ? " resultado" : " resultados")
+    : "Mostrando " + rows.length + " de " + number(total, 0) + " resultados";
+  resultsFooter.classList.toggle("hidden", !rows.length || rows.length >= total);
+  moreResultsButton.textContent = "Mostrar " + Math.min(30, total - rows.length) + " más";
 
   if (!rows.length) {
     resultsNode.innerHTML = '<div class="empty-state">No encontramos coincidencias. Prueba con menos palabras o una descripción más general.</div>';
@@ -684,9 +717,21 @@ function wireOriginButtons() {
   });
 }
 
-searchButton.addEventListener("click", runSearch);
+searchButton.addEventListener("click", () => runSearch());
 searchInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") runSearch();
 });
+for (const input of [supplierFilter, yearFilter, sortFilter]) {
+  input.addEventListener("change", () => {
+    if (searchInput.value.trim().length >= 2) runSearch();
+  });
+}
+resetFiltersButton.addEventListener("click", () => {
+  supplierFilter.value = "";
+  yearFilter.value = "";
+  sortFilter.value = "relevance";
+  if (searchInput.value.trim().length >= 2) runSearch();
+});
+moreResultsButton.addEventListener("click", () => runSearch({ append: true }));
 
 bootstrapSession();
