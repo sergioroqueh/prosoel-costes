@@ -2204,8 +2204,8 @@ async function loadEnrichmentSummary() {
   const item=data[0];
   const metrics=[
     ["Referencias detectadas",item.total_candidates],
-    ["Pendientes de documentar",item.awaiting_evidence],
-    ["Descripciones contrastadas",item.with_verified_description],
+    ["Sin ficha externa contrastada",item.awaiting_evidence],
+    ["Nombres de ayuda publicados",item.with_verified_description],
   ];
   enrichmentSummaryMetrics.replaceChildren();
   for(const [label,value] of metrics) {
