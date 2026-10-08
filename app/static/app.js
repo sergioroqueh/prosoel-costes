@@ -1787,6 +1787,141 @@ async function saveReviewDecision(row) {
   if (savedMessage) savedMessage.textContent = "Decisión guardada y registrada en la bitácora.";
 }
 
+// V12: cada corrección opera SOBRE UNA LÍNEA, no sobre todas las compras del código.
+// No se borra ningún pedido ni se reescribe la hoja Excel de origen.
+function updatePurchaseReviewAction() {
+  const action=purchaseEditAction.value;
+  purchaseEditFields.classList.toggle("hidden",action!=="correct");
+  purchaseEditOrderConfirmPanel.classList.toggle("hidden",action!=="exclude_order");
+  if(action!=="exclude_order")purchaseEditOrderConfirm.value="";
+  purchaseEditSubmit.textContent=action==="exclude_order"?"Excluir pedido completo" :
+    action==="restore_order"?"Restaurar pedido completo" :
+    action==="exclude"?"Excluir esta línea" :
+    action==="restore"?"Restaurar esta línea" : "Guardar corrección";
+  purchaseEditSubmit.classList.toggle("is-danger",["exclude","exclude_order"].includes(action));
+  purchaseEditStatus.textContent="";
+  purchaseEditStatus.classList.remove("is-error");
+}
+
+function openPurchaseReviewEditor(line,candidate) {
+  if(currentUserRole!=="admin"||purchaseEditIsSaving)return;
+  purchaseLineInEditor=line;
+  purchaseCandidateInEditor=candidate;
+  const numberOfOrder=orderLabel(line);
+  purchaseEditHeading.textContent="Revisar compra · "+numberOfOrder;
+  purchaseEditSource.innerHTML=
+    '<div><strong>Pedido:</strong> '+escapeHtml(numberOfOrder)+
+    ' · '+escapeHtml(line.supplier||"—")+' · '+escapeHtml(line.order_date||"—")+'</div>'+
+    '<div><strong>Referencia del Excel:</strong> '+escapeHtml(line.supplier_reference_source||"—")+'</div>'+
+    '<div><strong>Descripción del Excel:</strong> '+escapeHtml(line.description_source||"—")+'</div>'+
+    '<div><strong>Precio original:</strong> '+money(line.net_unit_price)+
+    ' · Cantidad: '+number(line.quantity,2)+'</div>'+
+    '<div class="purchase-review-source-file"><strong>Archivo:</strong> '+
+    escapeHtml(line.source_filename||"—")+'</div>'+
+    (line.line_excluded?'<div class="purchase-review-existing-status">Esta línea está excluida del catálogo.</div>':'')+
+    (line.order_excluded?'<div class="purchase-review-existing-status">Todo este pedido está excluido.</div>':'');
+  purchaseEditReference.value=line.supplier_reference||"";
+  purchaseEditDescription.value=line.description_original||"";
+  purchaseEditReason.value="";
+  purchaseEditAcknowledged.checked=false;
+  purchaseEditOrderConfirm.value="";
+  purchaseEditOrderExpected.textContent=numberOfOrder;
+  purchaseEditAction.value=line.order_excluded?"restore_order":line.line_excluded?"restore":"correct";
+  purchaseEditAction.querySelector('option[value="exclude_order"]').disabled=!!line.order_excluded;
+  purchaseEditAction.querySelector('option[value="restore_order"]').disabled=!line.order_excluded;
+  purchaseEditAction.querySelector('option[value="exclude"]').disabled=!!line.line_excluded;
+  purchaseEditAction.querySelector('option[value="restore"]').disabled=
+    !line.line_excluded && !line.corrected_reference && !line.corrected_description;
+  updatePurchaseReviewAction();
+  purchaseEditDialog.showModal();
+}
+
+async function submitPurchaseReview() {
+  const line=purchaseLineInEditor, candidate=purchaseCandidateInEditor;
+  if(!line || !candidate || purchaseEditIsSaving || currentUserRole!=="admin")return;
+  const action=purchaseEditAction.value;
+  const orderAction=action==="exclude_order"||action==="restore_order";
+  const reason=purchaseEditReason.value.trim();
+  const minLength=orderAction?25:20;
+  purchaseEditStatus.classList.remove("is-error");
+  if(!purchaseEditAcknowledged.checked){
+    purchaseEditStatus.textContent="Debes marcar la confirmación después de comprobar el pedido.";
+    purchaseEditStatus.classList.add("is-error");
+    return;
+  }
+  if(reason.length<minLength){
+    purchaseEditStatus.textContent="Justifica tu decisión con al menos "+minLength+" caracteres.";
+    purchaseEditStatus.classList.add("is-error");
+    purchaseEditReason.focus();
+    return;
+  }
+  if(action==="exclude_order" &&
+      purchaseEditOrderConfirm.value.trim().toUpperCase()!==orderLabel(line).toUpperCase()){
+    purchaseEditStatus.textContent="Escribe exactamente el número del pedido para confirmar la exclusión completa.";
+    purchaseEditStatus.classList.add("is-error");
+    purchaseEditOrderConfirm.focus();
+    return;
+  }
+
+  const payload=orderAction?{
+    p_order_id:line.order_id,
+    p_exclude:action==="exclude_order",
+    p_reason:reason,
+    p_expected_revision:Number(line.order_review_revision??0),
+  }:{
+    p_line_id:line.order_line_id,
+    p_action:action,
+    p_reference:action==="correct"?purchaseEditReference.value.trim():null,
+    p_description:action==="correct"?purchaseEditDescription.value.trim():null,
+    p_reason:reason,
+    p_expected_revision:Number(line.line_review_revision??0),
+  };
+  purchaseEditIsSaving=true;
+  purchaseEditSubmit.disabled=true;
+  purchaseEditCancel.disabled=true;
+  purchaseEditClose.disabled=true;
+  purchaseEditStatus.textContent="Guardando la decisión con auditoría…";
+  let response;
+  try{
+    response=await supabase.rpc(orderAction?"review_purchase_order":"review_purchase_line",payload);
+  }catch(error){
+    response={error};
+  }
+  purchaseEditIsSaving=false;
+  purchaseEditSubmit.disabled=false;
+  purchaseEditCancel.disabled=false;
+  purchaseEditClose.disabled=false;
+  if(response.error || !response.data || response.data.result!=="saved"){
+    purchaseEditStatus.textContent=response.error?.message||"No se pudo guardar. Actualiza la ficha y vuelve a comprobar el pedido.";
+    purchaseEditStatus.classList.add("is-error");
+    return;
+  }
+  purchaseEditDialog.close();
+  purchaseLineInEditor=null;
+  purchaseCandidateInEditor=null;
+  // Volver a consultar las evidencias del grupo antes de recomendar nuevas decisiones.
+  await runReviewSearch();
+  await showReviewCandidate(candidate);
+  reviewLoaded=true;
+}
+
+purchaseEditAction.addEventListener("change",updatePurchaseReviewAction);
+purchaseEditSubmit.addEventListener("click",submitPurchaseReview);
+function closePurchaseReviewEditor() {
+  if(!purchaseEditIsSaving && purchaseEditDialog.open)purchaseEditDialog.close();
+}
+purchaseEditCancel.addEventListener("click",closePurchaseReviewEditor);
+purchaseEditClose.addEventListener("click",closePurchaseReviewEditor);
+purchaseEditDialog.addEventListener("cancel",(event)=>{
+  if(purchaseEditIsSaving)event.preventDefault();
+});
+purchaseEditDialog.addEventListener("close",()=>{
+  if(!purchaseEditIsSaving){
+    purchaseLineInEditor=null;
+    purchaseCandidateInEditor=null;
+  }
+});
+
 costsTab.addEventListener("click", () => activateWorkspace("costs"));
 reviewTab.addEventListener("click", () => activateWorkspace("review"));
 importTab.addEventListener("click", () => activateWorkspace("import"));
