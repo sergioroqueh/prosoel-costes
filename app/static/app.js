@@ -624,7 +624,7 @@ async function runSearch({ append = false } = {}) {
   });
   const referencePromise = !append && (filters.supplierId !== null || filters.year !== null)
     && looksLikePurchaseCode(query)
-    ? supabase.rpc("reference_purchase_history", { p_reference: query, result_limit: 500 })
+    ? supabase.rpc("reference_purchase_history_review", { p_reference: query, result_limit: 500 })
     : Promise.resolve({ data: [], error: null });
   const [searchResponse, referenceResponse] = await Promise.all([searchPromise, referencePromise]);
   const { data, error } = searchResponse;
@@ -708,7 +708,7 @@ async function openMaterial(materialId) {
 
   const [summaryResponse, pricesResponse, variantsResponse] = await Promise.all([
     supabase.rpc("material_summary", { p_material_id: materialId }),
-    supabase.rpc("material_price_history", {
+    supabase.rpc("material_price_history_review", {
       p_material_id: materialId,
       result_limit: 500,
     }),
@@ -741,7 +741,7 @@ async function openHistorical(row) {
   const filters = selectedFilters();
   detailPanel.innerHTML = '<div class="empty-state">Cargando compras históricas…</div>';
 
-  const { data, error } = await supabase.rpc("historical_price_history_filtered", {
+  const { data, error } = await supabase.rpc("historical_price_history_filtered_review", {
     p_reference: row.reference ?? null,
     p_description: row.title || "",
     p_supplier_id: filters.supplierId,
@@ -1071,7 +1071,7 @@ async function showReferenceComparison(reference, detailRequestId) {
   button.disabled = true;
   button.textContent = "Consultando todos los proveedores…";
   area.innerHTML = '<div class="comparison-loading">Recuperando compras por referencia exacta…</div>';
-  const { data, error } = await supabase.rpc("reference_purchase_history", {
+  const { data, error } = await supabase.rpc("reference_purchase_history_review", {
     p_reference: reference,
     result_limit: 500,
   });
@@ -1145,19 +1145,24 @@ function originHtml(row) {
   parts.push("<strong>Proveedor:</strong> " + escapeHtml(row.supplier || "—"));
   parts.push("<strong>Fecha:</strong> " + escapeHtml(row.order_date || "—"));
   parts.push("<strong>Obra:</strong> " + escapeHtml(row.project || "—"));
-  parts.push("<strong>Referencia de compra:</strong> " + escapeHtml(row.supplier_reference || "—"));
-  parts.push("<strong>Descripción original:</strong> " + escapeHtml(row.description_original || "—"));
+  parts.push("<strong>Referencia utilizada para precios:</strong> " + escapeHtml(row.supplier_reference || "—"));
+  parts.push("<strong>Descripción utilizada para precios:</strong> " + escapeHtml(row.description_original || "—"));
   parts.push("<strong>Cantidad:</strong> " + number(row.quantity, 3));
   parts.push("<strong>PVP:</strong> " + money(row.pvp));
   parts.push("<strong>Descuento:</strong> " + escapeHtml(displayDiscount(row.discount_raw)) + " (valor original: " + escapeHtml(row.discount_raw ?? "—") + ")");
   parts.push("<strong>Neto unitario:</strong> " + money(row.net_unit_price));
   parts.push("<strong>Total:</strong> " + money(row.total_price));
-  if (row.description_source && row.description_source !== row.description_original) {
+  if (row.description_source) {
     parts.push("<strong>Descripción que figura en el Excel:</strong> " + escapeHtml(row.description_source));
-    parts.push("<strong>Descripción técnica corregida:</strong> " + escapeHtml(row.description_original));
+  }
+  if (row.supplier_reference_source) {
+    parts.push("<strong>Referencia que figura en el Excel:</strong> " + escapeHtml(row.supplier_reference_source));
+  }
+  if (row.description_source && row.description_source !== row.description_original) {
+    parts.push("<strong>Existe una corrección técnica de descripción:</strong> Sí");
   }
   if (row.supplier_reference_source && row.supplier_reference_source !== row.supplier_reference) {
-    parts.push("<strong>Referencia que figura en el Excel:</strong> " + escapeHtml(row.supplier_reference_source));
+    parts.push("<strong>Existe una corrección de referencia:</strong> Sí");
   }
   if (row.line_excluded) parts.push("<strong>Excluida esta línea de los cálculos:</strong> Sí");
   if (row.order_excluded) parts.push("<strong>Excluido el pedido completo:</strong> Sí");
