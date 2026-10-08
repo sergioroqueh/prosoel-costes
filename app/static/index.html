@@ -92,6 +92,70 @@
           >
           <button id="searchButton" type="button">Buscar</button>
         </div>
+        <div class="cable-search-toolbar">
+          <button type="button" id="cableSearchToggle" class="cable-search-toggle"
+                  aria-expanded="false" aria-controls="cableSearchPanel">
+            <span aria-hidden="true">⚡</span> Buscar cable por características
+            <span class="cable-toggle-arrow" aria-hidden="true">▾</span>
+          </button>
+          <span class="cable-search-hint">Sin recordar códigos como RZ1-K 5G6</span>
+        </div>
+        <div id="cableSearchPanel" class="cable-search-panel hidden">
+          <div class="cable-search-heading">Búsqueda rápida de cables</div>
+          <div class="cable-fields">
+            <label for="cableFamily">Tipo de cable
+              <select id="cableFamily">
+                <option value="">Cualquier tipo</option>
+                <option value="RZ1-K">RZ1-K · manguera 0,6/1 kV</option>
+                <option value="H07Z1-K">H07Z1-K · conductor 750 V</option>
+                <option value="RV-K">RV-K</option>
+                <option value="OTROS">Otros / sin designación detectada</option>
+              </select>
+            </label>
+            <label for="cableCores">Conductores
+              <select id="cableCores">
+                <option value="">Cualquiera</option>
+                <option value="1">1</option><option value="2">2</option>
+                <option value="3">3</option><option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </label>
+            <label for="cableSection">Sección (mm²)
+              <select id="cableSection">
+                <option value="">Cualquiera</option>
+                <option value="1.5">1,5</option><option value="2.5">2,5</option>
+                <option value="4">4</option><option value="6">6</option>
+                <option value="10">10</option><option value="16">16</option>
+                <option value="25">25</option><option value="35">35</option>
+                <option value="50">50</option><option value="70">70</option>
+                <option value="95">95</option><option value="120">120</option>
+                <option value="150">150</option><option value="185">185</option>
+                <option value="240">240</option>
+              </select>
+            </label>
+            <label for="cablePE">Designación de conductores
+              <select id="cablePE">
+                <option value="">G y X (sin distinguir)</option>
+                <option value="G">G · designación con protección</option>
+                <option value="X">X · designación sin protección indicada</option>
+              </select>
+            </label>
+            <label for="cableColor">Color (opcional)
+              <select id="cableColor">
+                <option value="">Cualquiera</option>
+                <option value="azul">Azul</option>
+                <option value="negro">Negro</option>
+                <option value="gris">Gris</option>
+                <option value="marron">Marrón</option>
+                <option value="amarillo_verde">Amarillo/verde</option>
+              </select>
+            </label>
+          </div>
+          <div class="cable-search-footer">
+            <p>Se filtra por las características expresadas en los pedidos. «X» no confirma por sí sola la composición del cable: comprueba siempre su ficha y procedencia.</p>
+            <button type="button" id="cableSearchApply">Encontrar cables</button>
+          </div>
+        </div>
         <div class="filters-head">
           <strong>Filtrar resultados</strong>
           <button class="reset-filters" id="resetFiltersButton" type="button">Limpiar filtros</button>
