@@ -33,6 +33,7 @@ const searchInput = document.getElementById("searchInput");
 const searchButton = document.getElementById("searchButton");
 const resultsNode = document.getElementById("results");
 const resultCount = document.getElementById("resultCount");
+const exactReferenceNotice = document.getElementById("exactReferenceNotice");
 const detailPanel = document.getElementById("detailPanel");
 const orderCounter = document.getElementById("orderCounter");
 const resultTemplate = document.getElementById("resultTemplate");
@@ -473,6 +474,49 @@ async function loadCounter() {
     " · Huecos: " + (row.pending_gaps ?? 0);
 }
 
+// Solo activar la comprobación global cuando parece que se ha escrito un código,
+// no para términos generales como "DOWNLIGHT 18W".
+function looksLikePurchaseCode(query) {
+  const text = query.trim().toUpperCase();
+  if (text.length < 4 || text.length > 50) return false;
+  if (/^[0-9]{4,}[A-Z0-9._/-]*$/.test(text)) return true;
+  return /^[A-Z]{1,3}[0-9][A-Z0-9._/-]*(?: [A-Z0-9._/-]+)?$/.test(text);
+}
+
+function renderExactReferenceNotice(query, filters, referenceRows) {
+  exactReferenceNotice.replaceChildren();
+  exactReferenceNotice.classList.add("hidden");
+  if (!referenceRows?.length || (filters.supplierId === null && filters.year === null)) return;
+  const selectedMatch = referenceRows.some((row) =>
+    (filters.supplierId === null || Number(row.supplier_id) === filters.supplierId)
+      && (filters.year === null || Number(row.order_year) === filters.year)
+  );
+  if (selectedMatch) return;
+  const numberOfOrders = new Set(referenceRows.map((row) => row.order_id)).size;
+  const providers = Array.from(new Set(referenceRows.map((row) => row.supplier).filter(Boolean)));
+  const message = document.createElement("p");
+  const strong = document.createElement("strong");
+  strong.textContent = "La referencia exacta " + query + " no aparece con los filtros actuales.";
+  message.appendChild(strong);
+  message.append(" Se encuentra en " + numberOfOrders + (numberOfOrders === 1 ? " pedido" : " pedidos")
+    + " de " + providers.length + (providers.length === 1 ? " proveedor" : " proveedores")
+    + ": " + providers.slice(0,4).join(", ") + (providers.length > 4 ? "…" : "") + ".");
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "exact-reference-action";
+  button.textContent = "Ver referencia exacta sin filtros";
+  button.addEventListener("click", () => {
+    selectedSupplierId = null;
+    supplierFilter.value = "";
+    closeSupplierSuggestions();
+    yearFilter.value = "";
+    sortFilter.value = "relevance";
+    runSearch();
+  });
+  exactReferenceNotice.append(message, button);
+  exactReferenceNotice.classList.remove("hidden");
+}
+
 async function runSearch({ append = false } = {}) {
   const query = searchInput.value.trim();
   if (query.length < 2) {
@@ -480,6 +524,7 @@ async function runSearch({ append = false } = {}) {
     visibleRows = [];
     totalResults = 0;
     resultCount.textContent = "";
+    exactReferenceNotice.classList.add("hidden");
     resultsFooter.classList.add("hidden");
     resultsNode.innerHTML = '<div class="empty-state">Escribe al menos dos caracteres.</div>';
     return;
@@ -495,12 +540,13 @@ async function runSearch({ append = false } = {}) {
     resultsNode.className = "results";
     resultsNode.innerHTML = '<div class="empty-state">Buscando en el histórico completo…</div>';
     resultsFooter.classList.add("hidden");
+    exactReferenceNotice.classList.add("hidden");
   }
   searchButton.disabled = true;
   searchButton.textContent = "Buscando…";
   moreResultsButton.disabled = true;
 
-  const { data, error } = await supabase.rpc("search_costs_filtered", {
+  const searchPromise = supabase.rpc("search_costs_filtered", {
     search_query: query,
     result_limit: 30,
     p_supplier_id: filters.supplierId,
@@ -508,6 +554,12 @@ async function runSearch({ append = false } = {}) {
     p_sort: filters.sort,
     p_offset: append ? visibleRows.length : 0,
   });
+  const referencePromise = !append && (filters.supplierId !== null || filters.year !== null)
+    && looksLikePurchaseCode(query)
+    ? supabase.rpc("reference_purchase_history", { p_reference: query, result_limit: 500 })
+    : Promise.resolve({ data: [], error: null });
+  const [searchResponse, referenceResponse] = await Promise.all([searchPromise, referencePromise]);
+  const { data, error } = searchResponse;
   if (requestId !== searchGeneration) return;
 
   searchButton.disabled = false;
@@ -527,6 +579,11 @@ async function runSearch({ append = false } = {}) {
   visibleRows = append ? visibleRows.concat(newRows) : newRows;
   totalResults = newRows.length ? Number(newRows[0].total_count) : (append ? totalResults : 0);
   renderResults(visibleRows, totalResults);
+  if (!append && !referenceResponse.error) {
+    renderExactReferenceNotice(query, filters, referenceResponse.data || []);
+  } else if (!append && referenceResponse.error) {
+    console.warn("No se pudo comprobar la referencia exacta:", referenceResponse.error);
+  }
 }
 
 function renderResults(rows, total) {
