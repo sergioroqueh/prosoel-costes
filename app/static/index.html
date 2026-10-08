@@ -7,8 +7,8 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https://kusbndefngttaiytcrui.supabase.co wss://kusbndefngttaiytcrui.supabase.co; img-src 'self' data:; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <title>PROSOEL Costes</title>
   <meta name="theme-color" content="#134079">
-  <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/prosoel-mark.svg?v=20261008-v14">
-  <link rel="stylesheet" href="./styles.css?v=20261008-v14">
+  <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/prosoel-mark.svg?v=20261008-v15">
+  <link rel="stylesheet" href="./styles.css?v=20261008-v15">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -304,6 +304,15 @@
           <h2>Incorporar un pedido nuevo</h2>
           <p>Selecciona el Excel original de HOJA PEDIDO. El navegador leerá el archivo localmente y mostrará todos los datos antes de enviarlos a Supabase. No se almacenará el fichero XLSX original.</p>
         </header>
+        <section class="enrichment-summary" aria-labelledby="enrichmentHeading">
+          <div>
+            <h3 id="enrichmentHeading">Preparación automática del catálogo</h3>
+            <p>Cada material nuevo queda en una cola con su referencia y las características detectadas en el pedido, sin alterar el histórico. Las fichas oficiales y las equivalencias solo se publican cuando existe evidencia contrastada.</p>
+          </div>
+          <div id="enrichmentSummaryMetrics" class="enrichment-summary-metrics" aria-live="polite">
+            Consultando el estado del catálogo…
+          </div>
+        </section>
         <div class="import-card">
           <label for="importFile">Archivo de pedido (.xlsx)</label>
           <input id="importFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
@@ -422,6 +431,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261008-v14"></script>
+  <script type="module" src="./app.js?v=20261008-v15"></script>
 </body>
 </html>
