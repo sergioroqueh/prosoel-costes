@@ -2,7 +2,8 @@ name: Deploy PROSOEL Costes to GitHub Pages
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
     paths:
       - "app/static/**"
       - ".github/workflows/pages.yml"
@@ -36,6 +37,6 @@ jobs:
         with:
           path: app/static
 
-      - name: Deploy
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
