@@ -219,3 +219,11 @@ PVP, descuento, neto, total y archivo de origen.
 - Sintaxis JS comprobada PASS.
 - Pendiente: prueba humana de la interfaz en navegador (incluyendo comparación, Tooltip/«Ver origen» y móvil), comprobar éxito del despliegue GitHub Pages para commit `89141fb2`.
 - Comprobar en pantalla `A9F79425` con CADIELSA, después «Ver referencia exacta sin filtros», elegir uno de los resultados exactos y pulsar «Comparar proveedores y evolución».
+
+### Cierre verificado V5
+- GitHub Pages workflow #36, commit `89141fb2`: **completed / success**. Frontend V5 desplegado.
+- Supabase tras la migración: 2.863 pedidos, 11.538 líneas, sin cambios en compras originales.
+- `public.reference_purchase_history`: `anon` sin EXECUTE; usuarios autenticados con EXECUTE y control `private.has_app_access()` + RLS. Una identidad autenticada sin estar en allowlist devuelve 0 filas.
+- Auditoría de seguridad posterior sin advertencias nuevas: solo quedan aviso INFO de staging con RLS sin policy (intencional) y aviso Auth de protección contra contraseñas filtradas, anterior.
+- Pruebas con filas reales de `A9F79425`: función web genera SVG, 6 pedidos, 3 proveedores, 1 precio atípico y detalle histórico; comprobación aislada PASS.
+- Falta validación manual de experiencia real tras abrir la aplicación con `Ctrl+F5`; ninguna prueba de interfaz autenticada completa mediante navegador remoto.
