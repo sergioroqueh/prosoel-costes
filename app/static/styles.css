@@ -1646,3 +1646,23 @@ main {
  white-space:pre-line;
  overflow-wrap:anywhere;
 }
+
+/* Selección explícita de líneas homogéneas (máximo 30). */
+.review-bulk-actions {
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px 15px;
+  background:#f0f5fb;
+  border-bottom:1px solid #dce5ef;
+  padding:10px 12px;
+}
+.review-bulk-actions label {display:flex;align-items:center;gap:8px;color:#345171;font-size:12px;cursor:pointer;}
+.review-bulk-actions input {width:16px;height:16px;accent-color:#244d80;}
+.review-bulk-actions span {font-size:11px;color:#5d6f82;}
+.review-bulk-actions button {margin-left:auto;border:1px solid #244d80;background:#244d80;color:#fff;padding:8px 11px;
+  border-radius:7px;font-size:12px;font-weight:750;cursor:pointer;}
+.review-bulk-actions button:disabled {opacity:.45;cursor:not-allowed;}
+.review-line-checkbox {width:16px;height:16px;accent-color:#244d80;cursor:pointer;}
+.review-line-checkbox:focus-visible,.review-bulk-actions :is(button,input):focus-visible {outline:3px solid #8badd4;outline-offset:2px;}
+@media(max-width:620px){.review-bulk-actions button{width:100%;margin-left:0;}}
