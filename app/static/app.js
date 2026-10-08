@@ -479,13 +479,18 @@ async function openMaterial(materialId) {
 }
 
 async function openHistorical(row) {
+  const requestId = ++detailGeneration;
+  const filters = selectedFilters();
   detailPanel.innerHTML = '<div class="empty-state">Cargando compras históricas…</div>';
 
-  const { data, error } = await supabase.rpc("historical_price_history", {
-    p_reference: row.reference || null,
+  const { data, error } = await supabase.rpc("historical_price_history_filtered", {
+    p_reference: row.reference ?? null,
     p_description: row.title || "",
+    p_supplier_id: filters.supplierId,
+    p_year: filters.year,
     result_limit: 500,
   });
+  if (requestId !== detailGeneration) return;
 
   if (error) {
     console.error(error);
@@ -570,7 +575,7 @@ function renderMaterialDetail(detail, rows) {
         " · PVP " +
         money(latest.pvp) +
         " · Dto. " +
-        escapeHtml(latest.discount_raw || "—") +
+        escapeHtml(displayDiscount(latest.discount_raw)) +
         "</p>"
     );
     html.push('<button class="action-button" id="showLatestOrigin" type="button">Ver línea de origen</button>');
@@ -679,7 +684,7 @@ function historyTableHtml(rows) {
     html.push("<td>" + escapeHtml(row.supplier || "—") + "</td>");
     html.push("<td>" + number(row.quantity, 2) + "</td>");
     html.push("<td>" + money(row.pvp) + "</td>");
-    html.push("<td>" + escapeHtml(row.discount_raw || "—") + "</td>");
+    html.push('<td title="Original: ' + escapeHtml(row.discount_raw ?? "—") + '">' + escapeHtml(displayDiscount(row.discount_raw)) + "</td>");
     html.push("<td><strong>" + money(row.net_unit_price) + "</strong></td>");
     html.push('<td><button class="origin-link" type="button" data-origin-index="' + index + '">Ver origen</button></td>');
     html.push("</tr>");
@@ -700,7 +705,7 @@ function originHtml(row) {
   parts.push("<strong>Descripción original:</strong> " + escapeHtml(row.description_original || "—"));
   parts.push("<strong>Cantidad:</strong> " + number(row.quantity, 3));
   parts.push("<strong>PVP:</strong> " + money(row.pvp));
-  parts.push("<strong>Descuento:</strong> " + escapeHtml(row.discount_raw || "—"));
+  parts.push("<strong>Descuento:</strong> " + escapeHtml(displayDiscount(row.discount_raw)) + " (valor original: " + escapeHtml(row.discount_raw ?? "—") + ")");
   parts.push("<strong>Neto unitario:</strong> " + money(row.net_unit_price));
   parts.push("<strong>Total:</strong> " + money(row.total_price));
   parts.push("<strong>Archivo origen:</strong> " + escapeHtml(row.source_filename || "—"));
