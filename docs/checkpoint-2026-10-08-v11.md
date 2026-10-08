@@ -70,3 +70,12 @@ La consulta anterior de precios, el buscador, la importación XLSX y el control 
 
 ## Control de cambios
 La fuente viva es Supabase; todo SQL y frontend se han guardado en el repositorio privado GitHub `sergioroqueh/prosoel-costes`. Este archivo contiene el contexto para continuar en un chat nuevo.
+
+## Cierre verificado
+
+- GitHub Pages: workflow **#70**, commit `42971cdf`, estado `completed / success`. La V11 está publicada.
+- Guardada lista ordenada de los 19 casos en [cola-priorizada-normalizacion-v11.md](cola-priorizada-normalizacion-v11.md).
+- Prueba de integración transaccional V11: se importó temporalmente `27/98764` con dos luminarias de 12 W y 18 W bajo el mismo código de compra. El trigger las clasificó como `iluminacion`, generó `technical_alerts: {"potencias_W":["12","18"]}` y dejó `review_status=pending`. Se ejecutó `ROLLBACK`.
+- Comprobado después: **0** pedidos ficticios, **0** candidatos ficticios, 11.546 líneas originales, **0** decisiones de normalización persistidas.
+- Las aprobaciones incorrectas `ready_for_mapping` de cuatro ejemplos reales fueron rechazadas en PostgreSQL y no afectaron a ninguna compra.
+- Pendiente únicamente prueba visual humana de la pestaña Normalización V11 y, de la fase V10, del Control de importaciones bajo sesión autorizada.
