@@ -141,9 +141,15 @@ function showSupplierSuggestions() {
   const matches = suppliers
     .filter((entry) => normalizeSupplierName(entry.name).includes(query))
     .sort((a, b) => {
-      const aStart = normalizeSupplierName(a.name).startsWith(query) ? 0 : 1;
-      const bStart = normalizeSupplierName(b.name).startsWith(query) ? 0 : 1;
-      return aStart - bStart || a.name.localeCompare(b.name, "es");
+      // Coincidencias al inicio del nombre, luego al inicio de cualquier palabra.
+      // Por ejemplo, "RI" prioriza RIBÓ y GRUPO RIAS frente a "ingeniería".
+      const rank = (name) => {
+        const value = normalizeSupplierName(name);
+        if (!query || value.startsWith(query)) return 0;
+        if (value.split(/\s+/).some((word) => word.startsWith(query))) return 1;
+        return 2;
+      };
+      return rank(a.name) - rank(b.name) || a.name.localeCompare(b.name, "es");
     })
     .slice(0, 12);
 
