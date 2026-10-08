@@ -71,6 +71,8 @@ const supplierCombobox = document.getElementById("supplierCombobox");
 const supplierSuggestions = document.getElementById("supplierSuggestions");
 const yearFilter = document.getElementById("yearFilter");
 const sortFilter = document.getElementById("sortFilter");
+// Valor predeterminado en cada entrada; el usuario puede cambiarlo libremente.
+sortFilter.value = "recent";
 const resetFiltersButton = document.getElementById("resetFiltersButton");
 const moreResultsButton = document.getElementById("moreResultsButton");
 const resultsFooter = document.getElementById("resultsFooter");
