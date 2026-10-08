@@ -45,6 +45,18 @@ const sortFilter = document.getElementById("sortFilter");
 const resetFiltersButton = document.getElementById("resetFiltersButton");
 const moreResultsButton = document.getElementById("moreResultsButton");
 const resultsFooter = document.getElementById("resultsFooter");
+const costsTab = document.getElementById("costsTab");
+const reviewTab = document.getElementById("reviewTab");
+const costsWorkspace = document.getElementById("costsWorkspace");
+const reviewWorkspace = document.getElementById("reviewWorkspace");
+const reviewQuery = document.getElementById("reviewQuery");
+const reviewRisk = document.getElementById("reviewRisk");
+const reviewTotal = document.getElementById("reviewTotal");
+const reviewResults = document.getElementById("reviewResults");
+const reviewVisibleCount = document.getElementById("reviewVisibleCount");
+const reviewDetail = document.getElementById("reviewDetail");
+const reviewMoreButton = document.getElementById("reviewMoreButton");
+const reviewFooter = document.getElementById("reviewFooter");
 
 let searchGeneration = 0;
 let detailGeneration = 0;
@@ -54,6 +66,13 @@ let suppliers = [];
 let selectedSupplierId = null; // null = Todos los proveedores
 let supplierCandidates = [];
 let highlightedSupplierIndex = -1;
+let reviewRows = [];
+let reviewCount = 0;
+let reviewSearchGeneration = 0;
+let reviewDetailGeneration = 0;
+let reviewLoaded = false;
+let reviewSelectedKey = null;
+let reviewTypingTimeout = null;
 
 
 function money(value) {
