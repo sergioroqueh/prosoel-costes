@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex,nofollow">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https://kusbndefngttaiytcrui.supabase.co wss://kusbndefngttaiytcrui.supabase.co; img-src 'self' data:; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <title>PROSOEL Costes</title>
-  <link rel="stylesheet" href="./styles.css?v=20261008-1105">
+  <link rel="stylesheet" href="./styles.css?v=20261008-1205">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -73,9 +73,36 @@
           >
           <button id="searchButton" type="button">Buscar</button>
         </div>
+        <div class="filters-head">
+          <strong>Filtrar resultados</strong>
+          <button class="reset-filters" id="resetFiltersButton" type="button">Limpiar filtros</button>
+        </div>
+        <div class="filters-grid">
+          <label for="supplierFilter">Proveedor
+            <select id="supplierFilter" aria-label="Filtrar por proveedor">
+              <option value="">Todos los proveedores</option>
+            </select>
+          </label>
+          <label for="yearFilter">Año del pedido
+            <select id="yearFilter" aria-label="Filtrar por año">
+              <option value="">Todos los años</option>
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+            </select>
+          </label>
+          <label for="sortFilter">Ordenar por
+            <select id="sortFilter" aria-label="Ordenar resultados">
+              <option value="relevance">Mayor relevancia</option>
+              <option value="recent">Compra más reciente</option>
+              <option value="frequent">Más pedidos</option>
+              <option value="price_asc">Menor precio neto</option>
+              <option value="price_desc">Mayor precio neto</option>
+            </select>
+          </label>
+        </div>
         <p class="hint">
-          No hace falta conocer la referencia exacta. Puedes buscar por descripción,
-          fabricante, modelo, sección, potencia o código.
+          Filtra el histórico completo antes de ordenar. Los importes son precios de compra históricos, no ofertas actuales.
         </p>
       </section>
 
@@ -87,6 +114,9 @@
           </div>
           <div id="results" class="results empty-state">
             Escribe una descripción o referencia para empezar.
+          </div>
+          <div id="resultsFooter" class="results-footer hidden">
+            <button type="button" id="moreResultsButton" class="more-results-button">Mostrar 30 más</button>
           </div>
         </div>
 
@@ -112,6 +142,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261008-1105"></script>
+  <script type="module" src="./app.js?v=20261008-1205"></script>
 </body>
 </html>
