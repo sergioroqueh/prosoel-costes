@@ -172,3 +172,9 @@ PVP, descuento, neto, total y archivo de origen.
 ### Próxima fase
 - Comparativa histórica entre proveedores y evolución de precios con trazabilidad y advertencias sobre equivalencia técnica.
 - Mantener solamente los dos usuarios existentes, no exponer datos de pedidos en GitHub y no alterar valores históricos.
+
+### Ajuste posterior V4 — teclado y móvil
+- Corregida la selección de sugerencias del proveedor para ratón/táctil: se mantiene abierto al cambiar foco dentro del componente y se cierra al salir.
+- Versión de caché JS/CSS actualizada a `v=20261008-1245`.
+- La última versión es la que incorpora commits `b2f7c2dc` (autocompletado) y `5bcc7689` (caché).
+- Esperar confirmación de GitHub Pages run 26, después prueba humana en el navegador.
