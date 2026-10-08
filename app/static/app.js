@@ -1856,6 +1856,8 @@ function updatePurchaseReviewAction() {
 
 function openPurchaseReviewEditor(line,candidate) {
   if(currentUserRole!=="admin"||purchaseEditIsSaving)return;
+  purchaseLinesInBulk=null;
+  purchaseEditAction.disabled=false;
   purchaseLineInEditor=line;
   purchaseCandidateInEditor=candidate;
   const numberOfOrder=orderLabel(line);
@@ -1887,6 +1889,32 @@ function openPurchaseReviewEditor(line,candidate) {
   purchaseEditHistory.textContent="Consultando la bitácora...";
   purchaseEditDialog.showModal();
   loadPurchaseReviewHistory(line);
+}
+
+function openPurchaseBulkEditor(lines,candidate) {
+  if(currentUserRole!=="admin"||purchaseEditIsSaving ||
+     !Array.isArray(lines)||lines.length<2||lines.length>30)return;
+  const sameSource=lines.every((line)=>
+    line.supplier_reference_source===lines[0].supplier_reference_source &&
+    line.description_source===lines[0].description_source);
+  if(!sameSource)return;
+  openPurchaseReviewEditor(lines[0],candidate);
+  purchaseLinesInBulk=lines.slice();
+  purchaseEditHeading.textContent="Corregir "+lines.length+" líneas de la misma descripción";
+  purchaseEditSource.innerHTML=
+    '<div><strong>Referencia del Excel:</strong> '+
+      escapeHtml(lines[0].supplier_reference_source||"—")+'</div>'+
+    '<div><strong>Descripción del Excel:</strong> '+
+      escapeHtml(lines[0].description_source||"—")+'</div>'+
+    '<div><strong>Pedidos afectados:</strong> '+
+      lines.map((line)=>escapeHtml(orderLabel(line))).join(", ")+'</div>'+
+    '<div class="purchase-review-existing-status">Atención: una sola corrección se aplicará a '+
+      lines.length+' líneas, con eventos de auditoría independientes. Ningún precio cambia.</div>';
+  purchaseEditAction.value="correct";
+  purchaseEditAction.disabled=true;
+  updatePurchaseReviewAction();
+  purchaseEditHistory.textContent="El historial individual de cada compra seguirá disponible al revisarla por separado.";
+  purchaseEditSubmit.textContent="Guardar corrección en "+lines.length+" líneas";
 }
 
 async function loadPurchaseReviewHistory(line) {
@@ -1940,9 +1968,10 @@ async function submitPurchaseReview() {
   const line=purchaseLineInEditor, candidate=purchaseCandidateInEditor;
   if(!line || !candidate || purchaseEditIsSaving || currentUserRole!=="admin")return;
   const action=purchaseEditAction.value;
+  const bulk=purchaseLinesInBulk && purchaseLinesInBulk.length>=2?purchaseLinesInBulk:null;
   const orderAction=action==="exclude_order"||action==="restore_order";
   const reason=purchaseEditReason.value.trim();
-  const minLength=orderAction?25:20;
+  const minLength=bulk?30:orderAction?25:20;
   purchaseEditStatus.classList.remove("is-error");
   if(!purchaseEditAcknowledged.checked){
     purchaseEditStatus.textContent="Debes marcar la confirmación después de comprobar el pedido.";
@@ -1963,7 +1992,13 @@ async function submitPurchaseReview() {
     return;
   }
 
-  const payload=orderAction?{
+  const payload=bulk?{
+    p_line_ids:bulk.map((item)=>item.order_line_id),
+    p_expected_revisions:bulk.map((item)=>Number(item.line_review_revision??0)),
+    p_reference:purchaseEditReference.value.trim(),
+    p_description:purchaseEditDescription.value.trim(),
+    p_reason:reason,
+  }:orderAction?{
     p_order_id:line.order_id,
     p_exclude:action==="exclude_order",
     p_reason:reason,
@@ -1983,7 +2018,8 @@ async function submitPurchaseReview() {
   purchaseEditStatus.textContent="Guardando la decisión con auditoría…";
   let response;
   try{
-    response=await supabase.rpc(orderAction?"review_purchase_order":"review_purchase_line",payload);
+    response=await supabase.rpc(bulk?"review_purchase_lines_bulk":
+      orderAction?"review_purchase_order":"review_purchase_line",payload);
   }catch(error){
     response={error};
   }
@@ -1998,6 +2034,7 @@ async function submitPurchaseReview() {
   }
   purchaseEditDialog.close();
   purchaseLineInEditor=null;
+  purchaseLinesInBulk=null;
   purchaseCandidateInEditor=null;
   // Volver a consultar las evidencias del grupo antes de recomendar nuevas decisiones.
   await runReviewSearch();
@@ -2018,6 +2055,7 @@ purchaseEditDialog.addEventListener("cancel",(event)=>{
 purchaseEditDialog.addEventListener("close",()=>{
   if(!purchaseEditIsSaving){
     purchaseLineInEditor=null;
+    purchaseLinesInBulk=null;
     purchaseCandidateInEditor=null;
   }
 });
