@@ -1192,7 +1192,7 @@ function historyTableHtml(rows) {
     html.push("<td><strong>" + money(row.net_unit_price) + "</strong></td>");
     html.push('<td><button class="origin-link" type="button" data-origin-index="' + index + '">Ver origen</button></td>');
     html.push("</tr>");
-    html.push('<tr id="origin-row-' + index + '" class="hidden"><td colspan="8"><div class="origin-detail">' + originHtml(row) + "</div></td></tr>");
+    html.push('<tr id="origin-row-' + index + '" class="hidden"><td colspan="8" class="origin-detail-cell"><div class="origin-detail">' + originHtml(row) + "</div></td></tr>");
   });
 
   html.push("</tbody></table></div>");
