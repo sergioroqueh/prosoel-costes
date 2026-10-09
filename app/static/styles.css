@@ -357,6 +357,14 @@ main {
 
 .origin-link:hover { text-decoration: underline; }
 
+/* El histórico mantiene columnas compactas, pero las notas y motivos largos
+   de "Ver origen" deben poder partirse en varias líneas dentro del mismo ancho. */
+.history-table td.origin-detail-cell {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
 .origin-detail {
   margin-top: 12px;
   padding: 12px;
@@ -365,6 +373,13 @@ main {
   border: 1px solid #e0e5eb;
   font-size: 13px;
   line-height: 1.5;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .hidden { display: none !important; }
