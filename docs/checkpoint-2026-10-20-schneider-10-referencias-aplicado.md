@@ -1,3 +1,7 @@
+> **ACTUALIZACIÓN 2026-10-20 — EXCEPCIÓN 6063 RESUELTA.** El usuario confirmó que la referencia original A9R60240 era correcta y la descripción del pedido 25/04 estaba equivocada. Se ha corregido y auditado la línea 6063; A9R60240 tiene ya **19 compras unificadas y 7 reglas activas**, sin modificar sus datos originales. Ver [checkpoint de cierre](checkpoint-2026-10-20-a9r60240-linea-6063-correccion.md). El resto del documento describe el estado anterior a esta corrección.
+
+---
+
 # PROSOEL Costes — Diez referencias Schneider Acti9: NORMALIZACIÓN APLICADA
 
 Fecha 2026-10-20. Supabase proyecto `kusbndefngttaiytcrui`. Repositorio `sergioroqueh/prosoel-costes`. **Estado: transacción confirmada y auditoría independiente superada**.
