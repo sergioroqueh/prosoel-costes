@@ -1181,7 +1181,16 @@ function historyTableHtml(rows) {
   html.push("<th>Fecha</th><th>Pedido</th><th>Proveedor</th><th>Cant.</th><th>PVP</th><th>Dto.</th><th>Neto</th><th>Origen</th>");
   html.push("</tr></thead><tbody>");
 
-  rows.forEach((row, index) => {
+  // El orden de la tabla es siempre por fecha de compra (más reciente primero).
+  // Trabajamos con una copia: no alteramos la respuesta ni los precios originales.
+  const orderedRows = [...rows].sort((a, b) =>
+    String(b.order_date || "").localeCompare(String(a.order_date || ""))
+      || Number(b.order_year || 0) - Number(a.order_year || 0)
+      || Number(b.order_number || 0) - Number(a.order_number || 0)
+      || Number(b.order_subnumber || 0) - Number(a.order_subnumber || 0)
+  );
+
+  orderedRows.forEach((row, index) => {
     html.push("<tr>");
     html.push("<td>" + escapeHtml(row.order_date || "—") + "</td>");
     html.push("<td>" + escapeHtml(orderLabel(row)) + "</td>");
