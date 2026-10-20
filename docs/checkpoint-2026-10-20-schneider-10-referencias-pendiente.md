@@ -1,3 +1,7 @@
+> **ESTADO ACTUALIZADO: LOTE APLICADO Y VERIFICADO (2026-10-20).** Consultar [checkpoint definitivo](checkpoint-2026-10-20-schneider-10-referencias-aplicado.md). Ya se han normalizado las 112 compras elegibles, registrado 112 eventos y activado 44 reglas de importación. La excepción 6063 sigue pendiente. Lo que sigue era la auditoría PREVIA, no el estado actual.
+
+---
+
 # PROSOEL - Schneider Acti9 (10 referencias) - PENDIENTE DE APLICAR
 
 Fecha 2026-10-20. Supabase: `kusbndefngttaiytcrui`.
