@@ -1,3 +1,7 @@
+> **ESTADO ACTUALIZADO — RESUELTO (2026-10-20)**: el lote ya fue aplicado y verificado. Ver [checkpoint definitivo](checkpoint-2026-10-20-lote-diferenciales-dx3-aplicado.md). Las 81 líneas, incluidas la corrección de la línea 5729 de referencia efectiva 411661 a 411664, se normalizaron con 38 reglas futuras. El documento que sigue describe únicamente la auditoría **previa**, no el estado actual.
+
+---
+
 # PROSOEL Costes — Lote DX3 Legrand, 20/10/2026 — PENDIENTE DE APLICAR
 
 ## Alcance y precauciones
