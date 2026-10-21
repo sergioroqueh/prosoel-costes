@@ -759,6 +759,22 @@ main {
 .exact-reference-action:hover { background: #e5f0fc; }
 .exact-reference-action:focus-visible { outline: 3px solid #8badd4; outline-offset: 2px; }
 
+/* El material abierto permanece inequívocamente marcado mientras se consulta su ficha. */
+.result-card.is-selected,
+.result-card.is-selected:hover,
+.result-card.is-selected.pending,
+.result-card.is-selected.verified {
+  background: #e7f1ff;
+  border-color: #396eaa;
+  border-left: 5px solid var(--prosoel-blue);
+  box-shadow: 0 0 0 2px rgba(19, 64, 121, .18), 0 4px 12px rgba(19, 64, 121, .10);
+}
+.result-card.is-selected .result-title::before {
+  content: "●";
+  color: var(--prosoel-blue);
+  margin-right: 7px;
+}
+
 /* Comparativa de precios por referencia comercial literal */
 .compare-entry {
   display: flex;
