@@ -131,6 +131,7 @@ let searchGeneration = 0;
 let detailGeneration = 0;
 let visibleRows = [];
 let totalResults = 0;
+let selectedResultKey = null;
 let suppliers = [];
 let selectedSupplierId = null; // null = Todos los proveedores
 let supplierCandidates = [];
@@ -637,6 +638,7 @@ async function runSearch({ append = false } = {}) {
     ++detailGeneration;
     visibleRows = [];
     totalResults = 0;
+    selectedResultKey = null;
     detailPanel.innerHTML = '<div class="empty-state">Selecciona un material para ver el detalle de sus compras.</div>';
     resultsNode.className = "results";
     resultsNode.innerHTML = '<div class="empty-state">Buscando en el histórico completo…</div>';
@@ -702,7 +704,10 @@ function renderResults(rows, total) {
     return;
   }
 
-  rows.forEach((row) => {
+  rows.forEach((row, index) => {
+    const selectionKey = row.kind === "material" && row.material_id
+      ? `material:${row.material_id}`
+      : `historical:${row.reference_key || row.reference || ""}:${row.commercial_variant_key || row.title || ""}:${index}`;
     const fragment = resultTemplate.content.cloneNode(true);
     const button = fragment.querySelector(".result-card");
     const title = fragment.querySelector(".result-title");
@@ -711,6 +716,8 @@ function renderResults(rows, total) {
     const badge = fragment.querySelector(".purchase-badge");
 
     button.classList.add(row.kind === "material" ? "verified" : "pending");
+    button.classList.toggle("is-selected", selectionKey === selectedResultKey);
+    button.setAttribute("aria-pressed", String(selectionKey === selectedResultKey));
     // Nombre principal = el código original del almacén si existe descripción ampliada.
     // El alias validado facilita la búsqueda, pero jamás sustituye la identidad de compra.
     title.textContent = row.descriptive_name
@@ -735,6 +742,12 @@ function renderResults(rows, total) {
       (Number(row.purchase_count) === 1 ? " pedido" : " pedidos");
 
     button.addEventListener("click", () => {
+      selectedResultKey = selectionKey;
+      resultsNode.querySelectorAll(".result-card").forEach((card) => {
+        const selected = card === button;
+        card.classList.toggle("is-selected", selected);
+        card.setAttribute("aria-pressed", String(selected));
+      });
       if (row.kind === "material" && row.material_id) {
         openMaterial(row.material_id);
       } else {
