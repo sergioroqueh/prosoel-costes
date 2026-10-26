@@ -2112,3 +2112,15 @@ button, input, select, textarea { accent-color: var(--prosoel-blue); }
 .order-lookup-classification-summary {
   font-size:12px; font-weight:700; color:#3b5978; margin:10px 0 12px;
 }
+
+/* Número de oferta del proveedor: sólo se muestra si consta en el pedido. */
+.order-heading-with-offer {display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 16px;}
+.order-heading-with-offer h3 {flex:0 0 auto;}
+.order-offer-label {
+  display:inline-flex; align-items:center; flex-wrap:wrap; gap:4px;
+  font-size:12px; font-weight:600; color:#345673;
+  background:#edf4fa; border:1px solid #d1dfed;
+  padding:5px 10px; border-radius:8px; overflow-wrap:anywhere; max-width:100%;
+}
+.order-offer-label strong {font-weight:750;color:#1b4876;}
+@media(max-width:600px) { .order-heading-with-offer {gap:5px 9px;} }
