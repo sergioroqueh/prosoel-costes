@@ -1,6 +1,10 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./config.js";
-import { readProsoelXlsx } from "./order_import.js?v=20261008-v9";
+import { readProsoelXlsx } from "./order_import.js?v=20261026-recovery-v3";
+import { initHistoricalOfferBackfill } from "./historical_offer_backfill.js?v=20261026-v5";
+import { initOrderLookup } from "./order_lookup.js?v=20261026-v3";
+import { initProjectLookup } from "./project_lookup.js?v=20261026-v2";
+import { classifyOriginalLine } from "./line_classification.js?v=20261026-v1";
 
 const supabase = createClient(
   SUPABASE_URL,
@@ -77,6 +81,8 @@ const resetFiltersButton = document.getElementById("resetFiltersButton");
 const moreResultsButton = document.getElementById("moreResultsButton");
 const resultsFooter = document.getElementById("resultsFooter");
 const costsTab = document.getElementById("costsTab");
+const orderLookupTab = document.getElementById("orderLookupTab");
+const orderLookupWorkspace = document.getElementById("orderLookupWorkspace");
 const reviewTab = document.getElementById("reviewTab");
 const costsWorkspace = document.getElementById("costsWorkspace");
 const reviewWorkspace = document.getElementById("reviewWorkspace");
@@ -518,6 +524,8 @@ logoutButton.addEventListener("click", async () => {
   resultsNode.innerHTML = "Escribe una descripción o referencia para empezar.";
   resultCount.textContent = "";
   detailPanel.innerHTML = '<div class="empty-state">Selecciona un material para ver precios, compras y trazabilidad.</div>';
+  orderLookup.reset();
+  historicalOfferBackfill.reset();
   showLogin();
 });
 
@@ -1300,18 +1308,23 @@ const reviewRiskLabels = {
 function activateWorkspace(which) {
   const reviewing = which === "review";
   const importing = which === "import" && currentUserRole === "admin";
-  const costs = !reviewing && !importing;
+  const lookingUpOrder = which === "orders";
+  const costs = !reviewing && !importing && !lookingUpOrder;
   costsWorkspace.classList.toggle("hidden", !costs);
+  orderLookupWorkspace.classList.toggle("hidden", !lookingUpOrder);
   reviewWorkspace.classList.toggle("hidden", !reviewing);
   importWorkspace.classList.toggle("hidden", !importing);
   costsTab.classList.toggle("is-active", costs);
+  orderLookupTab.classList.toggle("is-active", lookingUpOrder);
   reviewTab.classList.toggle("is-active", reviewing);
   importTab.classList.toggle("is-active", importing);
   costsTab.setAttribute("aria-selected", String(costs));
+  orderLookupTab.setAttribute("aria-selected", String(lookingUpOrder));
   reviewTab.setAttribute("aria-selected", String(reviewing));
   importTab.setAttribute("aria-selected", String(importing));
   if (reviewing && !reviewLoaded) runReviewSearch();
   if (importing && !importAuditLoaded) loadImportDashboard();
+  if (lookingUpOrder) orderLookup.focus();
 }
 
 function renderReviewResults() {
@@ -2215,6 +2228,7 @@ purchaseEditDialog.addEventListener("close",()=>{
 });
 
 costsTab.addEventListener("click", () => activateWorkspace("costs"));
+orderLookupTab.addEventListener("click", () => activateWorkspace("orders"));
 reviewTab.addEventListener("click", () => activateWorkspace("review"));
 importTab.addEventListener("click", () => activateWorkspace("import"));
 reviewMoreButton.addEventListener("click", () => runReviewSearch({ append: true }));
@@ -2422,6 +2436,7 @@ function showImportPreview({payload,warnings,computedTotal}, blocker=null) {
     ["Pedido",String(payload.order_year).slice(-2)+"/"+payload.order_number+(payload.order_subnumber?"."+payload.order_subnumber:"")],
     ["Fecha",payload.order_date||"—"],
     ["Proveedor",payload.supplier],
+    ...(payload.supplier_offer_reference?[["Oferta proveedor",payload.supplier_offer_reference]]:[]),
     ["Obra",payload.project||"No indicada"],
     ["Líneas",String(payload.lines.length)],
     ["Importe del pedido",money(payload.declared_total)],
@@ -2615,5 +2630,11 @@ resetFiltersButton.addEventListener("click", () => {
   }
 });
 moreResultsButton.addEventListener("click", () => runSearch({ append: true }));
+
+const historicalOfferBackfill = initHistoricalOfferBackfill({
+  client: supabase, escapeHtml, isAdmin: () => currentUserRole === "admin"
+});
+const projectLookup = initProjectLookup({ client: supabase, money, number, displayDiscount, escapeHtml, classifyOriginalLine });
+const orderLookup = initOrderLookup({ client: supabase, money, number, displayDiscount, escapeHtml, projectLookup, classifyOriginalLine });
 
 bootstrapSession();

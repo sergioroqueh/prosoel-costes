@@ -8,7 +8,7 @@
   <title>PROSOEL Costes</title>
   <meta name="theme-color" content="#134079">
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/prosoel-mark.svg?v=20261009-v17">
-  <link rel="stylesheet" href="./styles.css?v=20261021-selected-result-v1">
+  <link rel="stylesheet" href="./styles.css?v=20261026-offer-recovery-v1">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -75,6 +75,8 @@
       <nav class="workspace-tabs" role="tablist" aria-label="Secciones de PROSOEL Costes">
         <button type="button" class="workspace-tab is-active" id="costsTab" role="tab"
                 aria-selected="true" aria-controls="costsWorkspace">Consultar precios</button>
+        <button type="button" class="workspace-tab" id="orderLookupTab" role="tab"
+                aria-selected="false" aria-controls="orderLookupWorkspace">Buscar pedido</button>
         <button type="button" class="workspace-tab" id="reviewTab" role="tab"
                 aria-selected="false" aria-controls="reviewWorkspace">Normalización <span class="tab-pending">Revisión</span></button>
         <button type="button" class="workspace-tab hidden" id="importTab" role="tab"
@@ -220,6 +222,26 @@
       </section>
       </div>
 
+      <section id="orderLookupWorkspace" class="order-lookup-workspace hidden" role="tabpanel" aria-labelledby="orderLookupTab">
+        <div class="order-lookup-search-card">
+          <h2>Buscar pedido u obra</h2>
+          <p>Consulta un pedido concreto o busca todos los pedidos de una obra, ordenados desde el más reciente.</p>
+          <form id="orderLookupForm" class="order-lookup-form">
+            <label for="orderLookupInput">Número de pedido o nombre de obra</label>
+            <div class="search-row">
+              <input id="orderLookupInput" type="search" placeholder="Ej.: 26/819 o LYMA" autocomplete="off" inputmode="text"
+                     maxlength="48" aria-describedby="orderLookupHelp">
+              <button id="orderLookupButton" type="submit">Buscar</button>
+            </div>
+            <p id="orderLookupHelp" class="hint">Ejemplos: 26/819, 2026/819, 26-819, 26/819.1 o LYMA. Las obras con nombres parecidos se seleccionan por separado. La oferta del proveedor se muestra junto al pedido solo cuando está registrada.</p>
+          </form>
+          <p id="orderLookupStatus" class="order-lookup-status" role="status" aria-live="polite">Escribe un número de pedido o el nombre de una obra.</p>
+        </div>
+        <p class="order-lookup-classification-legend"><strong>Clasificación sugerida:</strong> «Material probable» y su familia se deducen automáticamente de la descripción. «Pendiente de revisión» significa que no hay evidencia suficiente o que puede ser un servicio. Los tipos ya identificados como portes, RAEE o servicios se respetan. Es una ayuda visual: no modifica el tipo original guardado ni los precios.</p>
+        <div id="orderLookupResults" class="order-lookup-results"></div>
+        <div id="orderLookupFooter" class="results-footer hidden"><button id="orderLookupMoreButton" type="button" class="more-results-button">Mostrar 20 más</button></div>
+      </section>
+
       <section id="reviewWorkspace" class="review-workspace hidden" role="tabpanel" aria-labelledby="reviewTab">
         <header class="review-intro">
           <div>
@@ -327,6 +349,24 @@
           </div>
         </div>
         <p class="import-notice">Seguridad: si el mismo archivo ya existe, se omite. Si coincide el número pero los archivos son distintos, la importación se detiene para revisión. Solo los administradores pueden confirmar.</p>
+
+        <section class="historical-offer-panel" aria-labelledby="historicalOfferHeading">
+          <h2 id="historicalOfferHeading">Recuperar ofertas de pedidos antiguos</h2>
+          <p>Selecciona los archivos originales <strong>2024.zip, 2025.zip y 2026.zip</strong>.
+             Solo se examinan Excel que coincidan exactamente con la huella SHA-256 y el nombre del archivo registrado.
+             No se suben los ZIP ni los Excel originales.</p>
+          <label for="historicalOfferZips">ZIP históricos de pedidos (1–4 archivos, hasta 600 MB cada uno)</label>
+          <input id="historicalOfferZips" type="file" accept=".zip,application/zip" multiple>
+          <button type="button" id="historicalOfferScan">Comprobar originales y previsualizar ofertas</button>
+          <button type="button" id="historicalOfferExport" disabled>Descargar auditoría completa (CSV)</button>
+          <p id="historicalOfferStatus" role="status" aria-live="polite" class="import-message">Selecciona ZIP originales para verificar las ofertas históricas.</p>
+          <div id="historicalOfferPreview"></div>
+          <label class="historical-offer-ack">
+            <input type="checkbox" id="historicalOfferAck">
+            <span>He revisado el resultado y autorizo guardar solamente las ofertas verificadas en sus pedidos originales, con auditoría. No se modificarán precios ni líneas.</span>
+          </label>
+          <button type="button" id="historicalOfferApply" disabled>Guardar ofertas verificadas</button>
+        </section>
         <section class="import-audit-panel" aria-labelledby="auditHeading">
           <div class="import-audit-head">
             <div>
@@ -431,6 +471,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261021-selected-result-v1"></script>
+  <script type="module" src="./app.js?v=20261026-offer-identity-v5"></script>
 </body>
 </html>

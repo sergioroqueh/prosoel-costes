@@ -2030,3 +2030,120 @@ button, input, select, textarea { accent-color: var(--prosoel-blue); }
   font-weight:750;
   color:var(--prosoel-blue,#134079);
 }
+
+
+/* Consulta de pedidos originales por numero (sin RPC ni GitHub Actions). */
+.order-lookup-workspace { width:100%; display:grid; gap:18px; }
+.order-lookup-search-card,.order-lookup-card {
+  background:var(--prosoel-surface);
+  border:1px solid var(--prosoel-border);
+  border-radius:14px;
+  box-shadow:0 3px 16px rgba(16,34,61,.05);
+}
+.order-lookup-search-card { padding:22px; }
+.order-lookup-search-card h2 { margin:0 0 7px; font-size:22px; color:var(--prosoel-blue); }
+.order-lookup-search-card>p { margin:0 0 17px; color:var(--prosoel-muted); }
+.order-lookup-form>label { display:block; margin-bottom:9px; font-weight:750; }
+.order-lookup-form .search-row input { min-width:0; }
+.order-lookup-form .search-row button:disabled { opacity:.55; cursor:wait; }
+.order-lookup-status { margin:14px 0 0!important; font-size:13px; font-weight:650; color:var(--prosoel-muted); }
+.order-lookup-results { display:grid; gap:16px; min-width:0; }
+.order-lookup-card { padding:20px; min-width:0; }
+.order-lookup-card-head { display:flex; align-items:start; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:16px; }
+.order-lookup-kicker { color:var(--prosoel-muted); font-size:12px; font-weight:750; text-transform:uppercase; letter-spacing:.06em; }
+.order-lookup-card h3 { margin:4px 0 0; font-size:22px; color:var(--prosoel-blue); }
+.order-lookup-linecount { background:var(--prosoel-blue-soft); color:var(--prosoel-blue); border-radius:30px; font-size:13px; font-weight:750; padding:6px 12px; }
+.order-lookup-facts { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+.order-lookup-fact { min-width:0; padding:12px; border-radius:9px; background:#f5f8fc; border:1px solid #e1e8f0; }
+.order-lookup-fact span { display:block; color:var(--prosoel-muted); font-size:11px; font-weight:700; margin-bottom:5px; }
+.order-lookup-fact strong { display:block; overflow-wrap:anywhere; font-size:14px; }
+.order-lookup-source { margin:16px 0 13px; color:#485d72; font-size:13px; overflow-wrap:anywhere; }
+.order-lookup-warning { border-left:3px solid var(--prosoel-orange); padding:10px 12px; background:var(--prosoel-orange-soft); border-radius:6px; font-size:13px; color:#694634; }
+.order-lookup-empty { padding:19px; border:1px dashed var(--prosoel-border); border-radius:10px; background:#fff; color:var(--prosoel-muted); }
+.order-lookup-table-scroll { overflow-x:auto; border:1px solid var(--prosoel-border); border-radius:10px; }
+.order-lookup-table { width:100%; border-collapse:collapse; font-size:12px; }
+.order-lookup-table thead { background:var(--prosoel-blue-soft); color:var(--prosoel-blue-dark); }
+.order-lookup-table th,.order-lookup-table td { text-align:left; padding:11px 10px; border-bottom:1px solid #e9edf4; white-space:nowrap; }
+.order-lookup-table .order-lookup-description { white-space:normal; min-width:260px; max-width:490px; overflow-wrap:anywhere; font-weight:600; }
+.order-lookup-table tbody tr:last-child td { border-bottom:0; }
+.order-lookup-table tbody tr:nth-child(even) { background:#fafbfe; }
+.order-lookup-footnote { color:var(--prosoel-muted); font-size:12px; line-height:1.5; }
+@media(max-width:900px) { .order-lookup-facts { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:600px) {
+  .order-lookup-search-card,.order-lookup-card { padding:14px; }
+  .order-lookup-form .search-row { grid-template-columns:1fr; }
+  .order-lookup-form .search-row button { min-height:43px; }
+  .order-lookup-facts { grid-template-columns:1fr; }
+}
+
+/* Busqueda de pedidos por obra: opciones separadas y listado desplegable. */
+.order-project-chooser { background:#fff; border:1px solid var(--prosoel-border); border-radius:12px; padding:17px; min-width:0; }
+.order-project-chooser-title { color:var(--prosoel-muted); font-weight:700; font-size:13px; margin-bottom:12px; }
+.order-project-options { display:flex; flex-wrap:wrap; gap:8px; max-height:180px; overflow-y:auto; }
+.order-project-option { border:1px solid #bfd1e4; background:#f6f9fd; color:var(--prosoel-blue); padding:9px 12px; border-radius:9px; font-size:13px; font-weight:700; cursor:pointer; }
+.order-project-option:hover,.order-project-option:focus-visible { border-color:var(--prosoel-blue); outline-offset:2px; }
+.order-project-option.is-selected { background:var(--prosoel-blue); border-color:var(--prosoel-blue); color:#fff; }
+.order-project-list { display:grid; gap:11px; min-width:0; }
+.order-project-card { background:#fff; border:1px solid var(--prosoel-border); border-radius:12px; padding:16px 18px; box-shadow:0 2px 8px rgba(16,34,61,.04); min-width:0; }
+.order-project-card-top { display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; align-items:start; }
+.order-project-card h3 { color:var(--prosoel-blue); font-size:19px; margin:3px 0 0; }
+.order-project-date { font-size:13px; color:var(--prosoel-muted); font-weight:700; }
+.order-project-meta { display:flex; flex-wrap:wrap; gap:8px 22px; margin:12px 0 8px; font-size:13px; color:#314861; }
+.order-project-source { color:#60738a; font-size:12px; margin:8px 0 12px; overflow-wrap:anywhere; }
+.order-project-conflict { color:#96552b; font-weight:700; }
+.order-project-expand { background:#eaf1f9; color:var(--prosoel-blue); border:1px solid #ceddea; border-radius:8px; font-weight:750; font-size:12px; cursor:pointer; padding:9px 12px; }
+.order-project-expand:hover { background:#dfeaf6; }
+.order-project-expand:disabled { opacity:.55; cursor:wait; }
+.order-project-details { margin-top:14px; }
+.order-project-details[hidden] { display:none!important; }
+.order-project-linecount { font-size:12px; font-weight:700; color:var(--prosoel-muted); margin:0 0 8px; }
+#orderLookupFooter { margin-top:0; justify-content:center; }
+@media(max-width:600px) { .order-project-card { padding:13px; } .order-project-chooser { padding:13px; } }
+
+/* Clasificación por reglas conservadoras, no modifica la base histórica. */
+.order-lookup-classification-legend {
+  color:#536780; font-size:12px; line-height:1.55;
+  margin:0; padding:10px 13px; border-left:3px solid #7a9ab9;
+  background:#f0f5fa; border-radius:7px;
+}
+.order-line-kind { color:#224b76; font-weight:650; }
+.order-lookup-table td:last-child { color:#536780; font-size:12px; }
+
+.order-lookup-classification-summary {
+  font-size:12px; font-weight:700; color:#3b5978; margin:10px 0 12px;
+}
+
+/* Número de oferta del proveedor: sólo se muestra si consta en el pedido. */
+.order-heading-with-offer {display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 16px;}
+.order-heading-with-offer h3 {flex:0 0 auto;}
+.order-offer-label {
+  display:inline-flex; align-items:center; flex-wrap:wrap; gap:4px;
+  font-size:12px; font-weight:600; color:#345673;
+  background:#edf4fa; border:1px solid #d1dfed;
+  padding:5px 10px; border-radius:8px; overflow-wrap:anywhere; max-width:100%;
+}
+.order-offer-label strong {font-weight:750;color:#1b4876;}
+@media(max-width:600px) { .order-heading-with-offer {gap:5px 9px;} }
+
+/* Recuperación supervisada de ofertas históricas desde ZIP locales. */
+.historical-offer-panel {
+  margin:20px 0; padding:20px; border:1px solid #cadaed; border-radius:13px;
+  background:#fff; display:grid; gap:13px;
+}
+.historical-offer-panel h2 {font-size:20px; color:#164579; margin:0;}
+.historical-offer-panel p {font-size:13px; color:#536a83; line-height:1.55; margin:0;}
+.historical-offer-panel>label:not(.historical-offer-ack) {font-weight:700;font-size:13px;}
+.historical-offer-panel input[type="file"] {border:1px dashed #a8bfd6; padding:12px; border-radius:9px; max-width:100%; background:#f7fafc;}
+.historical-offer-panel>button {justify-self:start;}
+.historical-offer-panel button:disabled {opacity:.55;cursor:wait;}
+.historical-offer-stats {display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px;margin-bottom:12px;}
+.historical-offer-stats>div {background:#f2f6fb;border:1px solid #e1e8f2;border-radius:9px;padding:11px;}
+.historical-offer-stats span {display:block;color:#58708b;font-size:11px;line-height:1.45;}
+.historical-offer-stats strong {display:block;font-size:19px;color:#1c497e;margin-top:3px;}
+.historical-offer-privacy {margin:10px 0!important;}
+.historical-offer-ack {display:flex;gap:9px;align-items:flex-start;color:#395574;font-size:13px;line-height:1.55;}
+.historical-offer-ack input {margin-top:3px;}
+.historical-offer-incidents {font-size:12px;color:#5e6d7e;margin:12px 0;}
+.historical-offer-incidents summary {font-weight:700;cursor:pointer;}
+.historical-offer-incidents li {margin:5px 0;overflow-wrap:anywhere;}
+@media(max-width:600px) { .historical-offer-panel {padding:14px;} }
