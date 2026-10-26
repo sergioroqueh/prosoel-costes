@@ -1,7 +1,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./config.js";
-import { readProsoelXlsx } from "./order_import.js?v=20261026-recovery-v2";
-import { initHistoricalOfferBackfill } from "./historical_offer_backfill.js?v=20261026-v2";
+import { readProsoelXlsx } from "./order_import.js?v=20261026-recovery-v3";
+import { initHistoricalOfferBackfill } from "./historical_offer_backfill.js?v=20261026-v3";
 import { initOrderLookup } from "./order_lookup.js?v=20261026-v3";
 import { initProjectLookup } from "./project_lookup.js?v=20261026-v2";
 import { classifyOriginalLine } from "./line_classification.js?v=20261026-v1";
