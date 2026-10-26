@@ -2030,3 +2030,48 @@ button, input, select, textarea { accent-color: var(--prosoel-blue); }
   font-weight:750;
   color:var(--prosoel-blue,#134079);
 }
+
+
+/* Consulta de pedidos originales por numero (sin RPC ni GitHub Actions). */
+.order-lookup-workspace { width:100%; display:grid; gap:18px; }
+.order-lookup-search-card,.order-lookup-card {
+  background:var(--prosoel-surface);
+  border:1px solid var(--prosoel-border);
+  border-radius:14px;
+  box-shadow:0 3px 16px rgba(16,34,61,.05);
+}
+.order-lookup-search-card { padding:22px; }
+.order-lookup-search-card h2 { margin:0 0 7px; font-size:22px; color:var(--prosoel-blue); }
+.order-lookup-search-card>p { margin:0 0 17px; color:var(--prosoel-muted); }
+.order-lookup-form>label { display:block; margin-bottom:9px; font-weight:750; }
+.order-lookup-form .search-row input { min-width:0; }
+.order-lookup-form .search-row button:disabled { opacity:.55; cursor:wait; }
+.order-lookup-status { margin:14px 0 0!important; font-size:13px; font-weight:650; color:var(--prosoel-muted); }
+.order-lookup-results { display:grid; gap:16px; min-width:0; }
+.order-lookup-card { padding:20px; min-width:0; }
+.order-lookup-card-head { display:flex; align-items:start; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:16px; }
+.order-lookup-kicker { color:var(--prosoel-muted); font-size:12px; font-weight:750; text-transform:uppercase; letter-spacing:.06em; }
+.order-lookup-card h3 { margin:4px 0 0; font-size:22px; color:var(--prosoel-blue); }
+.order-lookup-linecount { background:var(--prosoel-blue-soft); color:var(--prosoel-blue); border-radius:30px; font-size:13px; font-weight:750; padding:6px 12px; }
+.order-lookup-facts { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+.order-lookup-fact { min-width:0; padding:12px; border-radius:9px; background:#f5f8fc; border:1px solid #e1e8f0; }
+.order-lookup-fact span { display:block; color:var(--prosoel-muted); font-size:11px; font-weight:700; margin-bottom:5px; }
+.order-lookup-fact strong { display:block; overflow-wrap:anywhere; font-size:14px; }
+.order-lookup-source { margin:16px 0 13px; color:#485d72; font-size:13px; overflow-wrap:anywhere; }
+.order-lookup-warning { border-left:3px solid var(--prosoel-orange); padding:10px 12px; background:var(--prosoel-orange-soft); border-radius:6px; font-size:13px; color:#694634; }
+.order-lookup-empty { padding:19px; border:1px dashed var(--prosoel-border); border-radius:10px; background:#fff; color:var(--prosoel-muted); }
+.order-lookup-table-scroll { overflow-x:auto; border:1px solid var(--prosoel-border); border-radius:10px; }
+.order-lookup-table { width:100%; border-collapse:collapse; font-size:12px; }
+.order-lookup-table thead { background:var(--prosoel-blue-soft); color:var(--prosoel-blue-dark); }
+.order-lookup-table th,.order-lookup-table td { text-align:left; padding:11px 10px; border-bottom:1px solid #e9edf4; white-space:nowrap; }
+.order-lookup-table .order-lookup-description { white-space:normal; min-width:260px; max-width:490px; overflow-wrap:anywhere; font-weight:600; }
+.order-lookup-table tbody tr:last-child td { border-bottom:0; }
+.order-lookup-table tbody tr:nth-child(even) { background:#fafbfe; }
+.order-lookup-footnote { color:var(--prosoel-muted); font-size:12px; line-height:1.5; }
+@media(max-width:900px) { .order-lookup-facts { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:600px) {
+  .order-lookup-search-card,.order-lookup-card { padding:14px; }
+  .order-lookup-form .search-row { grid-template-columns:1fr; }
+  .order-lookup-form .search-row button { min-height:43px; }
+  .order-lookup-facts { grid-template-columns:1fr; }
+}
