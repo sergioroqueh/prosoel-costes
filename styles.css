@@ -2124,3 +2124,26 @@ button, input, select, textarea { accent-color: var(--prosoel-blue); }
 }
 .order-offer-label strong {font-weight:750;color:#1b4876;}
 @media(max-width:600px) { .order-heading-with-offer {gap:5px 9px;} }
+
+/* Recuperación supervisada de ofertas históricas desde ZIP locales. */
+.historical-offer-panel {
+  margin:20px 0; padding:20px; border:1px solid #cadaed; border-radius:13px;
+  background:#fff; display:grid; gap:13px;
+}
+.historical-offer-panel h2 {font-size:20px; color:#164579; margin:0;}
+.historical-offer-panel p {font-size:13px; color:#536a83; line-height:1.55; margin:0;}
+.historical-offer-panel>label:not(.historical-offer-ack) {font-weight:700;font-size:13px;}
+.historical-offer-panel input[type="file"] {border:1px dashed #a8bfd6; padding:12px; border-radius:9px; max-width:100%; background:#f7fafc;}
+.historical-offer-panel>button {justify-self:start;}
+.historical-offer-panel button:disabled {opacity:.55;cursor:wait;}
+.historical-offer-stats {display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px;margin-bottom:12px;}
+.historical-offer-stats>div {background:#f2f6fb;border:1px solid #e1e8f2;border-radius:9px;padding:11px;}
+.historical-offer-stats span {display:block;color:#58708b;font-size:11px;line-height:1.45;}
+.historical-offer-stats strong {display:block;font-size:19px;color:#1c497e;margin-top:3px;}
+.historical-offer-privacy {margin:10px 0!important;}
+.historical-offer-ack {display:flex;gap:9px;align-items:flex-start;color:#395574;font-size:13px;line-height:1.55;}
+.historical-offer-ack input {margin-top:3px;}
+.historical-offer-incidents {font-size:12px;color:#5e6d7e;margin:12px 0;}
+.historical-offer-incidents summary {font-weight:700;cursor:pointer;}
+.historical-offer-incidents li {margin:5px 0;overflow-wrap:anywhere;}
+@media(max-width:600px) { .historical-offer-panel {padding:14px;} }

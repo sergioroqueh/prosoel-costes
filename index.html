@@ -8,7 +8,7 @@
   <title>PROSOEL Costes</title>
   <meta name="theme-color" content="#134079">
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/prosoel-mark.svg?v=20261009-v17">
-  <link rel="stylesheet" href="./styles.css?v=20261026-offer-v1">
+  <link rel="stylesheet" href="./styles.css?v=20261026-offer-recovery-v1">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -349,6 +349,24 @@
           </div>
         </div>
         <p class="import-notice">Seguridad: si el mismo archivo ya existe, se omite. Si coincide el número pero los archivos son distintos, la importación se detiene para revisión. Solo los administradores pueden confirmar.</p>
+
+        <section class="historical-offer-panel" aria-labelledby="historicalOfferHeading">
+          <h2 id="historicalOfferHeading">Recuperar ofertas de pedidos antiguos</h2>
+          <p>Selecciona los archivos originales <strong>2024.zip, 2025.zip y 2026.zip</strong>.
+             Solo se examinan Excel que coincidan exactamente con la huella SHA-256 y el nombre del archivo registrado.
+             No se suben los ZIP ni los Excel originales.</p>
+          <label for="historicalOfferZips">ZIP históricos de pedidos (1–4 archivos, hasta 600 MB cada uno)</label>
+          <input id="historicalOfferZips" type="file" accept=".zip,application/zip" multiple>
+          <button type="button" id="historicalOfferScan">Comprobar originales y previsualizar ofertas</button>
+          <button type="button" id="historicalOfferExport" disabled>Descargar auditoría completa (CSV)</button>
+          <p id="historicalOfferStatus" role="status" aria-live="polite" class="import-message">Selecciona ZIP originales para verificar las ofertas históricas.</p>
+          <div id="historicalOfferPreview"></div>
+          <label class="historical-offer-ack">
+            <input type="checkbox" id="historicalOfferAck">
+            <span>He revisado el resultado y autorizo guardar solamente las ofertas verificadas en sus pedidos originales, con auditoría. No se modificarán precios ni líneas.</span>
+          </label>
+          <button type="button" id="historicalOfferApply" disabled>Guardar ofertas verificadas</button>
+        </section>
         <section class="import-audit-panel" aria-labelledby="auditHeading">
           <div class="import-audit-head">
             <div>
@@ -453,6 +471,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261026-offer-v1"></script>
+  <script type="module" src="./app.js?v=20261026-offer-recovery-v1"></script>
 </body>
 </html>
