@@ -61,7 +61,7 @@ export async function fetchOrdersByReference(client, parsed) {
   return orders.map((order) => ({ ...order, lines: byOrder.get(String(order.id)) || [] }));
 }
 
-export function initOrderLookup({ client, money, number, displayDiscount, escapeHtml }) {
+export function initOrderLookup({ client, money, number, displayDiscount, escapeHtml, projectLookup = null }) {
   const form = document.getElementById("orderLookupForm");
   const input = document.getElementById("orderLookupInput");
   const button = document.getElementById("orderLookupButton");
@@ -69,6 +69,16 @@ export function initOrderLookup({ client, money, number, displayDiscount, escape
   const results = document.getElementById("orderLookupResults");
   let generation = 0;
 
+  function displayLineKind(kind) {
+    const kinds = {
+      unknown: "Sin clasificar",
+      environmental_fee: "RAEE / ecotasa",
+      freight: "Portes / transporte",
+      service: "Servicio",
+      service_candidate: "Posible servicio",
+    };
+    return kinds[kind] || (kind ? String(kind) : "Sin clasificar");
+  }
   function formattedDate(value) {
     const match = String(value ?? "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
     return match ? match[3] + "/" + match[2] + "/" + match[1] : (value || "Sin fecha");
@@ -116,7 +126,7 @@ export function initOrderLookup({ client, money, number, displayDiscount, escape
       } else {
         html.push('<div class="order-lookup-table-scroll"><table class="order-lookup-table"><thead><tr>' +
           '<th>Nº</th><th>Referencia</th><th>Descripción original</th><th>Cantidad</th>' +
-          '<th>PVP/u</th><th>Descuento</th><th>Neto/u</th><th>Total</th><th>Tipo</th>' +
+          '<th>PVP/u</th><th>Descuento</th><th>Neto/u</th><th>Total</th><th>Clasificación</th>' +
           '</tr></thead><tbody>');
         for (const line of order.lines) {
           html.push('<tr><td>' + escapeHtml(line.line_number ?? "—") +
@@ -127,7 +137,7 @@ export function initOrderLookup({ client, money, number, displayDiscount, escape
             '</td><td>' + escapeHtml(displayDiscount(line.discount_raw)) +
             '</td><td>' + escapeHtml(money(line.net_unit_price)) +
             '</td><td>' + escapeHtml(money(line.total_price)) +
-            '</td><td>' + escapeHtml(line.line_kind || "—") + '</td></tr>');
+            '</td><td>' + escapeHtml(displayLineKind(line.line_kind)) + '</td></tr>');
         }
         html.push('</tbody></table></div>');
       }
@@ -139,13 +149,26 @@ export function initOrderLookup({ client, money, number, displayDiscount, escape
 
   async function search(event) {
     if (event) event.preventDefault();
-    const parsed = parseOrderReference(input.value);
+    const raw = input.value.trim();
+    const parsed = parseOrderReference(raw);
     const requestId = ++generation;
+    projectLookup?.cancel();
     results.replaceChildren();
     if (!parsed) {
-      button.disabled = false;
-      status.textContent = "Introduce año y número: por ejemplo, 26/775 o 2026/775.";
-      input.focus();
+      if (!raw || /^d{2,4}s*[/-]/.test(raw) || !projectLookup) {
+        button.disabled = false;
+        status.textContent = raw
+          ? "Referencia de pedido incompleta. Usa, por ejemplo, 26/775."
+          : "Escribe un número de pedido o el nombre de una obra.";
+        input.focus();
+        return;
+      }
+      button.disabled = true;
+      try {
+        await projectLookup.search(raw);
+      } finally {
+        if (requestId === generation) button.disabled = false;
+      }
       return;
     }
     button.disabled = true;
@@ -170,7 +193,8 @@ export function initOrderLookup({ client, money, number, displayDiscount, escape
       ++generation;
       input.value = "";
       button.disabled = false;
-      status.textContent = 'Escribe un número de pedido para consultar sus líneas originales.';
+      status.textContent = 'Escribe un número de pedido o el nombre de una obra.';
+      projectLookup?.cancel();
       results.replaceChildren();
     },
   };
