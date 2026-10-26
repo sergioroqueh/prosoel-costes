@@ -14,6 +14,20 @@ export function offerRequiresManualReview(reference) {
   return null;
 }
 
+// Distingue la referencia textual importada del número estructurado del índice.
+ // Nunca cambia el pedido ni interpreta subpedidos de formato especial.
+export function orderReferenceDiscrepancy(order) {
+  const stored=String(order?.order_reference??"").trim();
+  if(!/^\d{2}\/\d+$/.test(stored))return null;
+  const year=Number(order?.order_year), num=Number(order?.order_number);
+  if(!Number.isInteger(year)||!Number.isInteger(num)||num<1||num>999999)return null;
+  const reference=String(year%100).padStart(2,"0")+"/"+num;
+  const [oldYear,oldNum]=stored.split("/");
+  if(Number(oldYear)===year%100 && Number(oldNum)===num)return null;
+  return "Referencia en BD "+stored+"; número indexado "+reference+
+    ". Revisar la identificación del pedido antes de atribuir oferta.";
+}
+
 export function normalizedSourceName(value) {
   return String(value??"").replaceAll("\\","/").split("/").at(-1).normalize("NFC").trim().toLocaleLowerCase("es");
 }
@@ -27,7 +41,7 @@ export async function fetchOriginalOrderIndex(client) {
   const rows = [];
   for(let start=0; ;start+=1000) {
     const response=await client.from("orders")
-      .select("id,order_reference,source_sha256,source_filename,supplier_offer_reference")
+      .select("id,order_reference,order_year,order_number,order_subnumber,source_sha256,source_filename,supplier_offer_reference")
       .order("id",{ascending:true})
       .range(start,start+999);
     if(response.error) throw response.error;
@@ -126,7 +140,8 @@ export async function scanOriginalArchives(files,index,onProgress) {
           }
           continue;
         }
-        const doubt=offerRequiresManualReview(offer.reference);
+        const identityIssue=orderReferenceDiscrepancy(found);
+        const doubt=identityIssue||offerRequiresManualReview(offer.reference);
         if(doubt) {
           result.suspicious.push({
             order_reference:found.order_reference||"Pedido ID "+found.id,
@@ -216,7 +231,7 @@ export function initHistoricalOfferBackfill({client,escapeHtml,isAdmin}) {
         ["Excel examinados",result.processed],
         ["Huella SHA-256 verificada",result.hashVerified],
         ["Ofertas nuevas verificadas",result.offers.length],
-        ["Ofertas dudosas para revisar",result.suspicious.length],
+        ["Ofertas / identidades a revisar",result.suspicious.length],
         ["Sin oferta detectada (revisar)",result.noOffer],
         ["Excel no correspondientes al histórico",result.unmatched],
         ["Ofertas ya registradas",result.already],
