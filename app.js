@@ -1,8 +1,9 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./config.js";
 import { readProsoelXlsx } from "./order_import.js?v=20261008-v9";
-import { initOrderLookup } from "./order_lookup.js?v=20261026-v2";
-import { initProjectLookup } from "./project_lookup.js?v=20261026-v1";
+import { initOrderLookup } from "./order_lookup.js?v=20261026-v3";
+import { initProjectLookup } from "./project_lookup.js?v=20261026-v2";
+import { classifyOriginalLine } from "./line_classification.js?v=20261026-v1";
 
 const supabase = createClient(
   SUPABASE_URL,
@@ -2627,7 +2628,7 @@ resetFiltersButton.addEventListener("click", () => {
 });
 moreResultsButton.addEventListener("click", () => runSearch({ append: true }));
 
-const projectLookup = initProjectLookup({ client: supabase, money, number, displayDiscount, escapeHtml });
-const orderLookup = initOrderLookup({ client: supabase, money, number, displayDiscount, escapeHtml, projectLookup });
+const projectLookup = initProjectLookup({ client: supabase, money, number, displayDiscount, escapeHtml, classifyOriginalLine });
+const orderLookup = initOrderLookup({ client: supabase, money, number, displayDiscount, escapeHtml, projectLookup, classifyOriginalLine });
 
 bootstrapSession();
