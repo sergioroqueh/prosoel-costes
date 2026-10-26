@@ -49,6 +49,7 @@ test("construye índice Supabase por hash sin escribir datos",async()=>{
  const index=await subject.fetchOriginalOrderIndex(makeClient());
  assert.equal(index.rows.length,4);
  assert.equal(index.byHash.get(hash(1))[0].id,1);
+ assert.equal(index.byName.get("pedido 1.xlsx")[0].id,1);
 });
 
 test("separar oferta verificada, sin oferta, ya existente y nombres erróneos",async()=>{
@@ -59,6 +60,9 @@ test("separar oferta verificada, sin oferta, ya existente y nombres erróneos",a
  assert.equal(r.offers[0].order_id,1);
  assert.equal(r.offers[0].supplier_offer_reference,"OF-1");
  assert.equal(r.noOffer,1);
+ assert.equal(r.unrecognized.length,1);
+ assert.equal(r.unrecognized[0].order_reference,"24/2");
+ assert.ok(r.incidents.some(x=>x.reason.includes("SHA-256 ni nombre")));
  assert.equal(r.already,1);
  assert.equal(r.unmatched,1);
  assert.ok(r.incidents.some(x=>x.reason.includes("nombre")));
