@@ -1,7 +1,7 @@
 // Recuperación de ofertas históricas, exclusivamente con los XLSX originales.
 // Los ZIP y XLSX se procesan en el navegador; nunca se envían a Supabase.
 // Solo se envían registros metadato de oferta tras confirmación del administrador.
-import {zipIndex, readSupplierOfferFromXlsxBytes} from "./order_import.js?v=20261026-recovery-v1";
+import {zipIndex, readSupplierOfferFromXlsxBytes} from "./order_import.js?v=20261026-recovery-v2";
 
 export function normalizedSourceName(value) {
   return String(value??"").replaceAll("\\","/").split("/").at(-1).normalize("NFC").trim().toLocaleLowerCase("es");
