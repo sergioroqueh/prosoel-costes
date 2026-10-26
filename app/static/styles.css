@@ -2108,3 +2108,7 @@ button, input, select, textarea { accent-color: var(--prosoel-blue); }
 }
 .order-line-kind { color:#224b76; font-weight:650; }
 .order-lookup-table td:last-child { color:#536780; font-size:12px; }
+
+.order-lookup-classification-summary {
+  font-size:12px; font-weight:700; color:#3b5978; margin:10px 0 12px;
+}
