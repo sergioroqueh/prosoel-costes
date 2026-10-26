@@ -81,7 +81,7 @@ test("error de consulta a Supabase no se confunde con cero pedidos",async()=>{
 test("interfaz no escribe sin aceptación explícita y envía solo metadatos seguros",async()=>{
  const els=new Map();
  const ids=["historicalOfferZips","historicalOfferScan","historicalOfferAck",
-            "historicalOfferApply","historicalOfferStatus","historicalOfferPreview"];
+            "historicalOfferApply","historicalOfferExport","historicalOfferStatus","historicalOfferPreview"];
  for(const id of ids)els.set(id,{
    value:"",checked:false,disabled:false,files:[],textContent:"",innerHTML:"",
    handlers:{},addEventListener(evt,fn){this.handlers[evt]=fn},
@@ -104,6 +104,7 @@ test("interfaz no escribe sin aceptación explícita y envía solo metadatos seg
    await els.get("historicalOfferScan").handlers.click();
    assert.equal(writes,0);
    assert.equal(els.get("historicalOfferApply").disabled,true);
+   assert.equal(els.get("historicalOfferExport").disabled,false);
    assert.match(els.get("historicalOfferPreview").innerHTML,/OF-1/);
    els.get("historicalOfferAck").checked=true;
    els.get("historicalOfferAck").handlers.change();
