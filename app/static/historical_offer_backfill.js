@@ -32,13 +32,20 @@ export async function fetchOriginalOrderIndex(client) {
     if(!byHash.has(key))byHash.set(key,[]);
     byHash.get(key).push(order);
   }
-  return {rows,byHash};
+  const byName=new Map();
+  for(const order of rows) {
+    const filename=normalizedSourceName(order.source_filename);
+    if(!filename)continue;
+    if(!byName.has(filename))byName.set(filename,[]);
+    byName.get(filename).push(order);
+  }
+  return {rows,byHash,byName};
 }
 
 export async function scanOriginalArchives(files,index,onProgress) {
   const all=[...files];
   if(all.length<1||all.length>4)throw new Error("Selecciona entre 1 y 4 archivos ZIP de pedidos.");
-  const result={processed:0,hashVerified:0,offers:[],incidents:[],noOffer:0,
+  const result={processed:0,hashVerified:0,offers:[],incidents:[],unrecognized:[],noOffer:0,
     unmatched:0,already:0,nonXlsx:0,totalXlsx:0,failed:0};
   const identifiedOrders=new Set();
   for(const file of all) {
@@ -65,7 +72,19 @@ export async function scanOriginalArchives(files,index,onProgress) {
         }
         const digest=await shaHex(originalBytes);
         const matches=index.byHash.get(digest);
-        if(!matches) { result.unmatched++;continue; }
+        if(!matches) {
+          result.unmatched++;
+          const sameName=index.byName?.get(normalizedSourceName(name))||[];
+          if(sameName.length) {
+            result.failed++;
+            const refs=sameName.slice(0,3).map(o=>o.order_reference||"ID "+o.id).join(", ");
+            result.incidents.push({name,reason:"El nombre coincide con pedido(s) "+refs+
+              ", pero el SHA-256 es distinto. Archivo/version no verificados; excluido."});
+          } else {
+            result.incidents.push({name,reason:"Sin coincidencia de SHA-256 ni nombre de pedido registrado; excluido."});
+          }
+          continue;
+        }
         if(matches.length!==1) {
           result.failed++;
           result.incidents.push({name,reason:"Varios pedidos comparten la misma huella; revisión manual"});
@@ -81,7 +100,14 @@ export async function scanOriginalArchives(files,index,onProgress) {
         if(identifiedOrders.has(String(found.id)))continue;
         identifiedOrders.add(String(found.id));
         const offer=await readSupplierOfferFromXlsxBytes(originalBytes);
-        if(!offer) {result.noOffer++;continue;}
+        if(!offer) {
+          result.noOffer++;
+          result.unrecognized.push({
+            order_reference:found.order_reference||"Pedido ID "+found.id,
+            source_filename:found.source_filename,source_sha256:digest,
+          });
+          continue;
+        }
         if(found.supplier_offer_reference) {
           result.already++;
           if(String(found.supplier_offer_reference).trim()!==offer.reference) {
@@ -167,7 +193,7 @@ export function initHistoricalOfferBackfill({client,escapeHtml,isAdmin}) {
         ["Excel examinados",result.processed],
         ["Huella SHA-256 verificada",result.hashVerified],
         ["Ofertas nuevas verificadas",result.offers.length],
-        ["Excel sin oferta explícita",result.noOffer],
+        ["Sin oferta detectada (revisar)",result.noOffer],
         ["Excel no correspondientes al histórico",result.unmatched],
         ["Ofertas ya registradas",result.already],
         ["Excel no interpretables / incidencias",result.failed],
@@ -240,6 +266,10 @@ export function initHistoricalOfferBackfill({client,escapeHtml,isAdmin}) {
     for(const x of lastReport.offers){
       lines.push(["Verificada",x.order_reference,x.supplier_offer_reference,
         x.supplier_offer_label,x.source_filename,x.source_sha256,""]);
+    }
+    for(const x of lastReport.unrecognized){
+      lines.push(["Oferta no detectada",x.order_reference,"","",x.source_filename,x.source_sha256,
+        "SHA y nombre verificados, pero no se reconoció una oferta explícita en cabecera. Revisar antes de afirmar ausencia de oferta."]);
     }
     for(const x of lastReport.incidents){
       lines.push(["Revisar","","","",x.name,"",x.reason]);
