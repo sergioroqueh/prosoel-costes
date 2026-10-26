@@ -75,6 +75,8 @@
       <nav class="workspace-tabs" role="tablist" aria-label="Secciones de PROSOEL Costes">
         <button type="button" class="workspace-tab is-active" id="costsTab" role="tab"
                 aria-selected="true" aria-controls="costsWorkspace">Consultar precios</button>
+        <button type="button" class="workspace-tab" id="orderLookupTab" role="tab"
+                aria-selected="false" aria-controls="orderLookupWorkspace">Buscar pedido</button>
         <button type="button" class="workspace-tab" id="reviewTab" role="tab"
                 aria-selected="false" aria-controls="reviewWorkspace">Normalización <span class="tab-pending">Revisión</span></button>
         <button type="button" class="workspace-tab hidden" id="importTab" role="tab"
@@ -219,6 +221,24 @@
         </aside>
       </section>
       </div>
+
+      <section id="orderLookupWorkspace" class="order-lookup-workspace hidden" role="tabpanel" aria-labelledby="orderLookupTab">
+        <div class="order-lookup-search-card">
+          <h2>Consultar un pedido</h2>
+          <p>Busca por número de pedido y consulta exactamente qué se compró, sin alterar el histórico.</p>
+          <form id="orderLookupForm" class="order-lookup-form">
+            <label for="orderLookupInput">Referencia del pedido</label>
+            <div class="search-row">
+              <input id="orderLookupInput" type="search" placeholder="Ej.: 26/775" autocomplete="off" inputmode="text"
+                     maxlength="48" aria-describedby="orderLookupHelp">
+              <button id="orderLookupButton" type="submit">Buscar pedido</button>
+            </div>
+            <p id="orderLookupHelp" class="hint">Formatos válidos: 26/775, 2026/775, 26-775 y 26/775.1 (subpedido).</p>
+          </form>
+          <p id="orderLookupStatus" class="order-lookup-status" role="status" aria-live="polite">Escribe un número de pedido para consultar sus líneas originales.</p>
+        </div>
+        <div id="orderLookupResults" class="order-lookup-results"></div>
+      </section>
 
       <section id="reviewWorkspace" class="review-workspace hidden" role="tabpanel" aria-labelledby="reviewTab">
         <header class="review-intro">
@@ -431,6 +451,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261021-selected-result-v1"></script>
+  <script type="module" src="./app.js?v=20261026-order-lookup-v1"></script>
 </body>
 </html>
