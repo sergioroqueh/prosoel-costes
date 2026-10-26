@@ -1,6 +1,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./config.js";
-import { readProsoelXlsx } from "./order_import.js?v=20261026-offer-v1";
+import { readProsoelXlsx } from "./order_import.js?v=20261026-recovery-v1";
+import { initHistoricalOfferBackfill } from "./historical_offer_backfill.js?v=20261026-v1";
 import { initOrderLookup } from "./order_lookup.js?v=20261026-v3";
 import { initProjectLookup } from "./project_lookup.js?v=20261026-v2";
 import { classifyOriginalLine } from "./line_classification.js?v=20261026-v1";
@@ -524,6 +525,7 @@ logoutButton.addEventListener("click", async () => {
   resultCount.textContent = "";
   detailPanel.innerHTML = '<div class="empty-state">Selecciona un material para ver precios, compras y trazabilidad.</div>';
   orderLookup.reset();
+  historicalOfferBackfill.reset();
   showLogin();
 });
 
@@ -2629,6 +2631,9 @@ resetFiltersButton.addEventListener("click", () => {
 });
 moreResultsButton.addEventListener("click", () => runSearch({ append: true }));
 
+const historicalOfferBackfill = initHistoricalOfferBackfill({
+  client: supabase, escapeHtml, isAdmin: () => currentUserRole === "admin"
+});
 const projectLookup = initProjectLookup({ client: supabase, money, number, displayDiscount, escapeHtml, classifyOriginalLine });
 const orderLookup = initOrderLookup({ client: supabase, money, number, displayDiscount, escapeHtml, projectLookup, classifyOriginalLine });
 
