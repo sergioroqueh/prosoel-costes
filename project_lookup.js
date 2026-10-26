@@ -31,7 +31,7 @@ export async function findMatchingProjects(client, value) {
 
 export async function fetchProjectOrders(client, projectId, offset, pageSize = PROJECT_PAGE_SIZE) {
   const response = await client.from("orders")
-    .select("id,order_reference,order_year,order_number,order_subnumber,order_date,declared_total,source_filename,order_identity_status,suppliers(name)", { count: "exact" })
+    .select("id,order_reference,order_year,order_number,order_subnumber,order_date,declared_total,supplier_offer_reference,source_filename,order_identity_status,suppliers(name)", { count: "exact" })
     .eq("project_id", projectId)
     .order("order_date", { ascending: false, nullsFirst: false })
     .order("id", { ascending: false })
@@ -107,7 +107,10 @@ export function initProjectLookup({ client, money, number, displayDiscount, esca
       ? '<span class="order-project-conflict">Revisar identidad</span>' : "";
     return '<article class="order-project-card" data-project-order="' + escapeHtml(id) + '">' +
       '<div class="order-project-card-top"><div><span class="order-lookup-kicker">Pedido</span>' +
-      '<h3>' + escapeHtml(orderLabel(order)) + '</h3></div>' +
+      '<div class="order-heading-with-offer"><h3>' + escapeHtml(orderLabel(order)) + '</h3>' +
+      (order.supplier_offer_reference
+        ? '<span class="order-offer-label"><strong>Oferta:</strong> ' + escapeHtml(order.supplier_offer_reference) + '</span>'
+        : '') + '</div></div>' +
       '<span class="order-project-date">' + escapeHtml(dateLabel(order.order_date)) + '</span></div>' +
       '<div class="order-project-meta">' +
       '<span><strong>Proveedor:</strong> ' + escapeHtml(supplierName(order.suppliers)) + '</span>' +

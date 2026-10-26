@@ -18,7 +18,7 @@ export function parseOrderReference(raw) {
 // Conservar cada registro por separado, incluso cuando el numero se repite.
 export async function fetchOrdersByReference(client, parsed) {
   const ordersResponse = await client.from("orders")
-    .select("id,order_reference,order_year,order_number,order_subnumber,order_date,order_identity_status,validation_status,declared_total,source_filename,suppliers(name),projects(name)")
+    .select("id,order_reference,order_year,order_number,order_subnumber,order_date,order_identity_status,validation_status,declared_total,supplier_offer_reference,source_filename,suppliers(name),projects(name)")
     .eq("order_year", parsed.year)
     .eq("order_number", parsed.orderNumber)
     .order("id", { ascending: true })
@@ -108,7 +108,10 @@ export function initOrderLookup({ client, money, number, displayDiscount, escape
       const supplier = relationName(order.suppliers, "Proveedor sin identificar");
       const project = relationName(order.projects, "Obra sin identificar");
       html.push('<article class="order-lookup-card"><div class="order-lookup-card-head"><div>');
-      html.push('<div class="order-lookup-kicker">Pedido original</div><h3>' + escapeHtml(label) + '</h3>');
+      html.push('<div class="order-lookup-kicker">Pedido original</div><div class="order-heading-with-offer"><h3>' + escapeHtml(label) + '</h3>' +
+        (order.supplier_offer_reference
+          ? '<span class="order-offer-label"><strong>Oferta:</strong> ' + escapeHtml(order.supplier_offer_reference) + '</span>'
+          : '') + '</div>');
       html.push('</div><span class="order-lookup-linecount">' + order.lines.length +
         (order.lines.length === 1 ? " línea" : " líneas") + '</span></div>');
       html.push('<div class="order-lookup-facts">');

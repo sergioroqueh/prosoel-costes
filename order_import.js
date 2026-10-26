@@ -2,6 +2,8 @@
 // Soporta la hoja HOJA PEDIDO y las plantillas 2024 de doble descuento.
 // Sin dependencias externas: ZIP/Deflate-raw del navegador + DOMParser + WebCrypto.
 
+import { extractSupplierOfferReference } from "./offer_reference.js?v=20261026-v1";
+
 const MB = 1024 * 1024;
 const decoder = new TextDecoder("utf-8");
 const validSheet = "HOJA PEDIDO";
@@ -274,6 +276,7 @@ export async function readProsoelXlsx(file){
   const worksheetYear=(referenceRow.label||"").match(/([0-9]{2})\s*\//);
   const prefix=worksheetYear?worksheetYear[1]:null;
   const reference=internalNumber?(prefix?prefix+"/"+internalNumber:internalNumber):null;
+  const offer=extractSupplierOfferReference(ws,header.row);
   const order_date=excelDate(labelValue(ws,"FECHA:").value,ws.date1904);
   if(!order_date)throw new Error("No se ha podido leer la fecha de pedido en la hoja.");
   const year=Number(order_date.slice(0,4));
@@ -302,6 +305,8 @@ export async function readProsoelXlsx(file){
     supplier_contact:get("CONTACTO:"),supplier_email:get("MAIL CONTACTO:"),
     project:get("REFERENCIA AUX OBRA","REFERENCIA OBRA"),
     project_address:get("DIRECCIÓN MATERIAL"),project_contact:get("PERSONA CONTACTO"),
+    supplier_offer_reference:offer?.reference||null,
+    supplier_offer_label:offer?.sourceLabel||null,
     declared_total:declared===null?null:String(declared),
     unit_header:header.unit_header,template_variant:header.variant,
     internal_order_reference:reference,validation_status:totalStatus,
