@@ -1,6 +1,6 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./config.js";
-import { readProsoelXlsx } from "./order_import.js?v=20261008-v9";
+import { readProsoelXlsx } from "./order_import.js?v=20261026-offer-v1";
 import { initOrderLookup } from "./order_lookup.js?v=20261026-v3";
 import { initProjectLookup } from "./project_lookup.js?v=20261026-v2";
 import { classifyOriginalLine } from "./line_classification.js?v=20261026-v1";
@@ -2434,6 +2434,7 @@ function showImportPreview({payload,warnings,computedTotal}, blocker=null) {
     ["Pedido",String(payload.order_year).slice(-2)+"/"+payload.order_number+(payload.order_subnumber?"."+payload.order_subnumber:"")],
     ["Fecha",payload.order_date||"—"],
     ["Proveedor",payload.supplier],
+    ...(payload.supplier_offer_reference?[["Oferta proveedor",payload.supplier_offer_reference]]:[]),
     ["Obra",payload.project||"No indicada"],
     ["Líneas",String(payload.lines.length)],
     ["Importe del pedido",money(payload.declared_total)],
