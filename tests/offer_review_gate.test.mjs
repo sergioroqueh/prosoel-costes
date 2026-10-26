@@ -27,7 +27,7 @@ const candidate=[
 
 test("códigos sospechosos no se guardan automáticamente",()=>{
   const {offerRequiresManualReview}=withDependencies(candidate);
-  for(const code of candidate.slice(1,5))
+  for(const code of [...candidate.slice(1,5),"24-000641_Rev."])
     assert.ok(offerRequiresManualReview(code),code);
 });
 
