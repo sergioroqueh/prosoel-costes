@@ -29,7 +29,7 @@ const FAMILIES = [
     /\b(?:LUMINARIA|DOWNLIGHT|PROYECTOR LED|PANEL LED|TIRA LED|BOMBILLA|LAMPARA|APLIQUE|FOCO LED|DRIVER LED|BALIZA LED|PANTALLA ESTANCA|PLAFON|EMERGENCIA LED|BLOQUE AUTONOMO DE EMERGENCIA)\b/,
   ]],
   ["Mecanismos y tomas", [
-    /\b(?:PLACA CIEGA|PLACA SIMON|TECLA(?: DOBLE)?|CONMUTADOR|PULSADOR|BASE DE (?:CORRIENTE|ENCHUFE)|TOMA DE (?:CORRIENTE|ENCHUFE)|MECANISMO(?:S)?|ENCHUFE|INTERRUPTOR DE PERSIANA|MARCO (?:DE )?EMPOTRAR|MARCO (?:DE )?[1-9] (?:ELEMENTOS?|MODULOS?))\b/,
+    /\b(?:PLACA CIEGA|PLACA SIMON|TECLA(?: DOBLE)?|CONMUTADOR|PULSADOR|BASE DE (?:CORRIENTE|ENCHUFE)|TOMA DE (?:CORRIENTE|ENCHUFE)|MECANISMO(?:S)?|ENCHUFE|INTERRUPTOR DE PERSIANA|MARCO (?:SIMON|NILOE|PLEXO)|MARCO (?:DE )?EMPOTRAR|MARCO (?:DE )?[1-9] (?:ELEMENTOS?|MODULOS?))\b/,
   ]],
   ["Canalizaciones y tubos", [
     /\b(?:TUBO(?:S)?|TUBERIA|BANDEJA(?:S)?(?: PORTACABLES)?|CANALETA(?:S)?|CANALIZACION(?:ES)?|TUBODIX|RACOR|MANGUITO (?:DE )?(?:PVC|TUBO|UNION)|CURVA AISCAN)\b/,
@@ -43,7 +43,7 @@ const FAMILIES = [
 ];
 
 const POSSIBLE_SERVICE =
-  /\b(?:MANO DE OBRA|DESPLAZAMIENTO|MONTAJE|DESMONTAJE|INSTALACION|REPARACION|MANTENIMIENTO|REVISION|CERTIFICACION|CONFIGURACION|PROGRAMACION|ALQUILER|TRABAJOS? DE|PUESTA EN MARCHA|EJECUCION DE OBRA|SERVICIO (?:DE|TECNICO))\b/;
+  /\b(?:MANO DE OBRA|DESPLAZAMIENTO|MONTAJE|DESMONTAJE|INSTALACION|REPARACION|MANTENIMIENTO|REVISION|CERTIFICACION|CONFIGURACION|PROGRAMACION|ALQUILER|TRABAJOS? DE|PUESTA EN MARCHA|EJECUCION DE OBRA|SERVICIO (?:DE|TECNICO)|MANIPULACION|AJUSTE (?:DE|DEL)|MEDICIONES? (?:DE|PARA))\b/;
 
 const POSSIBLE_FEE =
   /\b(?:RAEE|ECOTASA|CANON AMBIENTAL|TASA MEDIOAMBIENTAL|PORTES?|GASTOS DE ENVIO|GASTOS (?:DE )?TRANSPORTE|COSTE DE TRANSPORTE|COSTE DE ENVIO)\b/;
@@ -87,6 +87,15 @@ export function classifyOriginalLine(line) {
       reason: "Posible servicio, porte o ecotasa: comprobación necesaria", suggested: true };
   }
 
+  // RJ45 define la función principal de un conector de datos;
+  // "conector" no debe provocar ambigüedad entre telecom y bornas.
+  if (/\bRJ[\s-]*45\b/.test(description) && /\b(?:CONECTOR|TOMA|BASE|HEMBRA|MACHO|LATIGUILLO)\b/.test(description)) {
+    return { kind: "material", kindLabel: originalKind === "material" ? "Material" : "Material probable",
+      familyLabel: "Telecomunicaciones y datos",
+      confidence: originalKind === "material" ? "registrada" : "alta",
+      reason: "Propuesta automática: conexión RJ45; pendiente de confirmación",
+      suggested: originalKind !== "material" };
+  }
   const matches = FAMILIES.filter(([, patterns]) =>
     patterns.some((pattern) => pattern.test(description))).map(([name]) => name);
   if (matches.length === 1) {
