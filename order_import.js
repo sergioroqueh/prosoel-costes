@@ -2,7 +2,7 @@
 // Soporta la hoja HOJA PEDIDO y las plantillas 2024 de doble descuento.
 // Sin dependencias externas: ZIP/Deflate-raw del navegador + DOMParser + WebCrypto.
 
-import { extractSupplierOfferReference } from "./offer_reference.js?v=20261026-observations-v2";
+import { extractSupplierOfferReference } from "./offer_reference.js?v=20261026-observations-v3";
 
 const MB = 1024 * 1024;
 const decoder = new TextDecoder("utf-8");

@@ -29,7 +29,11 @@ export function cleanOfferReference(value) {
 export function extractOfferFromObservations(value) {
   if (typeof value !== "string" || !value.trim()) return null;
   const text = value.replace(/\u00a0/g, " ").replace(/[ \t]+/g, " ");
-  const identifier = "([A-Z0-9][A-Z0-9._/-]{0,119})";
+  // Algunos proveedores usan prefijo separado: «A 44120» (TODO EXTINTOR).
+  // Se admite prefijo alfabético CORTO + espacio + código con dígitos.
+  // Nunca se permite un segundo término libre tras un número, para no
+  // capturar instrucciones como «5100012 ENTREGAR».
+  const identifier = "((?:[A-Z]{1,4}[ \\t]+[0-9][A-Z0-9._/-]{0,100})|(?:[A-Z0-9][A-Z0-9._/-]{0,119}))";
   const number = "(?:N[º°o.]?|N[ÚU]M(?:ERO)?\\.?|NRO\\.?|REF(?:ERENCIA)?\\.?)";
   const patterns = [
     new RegExp("(?:PEDIDO\\s+)?SEG[UÚ]N\\s+(?:LA\\s+)?OFERTA\\s*(?:"+number+"\\s*)?[:#-]?\\s*"+identifier,"gi"),
