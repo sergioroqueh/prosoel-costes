@@ -124,6 +124,14 @@ export function initOrderLookup({ client, money, number, displayDiscount, escape
       if (!order.lines.length) {
         html.push('<p class="order-lookup-empty">Pedido registrado sin líneas consultables.</p>');
       } else {
+        if (classifyOriginalLine) {
+          const proposed = order.lines.map((line) => classifyOriginalLine(line));
+          const materials = proposed.filter((item) => item.kind === "material").length;
+          const pending = proposed.filter((item) =>
+            item.kind === "pending" || item.kind === "service_candidate").length;
+          html.push('<p class="order-lookup-classification-summary">Propuestas: ' + materials +
+            ' materiales · ' + pending + ' pendientes de revisión</p>');
+        }
         html.push('<div class="order-lookup-table-scroll"><table class="order-lookup-table"><thead><tr>' +
           '<th>Nº</th><th>Referencia</th><th>Descripción original</th><th>Cantidad</th>' +
           '<th>PVP/u</th><th>Descuento</th><th>Neto/u</th><th>Total</th><th>Clasificación sugerida</th><th>Familia</th>' +
