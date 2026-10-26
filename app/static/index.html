@@ -8,7 +8,7 @@
   <title>PROSOEL Costes</title>
   <meta name="theme-color" content="#134079">
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/prosoel-mark.svg?v=20261009-v17">
-  <link rel="stylesheet" href="./styles.css?v=20261026-projects-v1">
+  <link rel="stylesheet" href="./styles.css?v=20261026-classification-v1">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -237,6 +237,7 @@
           </form>
           <p id="orderLookupStatus" class="order-lookup-status" role="status" aria-live="polite">Escribe un número de pedido o el nombre de una obra.</p>
         </div>
+        <p class="order-lookup-classification-legend"><strong>Clasificación sugerida:</strong> «Material probable» y su familia se deducen automáticamente de la descripción. «Pendiente de revisión» significa que no hay evidencia suficiente o que puede ser un servicio. Los tipos ya identificados como portes, RAEE o servicios se respetan. Es una ayuda visual: no modifica el tipo original guardado ni los precios.</p>
         <div id="orderLookupResults" class="order-lookup-results"></div>
         <div id="orderLookupFooter" class="results-footer hidden"><button id="orderLookupMoreButton" type="button" class="more-results-button">Mostrar 20 más</button></div>
       </section>
@@ -452,6 +453,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261026-projects-v1"></script>
+  <script type="module" src="./app.js?v=20261026-classification-v1"></script>
 </body>
 </html>
