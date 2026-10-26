@@ -3,6 +3,17 @@
 // Solo se envían registros metadato de oferta tras confirmación del administrador.
 import {zipIndex, readSupplierOfferFromXlsxBytes} from "./order_import.js?v=20261026-recovery-v3";
 
+// Un archivo auténtico no garantiza que una oferta extraída esté completa.
+export function offerRequiresManualReview(reference) {
+  const value=String(reference??"").trim();
+  const significant=value.replace(/[^A-Za-z0-9]/g,"");
+  if(significant.length<3)return "Código demasiado corto para aprobación automática";
+  if(/[._/-]$/.test(value))return "Código terminado en separador; podría estar incompleto";
+  if(/[-_/](?:REV|REVISI[ÓO]N)$/i.test(value))
+    return "Referencia termina en REV sin número de revisión; confirmar con el Excel";
+  return null;
+}
+
 export function normalizedSourceName(value) {
   return String(value??"").replaceAll("\\","/").split("/").at(-1).normalize("NFC").trim().toLocaleLowerCase("es");
 }
@@ -45,7 +56,7 @@ export async function fetchOriginalOrderIndex(client) {
 export async function scanOriginalArchives(files,index,onProgress) {
   const all=[...files];
   if(all.length<1||all.length>4)throw new Error("Selecciona entre 1 y 4 archivos ZIP de pedidos.");
-  const result={processed:0,hashVerified:0,offers:[],incidents:[],unrecognized:[],noOffer:0,
+  const result={processed:0,hashVerified:0,offers:[],incidents:[],unrecognized:[],suspicious:[],noOffer:0,
     unmatched:0,already:0,nonXlsx:0,totalXlsx:0,failed:0};
   const identifiedOrders=new Set();
   for(const file of all) {
@@ -113,6 +124,18 @@ export async function scanOriginalArchives(files,index,onProgress) {
           if(String(found.supplier_offer_reference).trim()!==offer.reference) {
             result.incidents.push({name,reason:"La oferta del histórico difiere de la oferta leída en Excel"});
           }
+          continue;
+        }
+        const doubt=offerRequiresManualReview(offer.reference);
+        if(doubt) {
+          result.suspicious.push({
+            order_reference:found.order_reference||"Pedido ID "+found.id,
+            supplier_offer_reference:offer.reference,
+            supplier_offer_label:offer.sourceLabel,
+            source_filename:found.source_filename,
+            source_sha256:digest,
+            reason:doubt,
+          });
           continue;
         }
         result.offers.push({
@@ -193,6 +216,7 @@ export function initHistoricalOfferBackfill({client,escapeHtml,isAdmin}) {
         ["Excel examinados",result.processed],
         ["Huella SHA-256 verificada",result.hashVerified],
         ["Ofertas nuevas verificadas",result.offers.length],
+        ["Ofertas dudosas para revisar",result.suspicious.length],
         ["Sin oferta detectada (revisar)",result.noOffer],
         ["Excel no correspondientes al histórico",result.unmatched],
         ["Ofertas ya registradas",result.already],
@@ -266,6 +290,10 @@ export function initHistoricalOfferBackfill({client,escapeHtml,isAdmin}) {
     for(const x of lastReport.offers){
       lines.push(["Verificada",x.order_reference,x.supplier_offer_reference,
         x.supplier_offer_label,x.source_filename,x.source_sha256,""]);
+    }
+    for(const x of lastReport.suspicious){
+      lines.push(["Revisar oferta",x.order_reference,x.supplier_offer_reference,
+        x.supplier_offer_label,x.source_filename,x.source_sha256,x.reason]);
     }
     for(const x of lastReport.unrecognized){
       lines.push(["Oferta no detectada",x.order_reference,"","",x.source_filename,x.source_sha256,
