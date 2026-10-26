@@ -68,6 +68,20 @@ test("separar oferta verificada, sin oferta, ya existente y nombres erróneos",a
  assert.ok(r.incidents.some(x=>x.reason.includes("nombre")));
 });
 
+test("mismo nombre pero SHA diferente se informa y jamás se propone para escritura",async()=>{
+ const alteredArchive=()=>({
+   names:()=>["otra/ruta/Pedido 4.xlsx"],
+   open:async()=>Uint8Array.of(99,8,7,6)
+ });
+ const different=moduleWith(alteredArchive,readOffer,crypto);
+ const index=await different.fetchOriginalOrderIndex(makeClient());
+ const result=await different.scanOriginalArchives([file],index,()=>{});
+ assert.equal(result.offers.length,0);
+ assert.equal(result.unmatched,1);
+ assert.ok(result.incidents.some(x=>x.reason.includes("SHA-256 es distinto")));
+ assert.ok(result.incidents.some(x=>x.reason.includes("24/4")));
+});
+
 test("no acepta ZIP no válido ni lotes mayores del límite",async()=>{
  const index=await subject.fetchOriginalOrderIndex(makeClient());
  await assert.rejects(subject.scanOriginalArchives([],index,()=>{}),/Selecciona/);
