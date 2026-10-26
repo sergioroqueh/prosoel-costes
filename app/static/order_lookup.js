@@ -61,7 +61,7 @@ export async function fetchOrdersByReference(client, parsed) {
   return orders.map((order) => ({ ...order, lines: byOrder.get(String(order.id)) || [] }));
 }
 
-export function initOrderLookup({ client, money, number, displayDiscount, escapeHtml, projectLookup = null }) {
+export function initOrderLookup({ client, money, number, displayDiscount, escapeHtml, projectLookup = null, classifyOriginalLine = null }) {
   const form = document.getElementById("orderLookupForm");
   const input = document.getElementById("orderLookupInput");
   const button = document.getElementById("orderLookupButton");
@@ -126,9 +126,13 @@ export function initOrderLookup({ client, money, number, displayDiscount, escape
       } else {
         html.push('<div class="order-lookup-table-scroll"><table class="order-lookup-table"><thead><tr>' +
           '<th>Nº</th><th>Referencia</th><th>Descripción original</th><th>Cantidad</th>' +
-          '<th>PVP/u</th><th>Descuento</th><th>Neto/u</th><th>Total</th><th>Clasificación</th>' +
+          '<th>PVP/u</th><th>Descuento</th><th>Neto/u</th><th>Total</th><th>Clasificación sugerida</th><th>Familia</th>' +
           '</tr></thead><tbody>');
         for (const line of order.lines) {
+          const classification = classifyOriginalLine ? classifyOriginalLine(line) : {
+            kindLabel: displayLineKind(line.line_kind), familyLabel: "—",
+            reason: "Clasificación registrada en el pedido",
+          };
           html.push('<tr><td>' + escapeHtml(line.line_number ?? "—") +
             '</td><td>' + escapeHtml(line.supplier_reference || "—") +
             '</td><td class="order-lookup-description">' + escapeHtml(line.description_original || "—") +
@@ -137,7 +141,9 @@ export function initOrderLookup({ client, money, number, displayDiscount, escape
             '</td><td>' + escapeHtml(displayDiscount(line.discount_raw)) +
             '</td><td>' + escapeHtml(money(line.net_unit_price)) +
             '</td><td>' + escapeHtml(money(line.total_price)) +
-            '</td><td>' + escapeHtml(displayLineKind(line.line_kind)) + '</td></tr>');
+            '</td><td class="order-line-kind" title="' + escapeHtml(classification.reason) +
+            '">' + escapeHtml(classification.kindLabel) +
+            '</td><td>' + escapeHtml(classification.familyLabel) + '</td></tr>');
         }
         html.push('</tbody></table></div>');
       }
