@@ -1,7 +1,7 @@
 // Número de oferta del proveedor: lectura estricta desde cabecera de pedido.
 // No se infiere de nombres de archivo, número del pedido ni descripciones.
 function fold(value) {
-  return String(value ?? "").normalize("NFKD")
+  return String(value ?? "").replace(/[º°]/g, "").normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[º°]/g, "")
     .replace(/[^A-Za-z0-9]+/g, " ")
