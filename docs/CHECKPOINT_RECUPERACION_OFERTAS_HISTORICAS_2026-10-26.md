@@ -15,6 +15,7 @@ Los originales de la carga inicial se habían recibido en una conversación de 0
   - Solo tras el match se extrae \`Nº OFERTA\` o \`REFERENCIA OFERTA\` de la cabecera \`HOJA PEDIDO\`.
   - Separa ofertas verificadas, Excel sin oferta explícita, existentes, hash ajeno, nombre distinto, archivo ilegible.
   - Vista previa con hasta 50 ofertas; nunca se suben ZIP/XLSX.
+  - Botón Descargar auditoría completa (CSV), incluyendo todas las ofertas propuestas y las incidencias; celdas protegidas frente a fórmulas peligrosas.
   - Casilla de aprobación humana; sin casilla no hay cambios.
   - RPC de escritura en lotes de 50; solo campos de metadatos, sin precios ni materiales.
 - \`app/static/order_import.js\` exporta el índice ZIP y el lector de oferta de cabecera, sin modificar la importación habitual.
@@ -28,7 +29,7 @@ Los originales de la carga inicial se habían recibido en una conversación de 0
 - Vista actual \`order_lookup.js\` y \`project_lookup.js\` ya muestran oferta únicamente si en BD aparece no nula, por el trabajo de la ronda anterior.
 
 ## Comprobaciones
-- 17/17 verificaciones JavaScript de un escenario sintético en motor JS: índice, 5 archivos (hash coincidente/ajeno, sin oferta, ya existente, nombre cambiado), no escritura durante previsualización, bloqueo sin confirmación, RPC tras aprobación, exclusión de cualquier campo de precio.
+- 17/17 verificaciones JavaScript iniciales y 15/15 verificaciones de regresión de un escenario sintético en motor JS: índice, 5 archivos (hash coincidente/ajeno, sin oferta, ya existente, nombre cambiado), no escritura durante previsualización, bloqueo sin confirmación, RPC tras aprobación, exclusión de cualquier campo de precio.
 - SQL migration ensayo BEGIN/ROLLBACK PASS, aplicación en Supabase PASS.
 - Negativa SQL: \`public.apply_verified_order_offers('[]')\` sin JWT devuelve 42501 «Solo administradores autorizados», PASS.
 - Contrato DB: 2.915 pedidos y 11.729 líneas, 0 ofertas históricas, 0 auditorías registradas en ese momento. RLS activado; cliente autenticado no tiene INSERT en tabla de auditoría.
