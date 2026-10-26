@@ -1,1 +1,0 @@
-"""Aplicación web PROSOEL Costes."""

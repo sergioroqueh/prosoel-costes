@@ -1,1 +1,0 @@
-"""Normalización de materiales PROSOEL."""

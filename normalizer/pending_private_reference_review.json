@@ -1,8 +1,0 @@
-{
-  "version": 1,
-  "policy": {
-    "auto_apply": false,
-    "note": "No hay referencias bloqueantes pendientes en la auditoría actual. Los detalles no demostrables públicamente permanecen como variantes locales o incidencias no bloqueantes; no se inventan equivalencias."
-  },
-  "entries": []
-}
