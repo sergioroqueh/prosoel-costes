@@ -130,6 +130,12 @@ export function initProjectLookup({ client, money, number, displayDiscount, esca
   }
   function renderLines(lines) {
     if (!lines.length) return '<div class="order-lookup-empty">Pedido sin líneas consultables.</div>';
+    const proposedCounts = lines.reduce((acc, line) => {
+      const kind = classify(line).kindLabel;
+      if (kind === "Material probable" || kind === "Material") acc.material++;
+      else if (kind === "Pendiente de revisión" || kind === "Posible servicio") acc.pending++;
+      return acc;
+    }, { material: 0, pending: 0 });
     const body = lines.map((line) => {
       const classification = classify(line);
       return '<tr><td>' + escapeHtml(line.line_number ?? "—") +
@@ -144,7 +150,9 @@ export function initProjectLookup({ client, money, number, displayDiscount, esca
       '">' + escapeHtml(classification.kindLabel) +
       '</td><td>' + escapeHtml(classification.familyLabel) + '</td></tr>';
     }).join("");
-    return '<p class="order-project-linecount">' + lines.length +
+    return '<p class="order-lookup-classification-summary">Propuestas: ' + proposedCounts.material +
+      ' materiales · ' + proposedCounts.pending + ' pendientes de revisión</p>' +
+      '<p class="order-project-linecount">' + lines.length +
       (lines.length === 1 ? " línea original" : " líneas originales") + '</p>' +
       '<div class="order-lookup-table-scroll"><table class="order-lookup-table">' +
       '<thead><tr><th>Nº</th><th>Referencia</th><th>Descripción original</th><th>Cantidad</th>' +
