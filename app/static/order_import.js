@@ -11,7 +11,7 @@ const validSheet = "HOJA PEDIDO";
 function little16(view, offset) { return view.getUint16(offset,true); }
 function little32(view, offset) { return view.getUint32(offset,true); }
 
-function zipIndex(buffer) {
+export function zipIndex(buffer) {
   const view = new DataView(buffer);
   const bytes = new Uint8Array(buffer);
   let eocd = -1;
@@ -77,7 +77,7 @@ function zipIndex(buffer) {
     if (inflated.length!==item.original) throw new Error("Tamaño ZIP descomprimido distinto del esperado.");
     return inflated;
   }
-  return {has:(name)=>result.has(name),open};
+  return {has:(name)=>result.has(name),open,names:()=>[...result.keys()]};
 }
 
 function xmlRoot(source) {
@@ -232,6 +232,17 @@ function classifyLine(reference,description){
   if(/^REPARACION\b|^SANEADO DE\b|\bCONFIGURACION\b/.test(d))return {
     kind:"service_candidate",confidence:0.80,reasons:["Descripción compatible con servicio, requiere revisión"],review:"pending"};
   return {kind:"unknown",confidence:0,reasons:[],review:"pending"};
+}
+
+// Lectura limitada a la cabecera, para cotejar ofertas históricas verificadas.
+export async function readSupplierOfferFromXlsxBytes(bytes) {
+  const buffer = bytes instanceof Uint8Array
+    ? bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+    : bytes;
+  const zip = zipIndex(buffer);
+  const cells = await readOrderCells(zip);
+  const header = findHeader(cells);
+  return extractSupplierOfferReference(cells, header.row);
 }
 
 export async function readProsoelXlsx(file){
