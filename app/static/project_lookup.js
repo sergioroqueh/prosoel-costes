@@ -58,7 +58,7 @@ export async function fetchOriginalOrderLines(client, orderId) {
   return rows;
 }
 
-export function initProjectLookup({ client, money, number, displayDiscount, escapeHtml }) {
+export function initProjectLookup({ client, money, number, displayDiscount, escapeHtml, classifyOriginalLine = null }) {
   const status = document.getElementById("orderLookupStatus");
   const results = document.getElementById("orderLookupResults");
   const footer = document.getElementById("orderLookupFooter");
@@ -122,9 +122,17 @@ export function initProjectLookup({ client, money, number, displayDiscount, esca
       '" class="order-project-details" data-order-details="' + escapeHtml(id) +
       '" hidden></div></article>';
   }
+  function classify(line) {
+    return classifyOriginalLine ? classifyOriginalLine(line) : {
+      kindLabel: labelLineKind(line.line_kind), familyLabel: "—",
+      reason: "Clasificación registrada en el pedido",
+    };
+  }
   function renderLines(lines) {
     if (!lines.length) return '<div class="order-lookup-empty">Pedido sin líneas consultables.</div>';
-    const body = lines.map((line) => '<tr><td>' + escapeHtml(line.line_number ?? "—") +
+    const body = lines.map((line) => {
+      const classification = classify(line);
+      return '<tr><td>' + escapeHtml(line.line_number ?? "—") +
       '</td><td>' + escapeHtml(line.supplier_reference || "—") +
       '</td><td class="order-lookup-description">' + escapeHtml(line.description_original || "—") +
       '</td><td>' + escapeHtml(number(line.quantity, 4)) +
@@ -132,12 +140,15 @@ export function initProjectLookup({ client, money, number, displayDiscount, esca
       '</td><td>' + escapeHtml(displayDiscount(line.discount_raw)) +
       '</td><td>' + escapeHtml(money(line.net_unit_price)) +
       '</td><td>' + escapeHtml(money(line.total_price)) +
-      '</td><td>' + escapeHtml(labelLineKind(line.line_kind)) + '</td></tr>').join("");
+      '</td><td class="order-line-kind" title="' + escapeHtml(classification.reason) +
+      '">' + escapeHtml(classification.kindLabel) +
+      '</td><td>' + escapeHtml(classification.familyLabel) + '</td></tr>';
+    }).join("");
     return '<p class="order-project-linecount">' + lines.length +
       (lines.length === 1 ? " línea original" : " líneas originales") + '</p>' +
       '<div class="order-lookup-table-scroll"><table class="order-lookup-table">' +
       '<thead><tr><th>Nº</th><th>Referencia</th><th>Descripción original</th><th>Cantidad</th>' +
-      '<th>PVP/u</th><th>Descuento</th><th>Neto/u</th><th>Total</th><th>Clasificación</th>' +
+      '<th>PVP/u</th><th>Descuento</th><th>Neto/u</th><th>Total</th><th>Clasificación sugerida</th><th>Familia</th>' +
       '</tr></thead><tbody>' + body + '</tbody></table></div>';
   }
   function cancel() {
