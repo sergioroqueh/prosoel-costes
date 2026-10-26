@@ -8,7 +8,7 @@
   <title>PROSOEL Costes</title>
   <meta name="theme-color" content="#134079">
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/prosoel-mark.svg?v=20261009-v17">
-  <link rel="stylesheet" href="./styles.css?v=20261021-selected-result-v1">
+  <link rel="stylesheet" href="./styles.css?v=20261026-projects-v1">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -224,20 +224,21 @@
 
       <section id="orderLookupWorkspace" class="order-lookup-workspace hidden" role="tabpanel" aria-labelledby="orderLookupTab">
         <div class="order-lookup-search-card">
-          <h2>Consultar un pedido</h2>
-          <p>Busca por número de pedido y consulta exactamente qué se compró, sin alterar el histórico.</p>
+          <h2>Buscar pedido u obra</h2>
+          <p>Consulta un pedido concreto o busca todos los pedidos de una obra, ordenados desde el más reciente.</p>
           <form id="orderLookupForm" class="order-lookup-form">
-            <label for="orderLookupInput">Referencia del pedido</label>
+            <label for="orderLookupInput">Número de pedido o nombre de obra</label>
             <div class="search-row">
-              <input id="orderLookupInput" type="search" placeholder="Ej.: 26/775" autocomplete="off" inputmode="text"
+              <input id="orderLookupInput" type="search" placeholder="Ej.: 26/819 o LYMA" autocomplete="off" inputmode="text"
                      maxlength="48" aria-describedby="orderLookupHelp">
-              <button id="orderLookupButton" type="submit">Buscar pedido</button>
+              <button id="orderLookupButton" type="submit">Buscar</button>
             </div>
-            <p id="orderLookupHelp" class="hint">Formatos válidos: 26/775, 2026/775, 26-775 y 26/775.1 (subpedido).</p>
+            <p id="orderLookupHelp" class="hint">Ejemplos: 26/819, 2026/819, 26-819, 26/819.1 o LYMA. Las obras con nombres parecidos se seleccionan por separado.</p>
           </form>
-          <p id="orderLookupStatus" class="order-lookup-status" role="status" aria-live="polite">Escribe un número de pedido para consultar sus líneas originales.</p>
+          <p id="orderLookupStatus" class="order-lookup-status" role="status" aria-live="polite">Escribe un número de pedido o el nombre de una obra.</p>
         </div>
         <div id="orderLookupResults" class="order-lookup-results"></div>
+        <div id="orderLookupFooter" class="results-footer hidden"><button id="orderLookupMoreButton" type="button" class="more-results-button">Mostrar 20 más</button></div>
       </section>
 
       <section id="reviewWorkspace" class="review-workspace hidden" role="tabpanel" aria-labelledby="reviewTab">
@@ -451,6 +452,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261026-order-lookup-v1"></script>
+  <script type="module" src="./app.js?v=20261026-projects-v1"></script>
 </body>
 </html>

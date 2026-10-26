@@ -2075,3 +2075,27 @@ button, input, select, textarea { accent-color: var(--prosoel-blue); }
   .order-lookup-form .search-row button { min-height:43px; }
   .order-lookup-facts { grid-template-columns:1fr; }
 }
+
+/* Busqueda de pedidos por obra: opciones separadas y listado desplegable. */
+.order-project-chooser { background:#fff; border:1px solid var(--prosoel-border); border-radius:12px; padding:17px; min-width:0; }
+.order-project-chooser-title { color:var(--prosoel-muted); font-weight:700; font-size:13px; margin-bottom:12px; }
+.order-project-options { display:flex; flex-wrap:wrap; gap:8px; max-height:180px; overflow-y:auto; }
+.order-project-option { border:1px solid #bfd1e4; background:#f6f9fd; color:var(--prosoel-blue); padding:9px 12px; border-radius:9px; font-size:13px; font-weight:700; cursor:pointer; }
+.order-project-option:hover,.order-project-option:focus-visible { border-color:var(--prosoel-blue); outline-offset:2px; }
+.order-project-option.is-selected { background:var(--prosoel-blue); border-color:var(--prosoel-blue); color:#fff; }
+.order-project-list { display:grid; gap:11px; min-width:0; }
+.order-project-card { background:#fff; border:1px solid var(--prosoel-border); border-radius:12px; padding:16px 18px; box-shadow:0 2px 8px rgba(16,34,61,.04); min-width:0; }
+.order-project-card-top { display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; align-items:start; }
+.order-project-card h3 { color:var(--prosoel-blue); font-size:19px; margin:3px 0 0; }
+.order-project-date { font-size:13px; color:var(--prosoel-muted); font-weight:700; }
+.order-project-meta { display:flex; flex-wrap:wrap; gap:8px 22px; margin:12px 0 8px; font-size:13px; color:#314861; }
+.order-project-source { color:#60738a; font-size:12px; margin:8px 0 12px; overflow-wrap:anywhere; }
+.order-project-conflict { color:#96552b; font-weight:700; }
+.order-project-expand { background:#eaf1f9; color:var(--prosoel-blue); border:1px solid #ceddea; border-radius:8px; font-weight:750; font-size:12px; cursor:pointer; padding:9px 12px; }
+.order-project-expand:hover { background:#dfeaf6; }
+.order-project-expand:disabled { opacity:.55; cursor:wait; }
+.order-project-details { margin-top:14px; }
+.order-project-details[hidden] { display:none!important; }
+.order-project-linecount { font-size:12px; font-weight:700; color:var(--prosoel-muted); margin:0 0 8px; }
+#orderLookupFooter { margin-top:0; justify-content:center; }
+@media(max-width:600px) { .order-project-card { padding:13px; } .order-project-chooser { padding:13px; } }
