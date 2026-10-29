@@ -1,6 +1,9 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./config.js";
 import { readProsoelXlsx } from "./order_import.js?v=20261008-v9";
+import { initOrderLookup } from "./order_lookup.js?v=20261030-v1";
+import { initProjectLookup } from "./project_lookup.js?v=20261030-v1";
+import { mountPriceTimeline, PRICE_SERIES_COLORS } from "./price_comparison_chart.js?v=20261030-v1";
 
 const supabase = createClient(
   SUPABASE_URL,
@@ -77,6 +80,8 @@ const resetFiltersButton = document.getElementById("resetFiltersButton");
 const moreResultsButton = document.getElementById("moreResultsButton");
 const resultsFooter = document.getElementById("resultsFooter");
 const costsTab = document.getElementById("costsTab");
+const orderLookupTab = document.getElementById("orderLookupTab");
+const orderLookupWorkspace = document.getElementById("orderLookupWorkspace");
 const reviewTab = document.getElementById("reviewTab");
 const costsWorkspace = document.getElementById("costsWorkspace");
 const reviewWorkspace = document.getElementById("reviewWorkspace");
@@ -1091,63 +1096,6 @@ function comparisonOutliers(rows) {
     .map((row) => row.order_line_id));
 }
 
-function makePriceTimeline(rows, outliers) {
-  const plotted = rows.filter((row) => validComparisonPrice(row) && row.order_date
-    && Number.isFinite(Date.parse(row.order_date + "T00:00:00Z")));
-  if (!plotted.length) {
-    return '<p class="comparison-note">No hay precios validados y fechados suficientes para representar la evolución.</p>';
-  }
-  const width = 690, height = 252, left = 67, right = 19, top = 24, bottom = 42;
-  const t = (row) => Date.parse(row.order_date + "T00:00:00Z");
-  const times = plotted.map(t);
-  const amounts = plotted.map((row) => Number(row.net_unit_price));
-  const from = Math.min(...times), to = Math.max(...times);
-  const low = Math.max(0, Math.min(...amounts) * 0.88);
-  const high = Math.max(...amounts) * 1.10;
-  const yMax = Math.max(high, low + 0.01);
-  const x = (row) => from === to ? (left + width - right) / 2
-    : left + ((t(row) - from) / (to - from)) * (width - left - right);
-  const y = (row) => height - bottom - ((Number(row.net_unit_price) - low)
-    / (yMax - low)) * (height - top - bottom);
-  const palette = ["#244d80", "#29816f", "#865db9", "#c0782b", "#3483ad", "#ab5b79", "#687e38"];
-  const suppliersInOrder = [...new Set(plotted.map((row) => row.supplier || "Sin proveedor"))].sort((a,b) => a.localeCompare(b,"es"));
-  const providers = suppliersInOrder.map((name,index) => ({ name, color: palette[index % palette.length] }));
-  const lines = [];
-  lines.push('<svg viewBox="0 0 ' + width + ' ' + height + '" class="price-timeline" role="img" aria-label="Evolución histórica del precio neto unitario según fecha y proveedor">');
-  lines.push('<title>Evolución de precios netos por proveedor</title>');
-  for (let i = 0; i < 4; i++) {
-    const v = low + (yMax - low) * (i / 3);
-    const yy = height - bottom - ((v - low) / (yMax - low)) * (height - top - bottom);
-    lines.push('<line x1="' + left + '" y1="' + yy + '" x2="' + (width-right) + '" y2="' + yy + '" stroke="#e3e9f0" stroke-width="1"/>');
-    lines.push('<text x="' + (left-7) + '" y="' + (yy+4) + '" text-anchor="end" font-size="11" fill="#536173">' + escapeHtml(number(v,2)) + '</text>');
-  }
-  const dateLabel = (stamp) => new Intl.DateTimeFormat("es-ES",{month:"2-digit",year:"2-digit",timeZone:"UTC"}).format(new Date(stamp));
-  lines.push('<text x="' + left + '" y="' + (height-12) + '" font-size="11" fill="#536173">' + escapeHtml(dateLabel(from)) + '</text>');
-  lines.push('<text x="' + (width-right) + '" y="' + (height-12) + '" text-anchor="end" font-size="11" fill="#536173">' + escapeHtml(dateLabel(to)) + '</text>');
-  lines.push('<text x="' + left + '" y="13" font-size="11" fill="#536173">Neto €/ud</text>');
-  for (const provider of providers) {
-    const entries = plotted.filter((row) => (row.supplier || "Sin proveedor") === provider.name)
-      .sort((a,b) => t(a) - t(b) || Number(a.order_id) - Number(b.order_id));
-    if (entries.length > 1) {
-      lines.push('<polyline fill="none" stroke="' + provider.color + '" stroke-width="2" stroke-opacity=".75" points="'
-        + entries.map((row) => x(row).toFixed(2) + "," + y(row).toFixed(2)).join(" ") + '"/>');
-    }
-    for (const row of entries) {
-      const unusual = outliers.has(row.order_line_id);
-      lines.push('<circle cx="' + x(row).toFixed(2) + '" cy="' + y(row).toFixed(2)
-        + '" r="' + (unusual ? 5.5 : 4) + '" fill="' + (unusual ? "#b45309" : provider.color)
-        + '" stroke="#fff" stroke-width="1.5"><title>'
-        + escapeHtml(provider.name + " · " + row.order_date + " · " + money(row.net_unit_price)
-          + " · Pedido " + orderLabel(row) + (unusual ? " · Posible precio atípico" : ""))
-        + '</title></circle>');
-    }
-  }
-  lines.push('</svg>');
-  lines.push('<div class="comparison-legend">' + providers.map((provider, index) =>
-    '<span><i class="legend-color-' + (index % palette.length) + '"></i>' + escapeHtml(provider.name) + '</span>'
-  ).join("") + '</div>');
-  return lines.join("");
-}
 
 function renderReferenceComparison(container, reference, rows) {
   if (!rows.length) {
@@ -1172,11 +1120,15 @@ function renderReferenceComparison(container, reference, rows) {
       purchases: new Set(selected.map((row) => row.order_id)).size };
   }).sort((a,b) => String(b.latest?.order_date||"").localeCompare(String(a.latest?.order_date||""))
     || a.name.localeCompare(b.name,"es"));
+
   const html = [];
-  html.push('<section class="comparison-panel">');
+  html.push('<section class="comparison-panel comparison-panel-premium">');
+  html.push('<div class="comparison-hero"><div class="comparison-hero-icon" aria-hidden="true">'+
+    '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 18V10M12 18V5M19 18V8"/></svg></div><div class="comparison-hero-copy">');
   html.push('<h3>Comparativa histórica por código: ' + escapeHtml(reference) + '</h3>');
   html.push('<p class="comparison-note">Coincidencia de <strong>referencia de compra</strong> en ' +
-    numberOfOrders + ' pedidos y ' + groups.length + ' proveedores. Son precios anteriores, no ofertas vigentes. La coincidencia del código no prueba equivalencia técnica.</p>');
+    numberOfOrders + ' pedidos y ' + groups.length + ' proveedores. Son precios anteriores, no ofertas vigentes. La coincidencia del código no prueba equivalencia técnica.</p></div>');
+  html.push('<span class="comparison-data-pill"><span aria-hidden="true">●</span> DATOS HISTÓRICOS</span></div>');
   if (descCount > 1) {
     html.push('<p class="comparison-warning">Hay ' + descCount + ' descripciones originales distintas para este código. Revisa el modelo y las características antes de comparar.</p>');
   }
@@ -1186,20 +1138,24 @@ function renderReferenceComparison(container, reference, rows) {
   if (outliers.size) {
     html.push('<p class="comparison-warning">' + outliers.size + ' precios potencialmente atípicos (más del 220 % o menos del 45 % de la mediana). Se incluyen, señalados en el gráfico; requieren revisión.</p>');
   }
+  html.push('<section class="comparison-supplier-card" aria-label="Proveedores coincidentes">');
+  html.push('<h4 class="comparison-mini-title"><span class="comparison-mini-icon" aria-hidden="true">▦</span>Proveedores coincidentes</h4>');
   html.push('<div class="comparison-table-wrap"><table class="comparison-table"><thead><tr><th>Proveedor</th><th>Pedidos</th><th>Último neto</th><th>Última fecha</th><th>Mediana</th><th>Rango</th></tr></thead><tbody>');
-  for (const g of groups) {
-    html.push('<tr><td><strong>' + escapeHtml(g.name) + '</strong></td><td>' + g.purchases + '</td><td>' +
-      money(g.latest?.net_unit_price) + '</td><td>' + escapeHtml(g.latest?.order_date || "—")
-      + '</td><td>' + money(g.summary.median) + '</td><td>' +
-      (g.summary.min === null ? "—" : money(g.summary.min) + " – " + money(g.summary.max))
-      + '</td></tr>');
-  }
-  html.push('</tbody></table></div>');
-  html.push('<h4>Evolución de precios de compra</h4>');
-  html.push(makePriceTimeline(rows,outliers));
-  html.push('<p class="comparison-note">Cada punto corresponde a una línea de compra validada aritméticamente. Un precio diferente puede deberse a cantidad, descuento, fecha o condiciones comerciales.</p>');
+  groups.forEach((g,i) => {
+    html.push('<tr><td><span class="comparison-supplier-name"><span class="comparison-series-dot" style="background:'+
+      PRICE_SERIES_COLORS[i%PRICE_SERIES_COLORS.length]+'"></span><strong>'+escapeHtml(g.name)+
+      '</strong></span></td><td>' + g.purchases + '</td><td class="comparison-latest-price">' +
+      money(g.latest?.net_unit_price) + '</td><td>' + escapeHtml(g.latest?.order_date || "—") +
+      '</td><td>' + money(g.summary.median) + '</td><td>' +
+      (g.summary.min === null ? "—" : money(g.summary.min) + " – " + money(g.summary.max)) + '</td></tr>');
+  });
+  html.push('</tbody></table></div></section>');
+  html.push('<div class="comparison-chart-mount" data-price-chart></div>');
   html.push('</section>');
   container.innerHTML = html.join("");
+  mountPriceTimeline(container.querySelector("[data-price-chart]"),rows,outliers,{
+    money,number,validComparisonPrice,orderLabel,supplierOrder:groups.map(g=>g.name)
+  });
 }
 
 async function showReferenceComparison(reference, detailRequestId) {
@@ -1365,18 +1321,23 @@ const reviewRiskLabels = {
 function activateWorkspace(which) {
   const reviewing = which === "review";
   const importing = which === "import" && currentUserRole === "admin";
-  const costs = !reviewing && !importing;
+  const lookingUpOrder = which === "orders";
+  const costs = !reviewing && !importing && !lookingUpOrder;
   costsWorkspace.classList.toggle("hidden", !costs);
+  orderLookupWorkspace.classList.toggle("hidden", !lookingUpOrder);
   reviewWorkspace.classList.toggle("hidden", !reviewing);
   importWorkspace.classList.toggle("hidden", !importing);
   costsTab.classList.toggle("is-active", costs);
+  orderLookupTab.classList.toggle("is-active", lookingUpOrder);
   reviewTab.classList.toggle("is-active", reviewing);
   importTab.classList.toggle("is-active", importing);
   costsTab.setAttribute("aria-selected", String(costs));
+  orderLookupTab.setAttribute("aria-selected", String(lookingUpOrder));
   reviewTab.setAttribute("aria-selected", String(reviewing));
   importTab.setAttribute("aria-selected", String(importing));
   if (reviewing && !reviewLoaded) runReviewSearch();
   if (importing && !importAuditLoaded) loadImportDashboard();
+  if (lookingUpOrder) orderLookup.focus();
 }
 
 function renderReviewResults() {
@@ -2280,6 +2241,7 @@ purchaseEditDialog.addEventListener("close",()=>{
 });
 
 costsTab.addEventListener("click", () => activateWorkspace("costs"));
+orderLookupTab.addEventListener("click", () => activateWorkspace("orders"));
 reviewTab.addEventListener("click", () => activateWorkspace("review"));
 importTab.addEventListener("click", () => activateWorkspace("import"));
 reviewMoreButton.addEventListener("click", () => runReviewSearch({ append: true }));
@@ -2680,5 +2642,13 @@ resetFiltersButton.addEventListener("click", () => {
   }
 });
 moreResultsButton.addEventListener("click", () => runSearch({ append: true }));
+
+// Módulos originales de consulta, en solo lectura.
+const projectLookup = initProjectLookup({
+  client:supabase, money, number, displayDiscount, escapeHtml
+});
+const orderLookup = initOrderLookup({
+  client:supabase, money, number, displayDiscount, escapeHtml, projectLookup
+});
 
 bootstrapSession();

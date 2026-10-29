@@ -8,7 +8,7 @@
   <title>PROSOEL Costes</title>
   <meta name="theme-color" content="#134079">
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/prosoel-mark.svg?v=20261009-v17">
-  <link rel="stylesheet" href="./styles.css?v=20261029-header-v2">
+  <link rel="stylesheet" href="./styles.css?v=20261030-charts-orders-v1">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -96,6 +96,8 @@
       <nav class="workspace-tabs" role="tablist" aria-label="Secciones de PROSOEL Costes">
         <button type="button" class="workspace-tab is-active" id="costsTab" role="tab"
                 aria-selected="true" aria-controls="costsWorkspace">Consultar precios</button>
+        <button type="button" class="workspace-tab" id="orderLookupTab" role="tab"
+                aria-selected="false" aria-controls="orderLookupWorkspace">Buscar pedido</button>
         <button type="button" class="workspace-tab" id="reviewTab" role="tab"
                 aria-selected="false" aria-controls="reviewWorkspace">Normalización <span class="tab-pending">Revisión</span></button>
         <button type="button" class="workspace-tab hidden" id="importTab" role="tab"
@@ -248,6 +250,26 @@
         </aside>
       </section>
       </div>
+
+      <section id="orderLookupWorkspace" class="order-lookup-workspace hidden" role="tabpanel" aria-labelledby="orderLookupTab">
+        <div class="order-lookup-search-card">
+          <h2>Buscar pedido u obra</h2>
+          <p>Consulta un pedido concreto o busca todos los pedidos de una obra, ordenados desde el más reciente.</p>
+          <form id="orderLookupForm" class="order-lookup-form">
+            <label for="orderLookupInput">Número de pedido o nombre de obra</label>
+            <div class="search-row">
+              <input id="orderLookupInput" type="search" placeholder="Ej.: 26/819 o LYMA" autocomplete="off" inputmode="text"
+                     maxlength="48" aria-describedby="orderLookupHelp">
+              <button id="orderLookupButton" type="submit">Buscar</button>
+            </div>
+            <p id="orderLookupHelp" class="hint">Ejemplos: 26/819, 2026/819, 26-819, 26/819.1 o LYMA. Las obras con nombres parecidos se seleccionan por separado.</p>
+          </form>
+          <p id="orderLookupStatus" class="order-lookup-status" role="status" aria-live="polite">Escribe un número de pedido o el nombre de una obra.</p>
+        </div>
+        <p class="order-lookup-classification-legend">Consulta de solo lectura. Se muestran las líneas originales del pedido y sus importes, sin alterar precios ni consolidar referencias.</p>
+        <div id="orderLookupResults" class="order-lookup-results"></div>
+        <div id="orderLookupFooter" class="results-footer hidden"><button id="orderLookupMoreButton" type="button" class="more-results-button">Mostrar 20 más</button></div>
+      </section>
 
       <section id="reviewWorkspace" class="review-workspace hidden" role="tabpanel" aria-labelledby="reviewTab">
         <header class="review-intro">
@@ -460,6 +482,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261029-header-v2"></script>
+  <script type="module" src="./app.js?v=20261030-charts-orders-v1"></script>
 </body>
 </html>
