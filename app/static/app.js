@@ -153,6 +153,9 @@ let purchaseLinesInBulk = null;
 let purchaseCandidateInEditor = null;
 let purchaseEditIsSaving = false;
 let currentUserRole = "user";
+// Personalización de navegación limitada a la cuenta concreta de Israel.
+// No reemplaza las políticas RLS ni altera el rol real del usuario.
+let isIsraelAccount = false;
 let currentImport = null;
 let importSelectionGeneration = 0;
 let importAuditGeneration = 0;
@@ -435,6 +438,9 @@ function showLogin(message = "") {
 }
 
 function showApp(user) {
+  isIsraelAccount = String(user?.email || "").trim().toLowerCase() === "israel@prosoel.es";
+  reviewTab.classList.toggle("hidden", isIsraelAccount);
+  if (isIsraelAccount) activateWorkspace("costs");
   authView.hidden = true;
   appView.hidden = false;
   authView.classList.add("hidden");
@@ -1319,7 +1325,8 @@ const reviewRiskLabels = {
 };
 
 function activateWorkspace(which) {
-  const reviewing = which === "review";
+  // Israel no ve ni puede abrir la vista de Normalización desde la navegación.
+  const reviewing = which === "review" && !isIsraelAccount;
   const importing = which === "import" && currentUserRole === "admin";
   const lookingUpOrder = which === "orders";
   const costs = !reviewing && !importing && !lookingUpOrder;
