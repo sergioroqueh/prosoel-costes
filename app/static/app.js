@@ -234,30 +234,94 @@ function selectSupplier(option) {
   }
 }
 
+// Solo se prioriza la presentación; cada filtro mantiene su proveedor real.
+// El histórico completo sigue accesible por búsqueda escrita.
+const PREFERRED_SUPPLIER_GROUPS = [
+  { name: "Rias", aliases: ["rias"] },
+  { name: "Jarama", aliases: ["jarama"] },
+  { name: "Cadielsa", aliases: ["cadielsa"] },
+  { name: "Guarconsa", aliases: ["guarconsa"] },
+  { name: "Cablecel", aliases: ["cablecel", "cable cel"] },
+  { name: "Saltoki", aliases: ["saltoki"] },
+  { name: "Fanduct", aliases: ["fanduct", "fanduc"] },
+  { name: "Fanair", aliases: ["fanair"] },
+  { name: "Komtes", aliases: ["komtes"] },
+  { name: "Reluz", aliases: ["reluz"] },
+  { name: "Ferreteria Palacios", aliases: ["ferreteria palacios", "palacios"] },
+  { name: "Solarbloc", aliases: ["solarbloc"] },
+];
+
+function supplierNameParts(value) {
+  const spaced = normalizeSupplierName(value).replace(/[^a-z0-9]+/g, " ").trim();
+  return { spaced, compact: spaced.replace(/\s+/g, "") };
+}
+
+function supplierHasAlias(name, aliases) {
+  const parts = supplierNameParts(name);
+  return aliases.some((alias) => {
+    const term = supplierNameParts(alias);
+    return (" " + parts.spaced + " ").includes(" " + term.spaced + " ") ||
+      (term.compact.length >= 6 && parts.compact.includes(term.compact));
+  });
+}
+
+function getPreferredSuppliers() {
+  const preferred = [];
+  const selected = new Set();
+  PREFERRED_SUPPLIER_GROUPS.forEach((group) => {
+    const options = suppliers.filter((entry) =>
+      !selected.has(entry.id) && supplierHasAlias(entry.name, group.aliases));
+    options.sort((a, b) => {
+      const reference = normalizeSupplierName(group.name);
+      const rank = (entry) => {
+        const name = normalizeSupplierName(entry.name);
+        return name === reference ? 0 : name.startsWith(reference) ? 1 : 2;
+      };
+      return rank(a) - rank(b) || a.name.localeCompare(b.name, "es");
+    });
+    if (options.length) {
+      selected.add(options[0].id);
+      preferred.push({ id: options[0].id, name: options[0].name });
+    }
+  });
+  return preferred;
+}
+
+function getMatchingSuppliers(query) {
+  const wanted = supplierNameParts(query);
+  return suppliers.filter((entry) => {
+    const name = normalizeSupplierName(entry.name);
+    const parts = supplierNameParts(entry.name);
+    return name.includes(query) || parts.compact.includes(wanted.compact) ||
+      (wanted.compact.startsWith("fanduct") && parts.compact.includes("fanduc"));
+  }).sort((a, b) => {
+    const rank = (name) => {
+      const value = normalizeSupplierName(name);
+      if (value.startsWith(query)) return 0;
+      if (value.split(/\s+/).some((word) => word.startsWith(query))) return 1;
+      return 2;
+    };
+    return rank(a.name) - rank(b.name) || a.name.localeCompare(b.name, "es");
+  });
+}
+
 function showSupplierSuggestions() {
   if (supplierFilter.disabled) return;
   const query = normalizeSupplierName(supplierFilter.value);
-  const matches = suppliers
-    .filter((entry) => normalizeSupplierName(entry.name).includes(query))
-    .sort((a, b) => {
-      // Coincidencias al inicio del nombre, luego al inicio de cualquier palabra.
-      // Por ejemplo, "RI" prioriza RIBÓ y GRUPO RIAS frente a "ingeniería".
-      const rank = (name) => {
-        const value = normalizeSupplierName(name);
-        if (!query || value.startsWith(query)) return 0;
-        if (value.split(/\s+/).some((word) => word.startsWith(query))) return 1;
-        return 2;
-      };
-      return rank(a.name) - rank(b.name) || a.name.localeCompare(b.name, "es");
-    })
-    .slice(0, 12);
-
+  const matches = query ? getMatchingSuppliers(query) : getPreferredSuppliers();
+  const shown = query ? matches.slice(0, 12) : matches;
   supplierCandidates = query
-    ? matches.map((entry) => ({ id: entry.id, name: entry.name }))
-    : [{ id: null, name: "Todos los proveedores" }, ...matches.map((entry) => ({ id: entry.id, name: entry.name }))];
+    ? shown.map((entry) => ({ id: entry.id, name: entry.name }))
+    : [{ id: null, name: "Todos los proveedores" }, ...shown];
 
   supplierSuggestions.replaceChildren();
   supplierCandidates.forEach((candidate, index) => {
+    if (!query && index === 1) {
+      const heading = document.createElement("div");
+      heading.className = "supplier-section-label";
+      heading.textContent = "PROVEEDORES HABITUALES";
+      supplierSuggestions.appendChild(heading);
+    }
     const button = document.createElement("button");
     button.id = "supplier-choice-" + index;
     button.type = "button";
@@ -274,6 +338,15 @@ function showSupplierSuggestions() {
     note.textContent = "No hay proveedores que coincidan. Prueba con otras letras.";
     supplierSuggestions.appendChild(note);
   }
+  const help = document.createElement("div");
+  help.className = "supplier-menu-help";
+  help.textContent = query
+    ? (matches.length > shown.length
+      ? "Mostrando los primeros 12. Escribe más letras para precisar."
+      : "Se buscan también proveedores fuera de la lista habitual.")
+    : "¿Buscas otro proveedor? Escribe su nombre para consultar todo el histórico.";
+  supplierSuggestions.appendChild(help);
+  supplierSuggestions.scrollTop = 0;
   highlightedSupplierIndex = -1;
   supplierFilter.removeAttribute("aria-activedescendant");
   supplierSuggestions.classList.remove("hidden");
