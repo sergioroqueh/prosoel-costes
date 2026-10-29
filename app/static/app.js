@@ -626,26 +626,26 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 });
 
 async function loadCounter() {
+  const lastNode = document.getElementById("lastOrderNumber");
+  const nextNode = document.getElementById("nextOrderNumber");
+  const gapNode = document.getElementById("orderGapCount");
   const year = new Date().getFullYear();
 
-  const { data, error } = await supabase.rpc("order_counter", {
-    p_year: year,
-  });
-
+  const { data, error } = await supabase.rpc("order_counter", { p_year: year });
   if (error || !data || !data.length) {
-    orderCounter.querySelector("strong").textContent = "Contador no disponible";
+    lastNode.textContent = "—";
+    nextNode.textContent = "—";
+    gapNode.textContent = "—";
+    orderCounter.title = "No se pudo cargar el contador de pedidos.";
     return;
   }
 
   const row = data[0];
   const yy = String(year).slice(-2);
-  const last = row.last_registered === null ? "—" : yy + "/" + row.last_registered;
-  const next = row.next_expected === null ? "—" : yy + "/" + row.next_expected;
-
-  orderCounter.querySelector("strong").textContent =
-    "Último: " + last +
-    " · Siguiente: " + next +
-    " · Avisos anotados: " + (row.pending_gaps ?? 0);
+  lastNode.textContent = row.last_registered === null ? "—" : yy + "/" + row.last_registered;
+  nextNode.textContent = row.next_expected === null ? "—" : yy + "/" + row.next_expected;
+  gapNode.textContent = String(row.pending_gaps ?? 0);
+  // Un aviso solo indica una incidencia anotada manualmente; no todos los huecos.
   orderCounter.title = "Avisos anotados manualmente sobre la secuencia; no equivale a todos los números ausentes. Consulta el Control de importaciones.";
 }
 
@@ -805,7 +805,6 @@ function renderResults(rows, total) {
         metaParts.push("En el pedido: " + row.title);
     }
     if (row.manufacturer) metaParts.push(row.manufacturer);
-    metaParts.push(row.kind === "material" ? "Material consolidado" : "Compra histórica · sin ficha unificada");
     if (row.last_supplier) metaParts.push("Último: " + row.last_supplier);
     meta.textContent = metaParts.join(" · ");
 
@@ -926,7 +925,6 @@ function renderMaterialDetail(detail, rows) {
     )
   );
   html.push("</div></div>");
-  html.push('<span class="status-badge ok">Consolidado</span>');
   html.push("</div>");
 
   html.push('<div class="stats-grid">');
@@ -1021,7 +1019,6 @@ function renderHistoricalDetail(result, rows) {
   html.push('<div class="detail-subtitle">' +
     escapeHtml(result.descriptive_name ? "Referencia original del almacén" : (result.reference || "Sin referencia")) +
     "</div></div>");
-  html.push('<span class="status-badge pending">Identidad técnica sin verificar</span>');
   html.push("</div>");
 
   html.push('<div class="stats-grid">');
@@ -1041,7 +1038,6 @@ function renderHistoricalDetail(result, rows) {
   if (result.descriptive_name) {
     html.push('<div class="historical-name-profile"><strong>Descripción de ayuda / búsqueda</strong>');
     html.push('<p>' + escapeHtml(result.descriptive_name) + '</p>');
-    html.push('<p>Es información adicional para localizar y comprender el material; no cambia la referencia ni acredita por sí sola la configuración exacta.</p>');
     html.push('<p><strong>Texto del pedido:</strong> ' + escapeHtml(result.title) + '</p>');
     if (result.descriptive_source_url && /^https:\/\//i.test(result.descriptive_source_url)) {
       html.push('<p><a href="' + escapeHtml(result.descriptive_source_url) +
@@ -1049,14 +1045,10 @@ function renderHistoricalDetail(result, rows) {
     }
     html.push('</div>');
   }
-  html.push('<div class="price-origin">');
-  html.push('<div class="price-origin-title">Histórico trazable</div>');
-  html.push("<p>Precio de compra histórico, con proveedor y fecha verificables en el pedido. La identidad del producto aún no se ha validado para agruparlo con otras referencias; esto no invalida su precio.</p>");
-  html.push("</div>");
 
   if (result.reference) {
     html.push('<div class="compare-entry">');
-    html.push('<div><strong>Comparativa por referencia de compra</strong><p>Busca este mismo código en todos los proveedores. No implica equivalencia técnica certificada.</p></div>');
+    html.push('<div><strong>Comparativa por referencia de compra</strong><p>Consulta las compras registradas con este código en distintos proveedores.</p></div>');
     html.push('<button class="action-button" id="compareReferenceButton" type="button">Comparar proveedores y evolución</button>');
     html.push('</div>');
     html.push('<div id="referenceComparison" aria-live="polite"></div>');
