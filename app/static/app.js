@@ -1120,11 +1120,15 @@ function renderReferenceComparison(container, reference, rows) {
       purchases: new Set(selected.map((row) => row.order_id)).size };
   }).sort((a,b) => String(b.latest?.order_date||"").localeCompare(String(a.latest?.order_date||""))
     || a.name.localeCompare(b.name,"es"));
+
   const html = [];
-  html.push('<section class="comparison-panel">');
+  html.push('<section class="comparison-panel comparison-panel-premium">');
+  html.push('<div class="comparison-hero"><div class="comparison-hero-icon" aria-hidden="true">'+
+    '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 18V10M12 18V5M19 18V8"/></svg></div><div class="comparison-hero-copy">');
   html.push('<h3>Comparativa histórica por código: ' + escapeHtml(reference) + '</h3>');
   html.push('<p class="comparison-note">Coincidencia de <strong>referencia de compra</strong> en ' +
-    numberOfOrders + ' pedidos y ' + groups.length + ' proveedores. Son precios anteriores, no ofertas vigentes. La coincidencia del código no prueba equivalencia técnica.</p>');
+    numberOfOrders + ' pedidos y ' + groups.length + ' proveedores. Son precios anteriores, no ofertas vigentes. La coincidencia del código no prueba equivalencia técnica.</p></div>');
+  html.push('<span class="comparison-data-pill"><span aria-hidden="true">●</span> DATOS HISTÓRICOS</span></div>');
   if (descCount > 1) {
     html.push('<p class="comparison-warning">Hay ' + descCount + ' descripciones originales distintas para este código. Revisa el modelo y las características antes de comparar.</p>');
   }
@@ -1134,20 +1138,24 @@ function renderReferenceComparison(container, reference, rows) {
   if (outliers.size) {
     html.push('<p class="comparison-warning">' + outliers.size + ' precios potencialmente atípicos (más del 220 % o menos del 45 % de la mediana). Se incluyen, señalados en el gráfico; requieren revisión.</p>');
   }
+  html.push('<section class="comparison-supplier-card" aria-label="Proveedores coincidentes">');
+  html.push('<h4 class="comparison-mini-title"><span class="comparison-mini-icon" aria-hidden="true">▦</span>Proveedores coincidentes</h4>');
   html.push('<div class="comparison-table-wrap"><table class="comparison-table"><thead><tr><th>Proveedor</th><th>Pedidos</th><th>Último neto</th><th>Última fecha</th><th>Mediana</th><th>Rango</th></tr></thead><tbody>');
-  for (const g of groups) {
-    html.push('<tr><td><strong>' + escapeHtml(g.name) + '</strong></td><td>' + g.purchases + '</td><td>' +
-      money(g.latest?.net_unit_price) + '</td><td>' + escapeHtml(g.latest?.order_date || "—")
-      + '</td><td>' + money(g.summary.median) + '</td><td>' +
-      (g.summary.min === null ? "—" : money(g.summary.min) + " – " + money(g.summary.max))
-      + '</td></tr>');
-  }
-  html.push('</tbody></table></div>');
-  html.push('<h4>Evolución de precios de compra</h4>');
-  html.push(makePriceTimeline(rows,outliers));
-  html.push('<p class="comparison-note">Cada punto corresponde a una línea de compra validada aritméticamente. Un precio diferente puede deberse a cantidad, descuento, fecha o condiciones comerciales.</p>');
+  groups.forEach((g,i) => {
+    html.push('<tr><td><span class="comparison-supplier-name"><span class="comparison-series-dot" style="background:'+
+      PRICE_SERIES_COLORS[i%PRICE_SERIES_COLORS.length]+'"></span><strong>'+escapeHtml(g.name)+
+      '</strong></span></td><td>' + g.purchases + '</td><td class="comparison-latest-price">' +
+      money(g.latest?.net_unit_price) + '</td><td>' + escapeHtml(g.latest?.order_date || "—") +
+      '</td><td>' + money(g.summary.median) + '</td><td>' +
+      (g.summary.min === null ? "—" : money(g.summary.min) + " – " + money(g.summary.max)) + '</td></tr>');
+  });
+  html.push('</tbody></table></div></section>');
+  html.push('<div class="comparison-chart-mount" data-price-chart></div>');
   html.push('</section>');
   container.innerHTML = html.join("");
+  mountPriceTimeline(container.querySelector("[data-price-chart]"),rows,outliers,{
+    money,number,validComparisonPrice,orderLabel,supplierOrder:groups.map(g=>g.name)
+  });
 }
 
 async function showReferenceComparison(reference, detailRequestId) {
