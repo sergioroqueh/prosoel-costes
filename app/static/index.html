@@ -8,7 +8,7 @@
   <title>PROSOEL Costes</title>
   <meta name="theme-color" content="#134079">
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/prosoel-mark.svg?v=20261009-v17">
-  <link rel="stylesheet" href="./styles.css?v=20261021-selected-result-v1">
+  <link rel="stylesheet" href="./styles.css?v=20261029-ui-suppliers-v1">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -82,6 +82,13 @@
       </nav>
       <div id="costsWorkspace" role="tabpanel" aria-labelledby="costsTab">
       <section class="search-panel">
+        <div class="search-intro">
+          <div>
+            <span class="search-kicker">CONSULTA DE COSTES</span>
+            <p class="search-subtitle">Busca materiales, compara compras y consulta su procedencia.</p>
+          </div>
+          <span class="search-historic-pill">Histórico de compras</span>
+        </div>
         <label for="searchInput">¿Qué material buscas?</label>
         <div class="search-row">
           <input
@@ -192,6 +199,7 @@
             </select>
           </div>
         </div>
+        <p class="supplier-filter-note">Se muestran primero los proveedores habituales. Escribe para encontrar cualquier otro proveedor.</p>
         <p class="hint">
           Filtra el histórico completo antes de ordenar. Los importes son precios de compra históricos, no ofertas actuales.
         </p>
@@ -431,6 +439,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261021-selected-result-v1"></script>
+  <script type="module" src="./app.js?v=20261029-ui-suppliers-v1"></script>
 </body>
 </html>
