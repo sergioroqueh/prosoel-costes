@@ -8,7 +8,7 @@
   <title>PROSOEL Costes</title>
   <meta name="theme-color" content="#134079">
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/prosoel-mark.svg?v=20261009-v17">
-  <link rel="stylesheet" href="./styles.css?v=20261029-ui-suppliers-v1">
+  <link rel="stylesheet" href="./styles.css?v=20261029-header-v2">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -51,22 +51,43 @@
 
   <div id="appView" class="hidden">
     <header class="topbar">
-      <div class="brand-identity brand-identity-header">
-        <img class="brand-logo" src="./assets/prosoel-mark.svg" alt="" aria-hidden="true" width="54" height="54">
-        <div class="brand-copy">
-          <div class="eyebrow">PROSOEL</div>
-          <h1>Costes y referencias</h1>
+      <div class="topbar-shell">
+        <div class="brand-identity brand-identity-header">
+          <div class="brand-mark-shell">
+            <img class="brand-logo" src="./assets/prosoel-mark.svg" alt="" aria-hidden="true" width="54" height="54">
+          </div>
+          <div class="brand-copy">
+            <div class="eyebrow">PROSOEL <span class="brand-eyebrow-separator" aria-hidden="true">/</span> OFICINA TÉCNICA</div>
+            <h1>Costes <span class="brand-title-accent">&amp;</span> referencias</h1>
+            <p class="header-subtitle">Histórico de compras y materiales</p>
+          </div>
         </div>
-      </div>
 
-      <div class="top-actions">
-        <div class="counter" id="orderCounter">
-          <span class="muted">Pedidos</span>
-          <strong>—</strong>
-        </div>
-        <div class="user-box">
-          <span id="currentUser"></span>
-          <button type="button" class="secondary-button" id="logoutButton">Salir</button>
+        <div class="top-actions">
+          <div class="counter" id="orderCounter" role="group" aria-label="Control de pedidos">
+            <div class="counter-card">
+              <span class="counter-card-label">ÚLTIMO PEDIDO</span>
+              <strong id="lastOrderNumber">—</strong>
+            </div>
+            <div class="counter-card counter-card-next">
+              <span class="counter-card-label">SIGUIENTE</span>
+              <strong id="nextOrderNumber">—</strong>
+            </div>
+            <div class="counter-card counter-card-alerts">
+              <span class="counter-card-label">AVISOS</span>
+              <strong id="orderGapCount">—</strong>
+            </div>
+          </div>
+          <div class="user-box">
+            <span class="user-avatar" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M4.5 20a7.5 7.5 0 0 1 15 0"></path>
+              </svg>
+            </span>
+            <span id="currentUser"></span>
+            <button type="button" class="secondary-button" id="logoutButton">Salir</button>
+          </div>
         </div>
       </div>
     </header>
@@ -439,6 +460,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261029-ui-suppliers-v1"></script>
+  <script type="module" src="./app.js?v=20261029-header-v2"></script>
 </body>
 </html>
