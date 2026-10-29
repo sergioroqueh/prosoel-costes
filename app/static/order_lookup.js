@@ -172,7 +172,7 @@ export function initOrderLookup({ client, money, number, displayDiscount, escape
     projectLookup?.cancel();
     results.replaceChildren();
     if (!parsed) {
-      if (!raw || /^\\d{2,4}\\s*[/-]/.test(raw) || !projectLookup) {
+      if (!raw || /^\d{2,4}\s*[/-]/.test(raw) || !projectLookup) {
         button.disabled = false;
         status.textContent = raw
           ? "Referencia de pedido incompleta. Usa, por ejemplo, 26/775."
