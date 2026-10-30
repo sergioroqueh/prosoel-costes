@@ -2844,3 +2844,9 @@ main { margin-top: 25px; }
 @media(min-width:1100px){.tracking-metrics{grid-template-columns:repeat(5,minmax(0,1fr));}}
 @media(max-width:900px){.tracking-source-list{grid-template-columns:1fr;}}
 @media(max-width:560px){.tracking-view-switch{width:100%;}.tracking-view-button{flex:1;padding:10px 7px;font-size:.76rem;}.tracking-project-group>summary{align-items:flex-start;flex-direction:column;gap:4px;}.tracking-project-cards{padding:0 7px 9px;}}
+
+/* Diagnóstico de solo lectura Google Drive, disponible exclusivamente en la vista privada de Sergio. */
+.tracking-drive-connect-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:15px;}
+.tracking-drive-connect-actions span{font-size:.79rem;color:#546e7c;line-height:1.5;flex:1;}
+.tracking-drive-connect-actions .tracking-refresh{border-color:#91b9cb;color:#12496f;background:#fff;}
+@media(max-width:580px){.tracking-drive-connect-actions{align-items:stretch;flex-direction:column;}.tracking-drive-connect-actions span{flex:auto;}}
