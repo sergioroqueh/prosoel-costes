@@ -186,9 +186,13 @@ export function initTracking({client,escapeHtml}) {
       '<p>'+counts.approved+' libro aprobado · '+counts.candidate+' candidatos · '+counts.review+' por revisar · '+counts.excluded+' carpetas apartadas</p>'+
       '<div class="tracking-sync-note '+(scheduled?"tracking-sync-on":"")+'">'+
       (scheduled?"Sincronización automática configurada cada ":"Sincronización horaria prevista (" )+
-      escapeHtml(syncSettings?.requested_interval_minutes??60)+' minutos'+(scheduled?'.':'), pendiente de autorizar la conexión permanente de Google.')+
+      escapeHtml(syncSettings?.requested_interval_minutes??60)+' minutos'+
+      (scheduled?'.':syncSettings?.auth_setup==="validated"?
+        '), Google autorizado; activación pendiente de validar el XLSX y sus diferencias.':
+        '), pendiente de autorizar Google.')+
       '</div><div class="tracking-drive-connect-actions">'+
       '<button type="button" class="tracking-refresh" id="trackingCheckGoogle" aria-label="Comprobar acceso de solo lectura a Google Drive">Comprobar conexión a Drive</button>'+
+      '<button type="button" class="tracking-refresh" id="trackingPreviewGoogle" aria-label="Comparar cambios sin modificar pedidos">Comparar con Drive (prueba)</button>'+
       '<span id="trackingGoogleResult" role="status" aria-live="polite">No se ha comprobado la conexión técnica.</span>'+
       '</div></section>';
     const items=[...catalog].sort((a,b)=>{
@@ -325,6 +329,40 @@ export function initTracking({client,escapeHtml}) {
       result.textContent=states[data?.state]||String(data?.message||"No se completó la comprobación.");
     } catch {
       result.textContent="Error de conexión con el verificador. No se ha modificado ningún archivo.";
+    } finally {button.disabled=false;}
+  });
+  list.addEventListener("click",async event=>{
+    const button=event.target.closest("#trackingPreviewGoogle");
+    if(!button)return;
+    const result=list.querySelector("#trackingGoogleResult");
+    if(!result)return;
+    button.disabled=true;
+    result.textContent="Leyendo el XLSX original y comparando materiales…";
+    try {
+      const {data,error}=await client.functions.invoke("drive-sync-preview",{body:{mode:"dry_run"}});
+      if(error) {
+        let details;
+        try {details=await error.context?.json?.();}catch {}
+        const label=String(details?.reason||details?.message||"No se ha podido completar la lectura.").slice(0,160);
+        result.textContent="Comparación no disponible: "+label+" No se ha modificado ningún pedido.";
+        return;
+      }
+      if(data?.summary && data?.diff?.counts){
+        const c=data.diff.counts, n=data.summary;
+        const totalChanges=Object.values(c).reduce((a,b)=>a+Number(b||0),0);
+        result.textContent=
+          "Drive: "+n.orders+" pedidos / "+n.lines+" materiales; "+
+          n.completed+" completos, "+n.partial+" parciales, "+
+          n.received+" líneas recibidas. "+
+          "Diferencias detectadas: "+totalChanges+
+          (data.pilot_baseline_matched?" · Totales del piloto verificados.":" · Revisar los totales del piloto.")+
+          (data.diff.requires_review?" · Revisión estructural necesaria.":"")+
+          " No se ha aplicado ningún cambio.";
+      } else {
+        result.textContent=String(data?.message||"La comparación requiere revisión.");
+      }
+    } catch {
+      result.textContent="No se pudo comparar. No se ha modificado ningún dato.";
     } finally {button.disabled=false;}
   });
   search.addEventListener("input",render);
