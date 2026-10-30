@@ -130,7 +130,7 @@ export function readPedidosXlsx(buffer){
     const lineSi=read(row,"M").toUpperCase()==="SI" || mergedSi.get(row)===true;
     const green=getIsGreen(rowMap.get(row)?.get("H"));
     const line={source_row:row,reference:normalizeRef(read(row,"G")),
-      description,requested_qty:qty,albaran:read(row,"J"),
+      description,requested_qty:qty,albaran:normalizeRef(read(row,"J")),
       observations:read(row,"K"),
       source_green:green,source_si:lineSi,drive_line_finalized:green&&lineSi};
     current.lines.push(line);
@@ -165,7 +165,7 @@ export function compareSource(orders,existingOrders,existingLines){
   }
   const counters={new_orders:0,removed_orders:0,new_lines:0,
     missing_lines:0,row_moved:0,changed_status:0,changed_quantity:0,
-    changed_reference:0,changed_observations:0};
+    changed_reference:0,changed_observations:0,changed_albarans:0};
   const examples=[];
   const seen=new Set();
   for(const order of orders){
@@ -194,10 +194,11 @@ export function compareSource(orders,existingOrders,existingLines){
       if(Boolean(prev.drive_line_finalized)!==n.drive_line_finalized)counters.changed_status++;
       if(Number(prev.requested_qty)!==n.requested_qty)counters.changed_quantity++;
       if(String(prev.observations||"")!==n.observations)counters.changed_observations++;
+      if(String(prev.albaran||"")!==n.albaran)counters.changed_albarans++;
     }
   }
   for(const known of existingOrders)if(!seen.has(known.order_reference))counters.removed_orders++;
   return {counts:counters,examples,requires_review:
     counters.row_moved>0||counters.missing_lines>0||counters.changed_reference>0||
-    counters.removed_orders>0};
+    counters.removed_orders>0||counters.changed_albarans>20};
 }
