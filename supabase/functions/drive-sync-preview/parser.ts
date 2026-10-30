@@ -110,7 +110,7 @@ export function readPedidosXlsx(buffer){
   for(const row of allRows){
     if(row<3)continue;
     const id=read(row,"A");
-    if(/^\d{2}\/\d{1,5}$/.test(id)) {
+    if(/^\d{2}\/\d{1,5}(?:-[A-Za-z0-9]+)?$/.test(id)) {
       const date=dateOrNull(rowMap.get(row)?.get("B"),strings);
       if(!date)fail("missing_order_date_"+row);
       current={source_row:row,order_reference:id,order_date:date,
