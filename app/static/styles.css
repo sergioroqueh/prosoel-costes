@@ -2723,3 +2723,77 @@ main { margin-top: 25px; }
 @media(prefers-reduced-motion:reduce) {
   .price-point, .price-period, .price-legend-chip { transition: none; }
 }
+
+
+/* Seguimiento privado de pedidos — superficies industriales, sin alterar el resto de PROSOEL. */
+.tracking-workspace { max-width: 1440px; margin: 0 auto; padding: 24px 22px 50px; }
+.tracking-hero { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:28px 30px; border-radius:22px; background:linear-gradient(120deg,#0b2342 0%,#143e5d 60%,#1b5362 100%); color:#fff; box-shadow:0 16px 38px rgba(6,25,43,.12); }
+.tracking-hero h2 {font-size:clamp(1.5rem,2.5vw,2.25rem);margin:7px 0;letter-spacing:-.04em;color:#fff;}
+.tracking-hero p {margin:0;color:#c8d9df;font-size:.91rem;}
+.tracking-beta-tag {font-size:.72rem;font-weight:750;letter-spacing:.12em;color:#b8eecf;border:1px solid rgba(178,236,201,.35);padding:10px 14px;border-radius:50px;white-space:nowrap;}
+.tracking-source {font-size:.81rem;line-height:1.6;color:var(--text-muted,#65778b);padding:14px 2px;}
+.tracking-source strong {color:#ab6511;}
+.tracking-source a {color:var(--primary,#1168aa);font-weight:700;text-decoration:underline;text-underline-offset:3px;}
+.tracking-metrics {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px;}
+.tracking-metric {border:1px solid #dae3e9;border-radius:16px;background:linear-gradient(145deg,#fff,#f1f6f7);padding:19px 20px;display:flex;flex-direction:column;gap:8px;min-width:0;}
+.tracking-metric span {font-size:.78rem;color:#587084;font-weight:650;}
+.tracking-metric strong {font-size:2rem;font-weight:780;letter-spacing:-.05em;line-height:1;color:#153955;}
+.tracking-metric-accent {border-color:#a0d5d1;background:linear-gradient(130deg,#e9f8f4,#f2f8fa);}
+.tracking-metric-accent strong {color:#077b6b;}
+.tracking-filter-panel {border:1px solid #dae3e9;background:#fff;border-radius:19px;padding:20px 22px;margin-bottom:22px;box-shadow:0 7px 27px rgba(12,40,70,.04);}
+.tracking-filter-title {display:flex;gap:12px;align-items:baseline;margin-bottom:13px;flex-wrap:wrap;}
+.tracking-filter-title strong {color:#143b57;font-size:1rem;}
+.tracking-filters {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+.tracking-filters label,.tracking-search-label {display:flex;flex-direction:column;gap:6px;font-size:.77rem;font-weight:690;color:#546b7a;min-width:0;}
+.tracking-filters input,.tracking-filters select,.tracking-search-label input {width:100%;min-width:0;min-height:42px;border:1px solid #cad9e3;border-radius:10px;padding:9px 12px;background:#fafdff;color:#1c354a;font-size:.88rem;font-weight:520;}
+.tracking-filters input:focus,.tracking-filters select:focus,.tracking-search-label input:focus {outline:2px solid #7ca9c2;outline-offset:1px;}
+.tracking-filter-bottom {display:flex;align-items:end;gap:14px;margin-top:13px;}
+.tracking-search-label {flex:1;}
+.tracking-refresh,.tracking-action {border:1px solid #9cb5c7;background:#fff;color:#145574;border-radius:10px;padding:11px 16px;cursor:pointer;font-size:.82rem;font-weight:740;white-space:nowrap;}
+.tracking-refresh:hover,.tracking-action:hover {background:#eaf4f9;}
+.tracking-refresh:disabled,.tracking-action:disabled {opacity:.5;cursor:not-allowed;}
+.tracking-list-head {display:flex;justify-content:space-between;gap:16px;align-items:center;margin:8px 0 10px;}
+.tracking-list-head h3 {margin:0;font-size:1.13rem;color:#133855;}
+.tracking-list-head .muted {font-size:.8rem;color:#587184;}
+.tracking-disclaimer {font-size:.77rem;color:#657e86;max-width:460px;text-align:right;}
+.tracking-status {font-size:.81rem;color:#657e86;margin:0 0 12px;}
+.tracking-results {display:grid;gap:12px;}
+.tracking-order {background:#fff;border:1px solid #d8e3e9;border-left:4px solid #7995ac;border-radius:15px;padding:17px 19px;box-shadow:0 6px 20px rgba(10,40,70,.04);}
+.tracking-order.is-alert {border-left-color:#b77b32;}
+.tracking-order.is-closed {border-left-color:#40a48e;}
+.tracking-order-head {display:flex;justify-content:space-between;align-items:center;gap:14px;}
+.tracking-order-ref {font-size:1.1rem;color:#0e3453;font-weight:790;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.tracking-badge {font-size:.65rem;letter-spacing:.035em;text-transform:uppercase;font-weight:770;color:#815213;background:#fff0d7;border-radius:40px;padding:5px 9px;}
+.is-closed .tracking-badge {color:#176c59;background:#dff7ef;}
+.tracking-order-meta,.tracking-order-note {font-size:.81rem;color:#61788a;margin-top:5px;line-height:1.45;}
+.tracking-details {margin-top:13px;border-top:1px solid #e2ebf0;padding-top:12px;}
+.tracking-details summary {font-weight:730;font-size:.82rem;color:#135b80;cursor:pointer;}
+.tracking-table-wrap {max-width:100%;overflow:auto;margin-top:11px;border:1px solid #e0e8ed;border-radius:10px;}
+.tracking-table-wrap table {border-collapse:collapse;width:100%;min-width:850px;font-size:.79rem;}
+.tracking-table-wrap thead {background:#eaf2f5;color:#2b526a;}
+.tracking-table-wrap th,.tracking-table-wrap td {text-align:left;padding:11px 12px;border-bottom:1px solid #e7edef;vertical-align:top;}
+.tracking-table-wrap th {font-weight:730;}
+.tracking-table-wrap td:first-child {min-width:210px;}
+.tracking-table-wrap td small {display:block;color:#667f8d;font-size:.77rem;line-height:1.4;margin-top:4px;}
+.tracking-ref {font-weight:750;color:#124e74;}
+.tracking-table-wrap td:nth-child(3) {min-width:210px;}
+.tracking-table-wrap td:last-child {white-space:pre-wrap;min-width:180px;}
+.tracking-empty {border:1px dashed #bccbd4;border-radius:14px;padding:28px;text-align:center;color:#607687;background:#f9fcfd;}
+.tracking-footnote {margin:21px 2px 0;font-size:.8rem;line-height:1.65;color:#637a8a;}
+@media(max-width:900px) {
+  .tracking-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .tracking-filters{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .tracking-list-head{align-items:start;flex-direction:column;}
+  .tracking-disclaimer{text-align:left;}
+}
+@media(max-width:580px) {
+  .tracking-workspace{padding:14px 10px 36px;}
+  .tracking-hero{padding:20px;align-items:start;flex-direction:column;}
+  .tracking-metrics{gap:8px;}
+  .tracking-metric{padding:14px;}
+  .tracking-metric strong{font-size:1.7rem;}
+  .tracking-filter-panel{padding:15px;}
+  .tracking-filters{grid-template-columns:1fr;}
+  .tracking-filter-bottom,.tracking-order-head{align-items:stretch;flex-direction:column;}
+  .tracking-refresh,.tracking-action{width:100%;}
+}
