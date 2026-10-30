@@ -8,7 +8,7 @@
   <title>PROSOEL Costes</title>
   <meta name="theme-color" content="#134079">
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/prosoel-mark.svg?v=20261009-v17">
-  <link rel="stylesheet" href="./styles.css?v=20261030-tracking-lineas-v2">
+  <link rel="stylesheet" href="./styles.css?v=20261030-tracking-multisource-v1">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -283,6 +283,11 @@
         </div>
         <div id="trackingSource" class="tracking-source" role="note">Cargando fuente…</div>
         <div class="tracking-metrics" id="trackingStats" aria-live="polite"></div>
+        <div class="tracking-view-switch" role="group" aria-label="Organizar seguimiento">
+          <button class="tracking-view-button is-active" type="button" data-tracking-view="queue" aria-pressed="true">Reclamaciones</button>
+          <button class="tracking-view-button" type="button" data-tracking-view="works" aria-pressed="false">Por obra</button>
+          <button class="tracking-view-button" type="button" data-tracking-view="sources" aria-pressed="false">Fuentes Drive</button>
+        </div>
         <div class="tracking-filter-panel">
           <div class="tracking-filter-title"><strong>Periodo del pedido</strong><span class="muted">Ultimos 30 dias por defecto</span></div>
           <div class="tracking-filters">
@@ -295,6 +300,7 @@
             <label>Desde<input id="trackingFrom" type="date"></label>
             <label>Hasta<input id="trackingTo" type="date"></label>
             <label class="tracking-hidden-filter">Almacen / proveedor<select id="trackingSupplier"><option value="">Todos</option></select></label>
+            <label>Obra<select id="trackingProject"><option value="">Todas las obras cargadas</option></select></label>
             <label>Estado<select id="trackingState">
               <option value="open" selected>Sin finalizar</option>
               <option value="due">Superan plazo</option>
@@ -318,7 +324,7 @@
         </div>
         <div id="trackingStatus" class="tracking-status" role="status" aria-live="polite">Selecciona un periodo para consultar los pedidos.</div>
         <div id="trackingResults" class="tracking-results"></div>
-        <p class="tracking-footnote">Cada material se considera recibido cuando aparece en verde y su celda FINALIZADO indica SI, también si está combinada con otras filas. Un SI en otro material no cierra todo el pedido. Los cierres manuales se auditan y son reversibles; no modifican Drive. La copia de datos de esta BETA no se sincroniza automaticamente con Google Drive.</p>
+        <p class="tracking-footnote">Cada material se considera recibido cuando aparece en verde y su celda FINALIZADO indica SI, también si está combinada con otras filas. Un SI en otro material no cierra todo el pedido. Los cierres manuales se auditan y son reversibles; no modifican Drive. La copia de datos de esta BETA no se sincroniza automáticamente con Google Drive. El catálogo de fuentes no importa ni activa archivos hasta validar su estructura y permisos.</p>
       </section>
 
       <section id="reviewWorkspace" class="review-workspace hidden" role="tabpanel" aria-labelledby="reviewTab">
@@ -532,6 +538,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261030-tracking-lineas-v2"></script>
+  <script type="module" src="./app.js?v=20261030-tracking-multisource-v1"></script>
 </body>
 </html>
