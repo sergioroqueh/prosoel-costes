@@ -186,7 +186,10 @@ export function initTracking({client,escapeHtml}) {
       '<p>'+counts.approved+' libro aprobado · '+counts.candidate+' candidatos · '+counts.review+' por revisar · '+counts.excluded+' carpetas apartadas</p>'+
       '<div class="tracking-sync-note '+(scheduled?"tracking-sync-on":"")+'">'+
       (scheduled?"Sincronización automática configurada cada ":"Sincronización horaria prevista (" )+
-      escapeHtml(syncSettings?.requested_interval_minutes??60)+' minutos'+(scheduled?'.':'), pendiente de autorizar la conexión permanente de Google.')+
+      escapeHtml(syncSettings?.requested_interval_minutes??60)+' minutos'+
+      (scheduled?'.':syncSettings?.auth_setup==="validated"?
+        '), Google autorizado; activación pendiente de validar el XLSX y sus diferencias.':
+        '), pendiente de autorizar Google.')+
       '</div><div class="tracking-drive-connect-actions">'+
       '<button type="button" class="tracking-refresh" id="trackingCheckGoogle" aria-label="Comprobar acceso de solo lectura a Google Drive">Comprobar conexión a Drive</button>'+
       '<button type="button" class="tracking-refresh" id="trackingPreviewGoogle" aria-label="Comparar cambios sin modificar pedidos">Comparar con Drive (prueba)</button>'+
@@ -338,7 +341,10 @@ export function initTracking({client,escapeHtml}) {
     try {
       const {data,error}=await client.functions.invoke("drive-sync-preview",{body:{mode:"dry_run"}});
       if(error) {
-        result.textContent="La comprobación no ha terminado. No se ha modificado ningún pedido.";
+        let details;
+        try {details=await error.context?.json?.();}catch {}
+        const label=String(details?.reason||details?.message||"No se ha podido completar la lectura.").slice(0,160);
+        result.textContent="Comparación no disponible: "+label+" No se ha modificado ningún pedido.";
         return;
       }
       if(data?.summary && data?.diff?.counts){
