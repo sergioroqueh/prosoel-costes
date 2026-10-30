@@ -8,7 +8,7 @@
   <title>PROSOEL Costes</title>
   <meta name="theme-color" content="#134079">
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/prosoel-mark.svg?v=20261009-v17">
-  <link rel="stylesheet" href="./styles.css?v=20261030-charts-orders-v1">
+  <link rel="stylesheet" href="./styles.css?v=20261030-tracking-sergio-v1">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -98,6 +98,7 @@
                 aria-selected="true" aria-controls="costsWorkspace">Consultar precios</button>
         <button type="button" class="workspace-tab" id="orderLookupTab" role="tab"
                 aria-selected="false" aria-controls="orderLookupWorkspace">Buscar pedido</button>
+        <button type="button" class="workspace-tab hidden" id="trackingTab" role="tab" aria-selected="false" aria-controls="trackingWorkspace">Seguimiento de pedidos <span class="tab-pending">BETA</span></button>
         <button type="button" class="workspace-tab" id="reviewTab" role="tab"
                 aria-selected="false" aria-controls="reviewWorkspace">Normalización <span class="tab-pending">Revisión</span></button>
         <button type="button" class="workspace-tab hidden" id="importTab" role="tab"
@@ -269,6 +270,51 @@
         <p class="order-lookup-classification-legend">Consulta de solo lectura. Se muestran las líneas originales del pedido y sus importes, sin alterar precios ni consolidar referencias.</p>
         <div id="orderLookupResults" class="order-lookup-results"></div>
         <div id="orderLookupFooter" class="results-footer hidden"><button id="orderLookupMoreButton" type="button" class="more-results-button">Mostrar 20 más</button></div>
+      </section>
+
+      <section id="trackingWorkspace" class="tracking-workspace hidden" role="tabpanel" aria-labelledby="trackingTab">
+        <div class="tracking-hero">
+          <div>
+            <div class="search-kicker">LOGISTICA / CONTROL INTERNO</div>
+            <h2>Seguimiento de pedidos</h2>
+            <p>Comprueba lo que falta por revisar, sin mezclar pedidos historicos fuera del periodo seleccionado.</p>
+          </div>
+          <span class="tracking-beta-tag">BETA · SOLO SERGIO</span>
+        </div>
+        <div id="trackingSource" class="tracking-source" role="note">Cargando fuente…</div>
+        <div class="tracking-metrics" id="trackingStats" aria-live="polite"></div>
+        <div class="tracking-filter-panel">
+          <div class="tracking-filter-title"><strong>Periodo del pedido</strong><span class="muted">Ultimos 30 dias por defecto</span></div>
+          <div class="tracking-filters">
+            <label>Periodo rapido<select id="trackingPeriod">
+              <option value="7">Ultimos 7 dias</option>
+              <option value="30" selected>Ultimos 30 dias</option>
+              <option value="90">Ultimos 90 dias</option>
+              <option value="custom">Personalizado</option>
+            </select></label>
+            <label>Desde<input id="trackingFrom" type="date"></label>
+            <label>Hasta<input id="trackingTo" type="date"></label>
+            <label>Almacen / proveedor<select id="trackingSupplier"><option value="">Todos</option></select></label>
+            <label>Estado<select id="trackingState">
+              <option value="open" selected>Sin finalizar</option>
+              <option value="due">Superan plazo</option>
+              <option value="review">Observaciones dudosas</option>
+              <option value="closed">Finalizados</option>
+              <option value="all">Todos</option>
+            </select></label>
+            <label>Dias para alerta<input id="trackingAlertDays" type="number" min="1" max="365" step="1" value="7"></label>
+          </div>
+          <div class="tracking-filter-bottom"><label class="tracking-search-label">Buscar pedido, material o referencia
+            <input id="trackingSearch" type="search" placeholder="Ej.: 26/829, GUARCONSA, A7-M8"></label>
+            <button type="button" class="tracking-refresh" id="trackingRefresh">Actualizar vista</button>
+          </div>
+        </div>
+        <div class="tracking-list-head"><div><h3>Pedidos del periodo</h3><span id="trackingVisible" class="muted"></span></div>
+          <span class="tracking-disclaimer">Los pendientes son candidatos a revisar, no entregas faltantes confirmadas.</span>
+        </div>
+        <div id="trackingStatus" class="tracking-status" role="status" aria-live="polite">Selecciona un periodo para consultar los pedidos.</div>
+        <div id="trackingResults" class="tracking-results"></div>
+        <p class="tracking-footnote">La marca FINALIZADO = SI del Excel prevalece sobre observaciones parciales. Los cierres manuales se auditan y son reversibles; no modifican Drive. La copia de datos de esta BETA no se sincroniza automaticamente con Google Drive.</p>
       </section>
 
       <section id="reviewWorkspace" class="review-workspace hidden" role="tabpanel" aria-labelledby="reviewTab">
@@ -482,6 +528,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261030-israel-navigation-v1"></script>
+  <script type="module" src="./app.js?v=20261030-tracking-sergio-v1"></script>
 </body>
 </html>
