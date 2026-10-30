@@ -111,7 +111,7 @@ export function initTracking({client,escapeHtml}) {
     try {
       const [src,cat,folderResults,settings,history]=await Promise.all([
         client.from("tracking_sources").select("id,display_name,drive_url,synced_at,modified_at_source,sync_mode").order("display_name"),
-        client.from("tracking_drive_catalog").select("file_id,folder_id,source_title,status,reason,drive_modified_at,last_imported_at,automatic_import_enabled").order("source_title").limit(1000),
+        client.from("tracking_drive_catalog").select("file_id,folder_id,source_title,status,reason,drive_modified_at,last_imported_at,automatic_import_enabled,validation_status,validation_error").order("source_title").limit(1000),
         client.from("tracking_drive_folders").select("folder_id,folder_label,classification").limit(1000),
         client.from("tracking_sync_settings").select("requested_interval_minutes,automatic_sync_enabled,auth_setup").eq("id",1).maybeSingle(),
         client.from("tracking_sync_runs").select("state,finished_at,started_at,message,change_summary").order("started_at",{ascending:false}).limit(5)
@@ -181,14 +181,16 @@ export function initTracking({client,escapeHtml}) {
       approved:catalog.filter(x=>x.status==="approved").length,
       candidate:catalog.filter(x=>x.status==="candidate").length,
       review:catalog.filter(x=>x.status==="review").length,
-      excluded:folders.filter(x=>x.classification==="excluded"||x.classification==="archive").length
+      excluded:folders.filter(x=>x.classification==="excluded"||x.classification==="archive").length,
+      automatic:catalog.filter(x=>x.status==="approved"&&x.automatic_import_enabled).length,
+      blocked:catalog.filter(x=>x.status==="candidate"&&(x.validation_status==="incompatible"||x.validation_status==="permission_missing")).length
     };
     const scheduled=Boolean(syncSettings?.automatic_sync_enabled && syncSettings?.auth_setup==="validated");
     const latest=syncHistory[0];
     const lastDate=latest?.finished_at?new Date(latest.finished_at).toLocaleString("es-ES"):"Sin ejecuciones todavía";
     const statusNote=latest?"Última ejecución: "+latest.state+" · "+lastDate+" · "+(latest.message||""):"Sin ejecuciones todavía.";
     const headline='<section class="tracking-source-overview"><h3>Fuentes de pedidos de Drive</h3>'+
-      '<p>'+counts.approved+' libro aprobado · '+counts.candidate+' candidatos · '+counts.review+' por revisar · '+counts.excluded+' carpetas apartadas</p>'+
+      '<p>'+counts.approved+' libros importados · '+counts.automatic+' en sincronización automática · '+counts.blocked+' bloqueados por validación/permisos · '+counts.review+' por revisar · '+counts.excluded+' carpetas apartadas</p>'+
       '<div class="tracking-sync-note '+(scheduled?"tracking-sync-on":"")+'">'+
       (scheduled?"Sincronización automática configurada cada ":"Sincronización horaria prevista (" )+
       escapeHtml(syncSettings?.requested_interval_minutes??60)+' minutos'+
@@ -206,10 +208,17 @@ export function initTracking({client,escapeHtml}) {
         folderName(a.file_id).localeCompare(folderName(b.file_id),"es");
     });
     const cards=items.map(x=>{
-      const label=x.status==="approved"?"Importado":x.status==="candidate"?"Pendiente de validar":x.status==="review"?"Revisión manual":"Excluido";
-      const date=x.drive_modified_at?new Date(x.drive_modified_at).toLocaleDateString("es-ES"):"Sin fecha";
+      const label=x.status==="approved"?(x.automatic_import_enabled?"Automático":"Importado"):
+        x.validation_status==="permission_missing"?"Sin permiso":
+        x.validation_status==="incompatible"?"Revisar formato":
+        x.status==="candidate"?"Pendiente de validar":
+        x.status==="review"?"Revisión manual":"Excluido";
+      const date=x.last_imported_at?new Date(x.last_imported_at).toLocaleString("es-ES"):
+        x.drive_modified_at?new Date(x.drive_modified_at).toLocaleDateString("es-ES"):"Sin fecha";
+      const detail=x.status==="approved"?"Última copia: ":"Archivo modificado: ";
+      const issue=x.validation_error?' · '+x.validation_error:'';
       return '<article class="tracking-source-item"><div><strong>'+escapeHtml(folderName(x.file_id))+
-        '</strong><small>'+escapeHtml(x.source_title)+' · modificado '+escapeHtml(date)+'</small></div>'+
+        '</strong><small>'+escapeHtml(x.source_title)+' · '+escapeHtml(detail)+escapeHtml(date)+escapeHtml(issue)+'</small></div>'+
         '<span class="tracking-source-state tracking-source-state-'+escapeHtml(x.status)+'">'+escapeHtml(label)+'</span></article>';
     }).join("");
     list.innerHTML=headline+'<div class="tracking-source-list">'+cards+'</div>';
@@ -230,8 +239,8 @@ export function initTracking({client,escapeHtml}) {
       '<div class="tracking-metric"><span>Observaciones para revisar</span><strong>'+review.length+'</strong></div>';
     const first=sources[0];
     const last=first?.synced_at ? new Date(first.synced_at).toLocaleString("es-ES") : "—";
-    source.textContent=sources.length+" fuentes importadas · "+catalog.filter(c=>c.status==="candidate").length+
-      " candidatos por validar · última copia: "+last+
+    source.textContent=sources.length+" fuentes importadas · "+catalog.filter(c=>c.status==="approved"&&c.automatic_import_enabled).length+
+      " en actualización automática · "+catalog.filter(c=>c.status==="candidate").length+" sin incorporar · última copia: "+last+
       (syncSettings?.automatic_sync_enabled?" · Sincronización horaria activa para fuentes autorizadas":" · Sincronización automática pendiente");
     if(viewMode==="sources") {renderSources();return;}
     const q=search.value.trim().toLocaleLowerCase("es");
@@ -325,7 +334,7 @@ export function initTracking({client,escapeHtml}) {
         return;
       }
       const states={
-        connected:"Conexión verificada: Google permite leer el Excel aprobado. Sincronización horaria todavía inactiva.",
+        connected:"Conexión verificada: la cuenta técnica puede leer Drive. Las obras autorizadas se sincronizan según su programación.",
         pending_credentials:"Pendiente de configurar la clave de la cuenta de servicio en Supabase.",
         permission_missing:"La cuenta de servicio todavía no tiene acceso de lectura al Excel aprobado.",
         google_auth_failed:"Google no ha aceptado la clave de servicio. Comprueba credenciales y Drive API.",
@@ -344,7 +353,8 @@ export function initTracking({client,escapeHtml}) {
     button.disabled=true;
     result.textContent="Leyendo el XLSX original y comparando materiales…";
     try {
-      const {data,error}=await client.functions.invoke("drive-sync-preview",{body:{mode:"dry_run"}});
+      const selectedSource=project.value||sources[0]?.id;
+      const {data,error}=await client.functions.invoke("drive-sync-preview",{body:{mode:"dry_run",source_id:selectedSource}});
       if(error) {
         let details;
         try {details=await error.context?.json?.();}catch {}
@@ -356,11 +366,11 @@ export function initTracking({client,escapeHtml}) {
         const c=data.diff.counts, n=data.summary;
         const totalChanges=Object.values(c).reduce((a,b)=>a+Number(b||0),0);
         result.textContent=
-          "Drive: "+n.orders+" pedidos / "+n.lines+" materiales; "+
+          (data.source||"Obra")+" · Drive: "+n.orders+" pedidos / "+n.lines+" materiales; "+
           n.completed+" completos, "+n.partial+" parciales, "+
           n.received+" líneas recibidas. "+
           "Diferencias detectadas: "+totalChanges+
-          (data.pilot_baseline_matched?" · Totales del piloto verificados.":" · Revisar los totales del piloto.")+
+          (data.baseline_matched?" · Coincide el número de pedidos y materiales.":" · Hay diferencias de cantidad de filas.")+
           (data.diff.requires_review?" · Revisión estructural necesaria.":"")+
           " No se ha aplicado ningún cambio.";
       } else {
