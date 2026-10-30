@@ -84,10 +84,17 @@ Deno.serve(async request=>{
     const userDb=createClient(url,key,{global:{headers:{Authorization:"Bearer "+jwt}},auth:{persistSession:false,autoRefreshToken:false}});
     const {data:profile,error:profileError}=await userDb.from("app_users").select("email,active").eq("email","compras@prosoel.es").maybeSingle();
     if(profileError||!profile?.active)return reply(403,"forbidden","Cuenta inactiva.");
-    // Solo catálogo aprobado, con permisos RLS y sincronización automática todavía desactivada.
-    const {data:source,error:sourceError}=await userDb.from("tracking_drive_catalog")
-       .select("file_id,source_title,drive_modified_at,status")
-       .eq("status","approved").order("source_title").limit(1).maybeSingle();
+    // Solo fuentes importadas/aprobadas, bajo RLS de Sergio.
+    let params={};try{params=await request.json()}catch {}
+    const chosen=String(params.source_id||"").trim();
+    if(chosen && !/^[a-zA-Z0-9_-]{16,128}$/.test(chosen))
+      return reply(400,"invalid_source","Identificador inválido.");
+    let sourceQuery=userDb.from("tracking_drive_catalog")
+      .select("file_id,source_title,drive_modified_at,status")
+      .eq("status","approved");
+    if(chosen)sourceQuery=sourceQuery.eq("file_id",chosen);
+    const {data:source,error:sourceError}=await sourceQuery
+      .order("source_title").limit(1).maybeSingle();
     if(sourceError||!source)return reply(409,"no_approved_source","No hay fuente autorizada.");
     const json=Deno.env.get("PROSOEL_GOOGLE_SERVICE_ACCOUNT_JSON");
     if(!json)return reply(503,"pending_credentials","Falta la credencial técnica.");
@@ -125,13 +132,11 @@ Deno.serve(async request=>{
     }
     const diff=compareSource(normalized.orders,existing,existingLines);
     const summary=normalized.summary;
-    const pilotValidated=existing.length===118&&existingLines.length===488&&
-      summary.orders===118&&summary.lines===488&&summary.completed===91&&
-      summary.partial===9&&summary.noneReceived===18&&summary.received===390;
-    return reply(200,pilotValidated&&!diff.requires_review?"preview_ready":"needs_review",
-      pilotValidated?"Comparación del Excel realizada sin modificar pedidos.":"La estructura o el contenido no coinciden con el piloto validado.",
+    const baselineMatched=existing.length===summary.orders&&existingLines.length===summary.lines;
+    return reply(200,!diff.requires_review?"preview_ready":"needs_review",
+      diff.requires_review?"La estructura ha cambiado y requiere revisión.":"Comparación realizada sin modificar pedidos.",
       {source:source.source_title,drive_modified_at:meta.modifiedTime,summary,diff,
-       pilot_baseline_matched:pilotValidated,automatic_sync:false});
+       baseline_matched:baselineMatched,automatic_sync:false});
   }catch(e){
     console.error("Drive preview failed",String(e?.message||"error").slice(0,120));
     return reply(503,"preview_error","No se pudo completar la comparación. No se ha modificado ningún dato.");
