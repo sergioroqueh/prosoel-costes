@@ -95,6 +95,10 @@ begin
   end if;
   select count(*),coalesce(max(source_row),0) into existing_orders,old_max_row
   from public.tracking_orders where source_id=p_source_id;
+  select greatest(old_max_row,coalesce(max(l.source_row),0))
+    into old_max_row from public.tracking_lines l
+    join public.tracking_orders o on o.id=l.order_id
+    where o.source_id=p_source_id;
   if existing_orders=0 then raise exception 'baseline_missing'; end if;
 
   -- Validate EVERY item before commit. Any exception rolls back all changes.
@@ -213,6 +217,11 @@ begin
             pg_catalog.jsonb_build_object('row',v_line_row,'reference',v_ref,'qty',v_qty));
       end if;
     end loop;
+    -- Prevent malformed snapshots from asserting a complete order with incomplete lines.
+    if (o->>'drive_finalized')::boolean is distinct from
+       (select bool_and(drive_line_finalized) from public.tracking_lines where order_id=created_order) then
+       raise exception 'order_completion_not_equal_to_lines';
+    end if;
     -- Status of the order is derived from line confirmations, not from a single SI.
     update public.tracking_orders set drive_finalized=(o->>'drive_finalized')::boolean,
       reception_date=v_receipt where id=created_order;
