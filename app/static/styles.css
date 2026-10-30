@@ -2850,3 +2850,5 @@ main { margin-top: 25px; }
 .tracking-drive-connect-actions span{font-size:.79rem;color:#546e7c;line-height:1.5;flex:1;}
 .tracking-drive-connect-actions .tracking-refresh{border-color:#91b9cb;color:#12496f;background:#fff;}
 @media(max-width:580px){.tracking-drive-connect-actions{align-items:stretch;flex-direction:column;}.tracking-drive-connect-actions span{flex:auto;}}
+
+.tracking-sync-status{font-size:.8rem;color:#516f7d;line-height:1.5;margin:12px 0 2px;}
