@@ -71,7 +71,7 @@ async function readPaged(build,limit=20000) {
  }
  throw new Error("oversized_source");
 }
-async function runOnce(db) {
+async function runOnce(db,slot=0) {
  const config=await db.from("tracking_sync_settings")
    .select("requested_interval_minutes,automatic_sync_enabled,auth_setup").eq("id",1).single();
  if(config.error)throw new Error("sync_settings_unreadable");
@@ -79,11 +79,11 @@ async function runOnce(db) {
    return {state:"disabled",message:"La sincronización automática no está habilitada."};
  const catalog=await db.from("tracking_drive_catalog")
    .select("file_id,source_title,status,automatic_import_enabled,last_imported_modified_at,last_imported_md5")
-   .eq("status","approved").eq("automatic_import_enabled",true).limit(2);
+   .eq("status","approved").eq("automatic_import_enabled",true).order("file_id").limit(100);
  if(catalog.error)throw new Error("catalog_unreadable");
- if((catalog.data||[]).length!==1)throw new Error("expected_exactly_one_pilot_source");
- const source=catalog.data[0];
- // Test only this existing pilot: further sources require separate validation and deployment.
+ if((catalog.data||[]).length<1)return {state:"disabled",message:"No hay fuentes aprobadas para sincronizar."};
+ if((catalog.data||[]).length>60)throw new Error("too_many_sources_per_rotation");
+ const source=catalog.data[slot%catalog.data.length];
  const baseline=await db.from("tracking_sources").select("id").eq("id",source.file_id).maybeSingle();
  if(baseline.error||!baseline.data)throw new Error("source_not_previously_imported");
  const log=await db.from("tracking_sync_runs").insert({
@@ -175,7 +175,11 @@ Deno.serve(async (request)=>{
  const auth=await db.rpc("tracking_verify_cron_token",{p_token:key});
  if(auth.error||auth.data!==true)return reply(403,"forbidden","No autorizado.");
  try {
-   const response=await runOnce(db);
+   let payload={};try{payload=await request.json();}catch{}
+   const slot=payload.slot??0;
+   if(!Number.isInteger(slot)||slot<0||slot>10000)
+     return reply(400,"bad_slot","Índice de sincronización inválido.");
+   const response=await runOnce(db,slot);
    return reply(200,response.state,"Comprobación horaria ejecutada.",response);
  }catch(e){
    console.error("PROSOEL cron:",String(e?.message||"error").slice(0,140));
