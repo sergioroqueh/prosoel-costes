@@ -17,6 +17,20 @@ export function trackingEffectiveState(order, decision) {
   return "open";
 }
 
+// Contrato de recepción de este Excel: material verde Y SI (incluyendo SI combinado).
+export function trackingLineDelivered(line) {
+  return Boolean(line && line.source_green === true && line.source_si === true && line.drive_line_finalized === true);
+}
+
+// Orden en el periodo YA filtrado. El desempate respeta el orden físico de Drive.
+export function sortTrackingOrders(items, orderBy="oldest") {
+  return items.sort((a,b)=>{
+    const diff=String(a.order_date).localeCompare(String(b.order_date)) ||
+      Number(a.source_row)-Number(b.source_row) || Number(a.id)-Number(b.id);
+    return orderBy==="newest" ? -diff : diff;
+  });
+}
+
 export function initTracking({client,escapeHtml}) {
   const root = document.getElementById("trackingWorkspace");
   const dateFrom = document.getElementById("trackingFrom");
@@ -49,7 +63,7 @@ export function initTracking({client,escapeHtml}) {
   function lineSummary(line) {
     const parsed=interpretTrackingObservation(line.observations,line.requested_qty);
     const req=line.requested_qty==null ? "—" : fmt(line.requested_qty);
-    const received=Boolean(line.drive_line_finalized);
+    const received=trackingLineDelivered(line);
     let note=received?"Recibido · verde + SI en Drive":"Pendiente de confirmar entrega";
     if(!received && parsed.kind==="probable") note="Anotadas "+fmt(parsed.received)+" · Posible resto "+fmt(Math.max(0,Number(line.requested_qty)-parsed.received))+" (revisar)";
     if(!received && parsed.kind==="review") note="Observación libre: revisar";
@@ -135,7 +149,7 @@ export function initTracking({client,escapeHtml}) {
     const current=orders.map(o=>({...o,_state:trackingEffectiveState(o,decisions.get(o.id))}));
     const open=current.filter(o=>o._state==="open");
     const eligible=open.filter(o=>age(o.order_date)>=Number(alertDays.value||7));
-    const review=open.filter(o=>o.lines.some(l=>!l.drive_line_finalized && (l.source_green && !l.source_si || interpretTrackingObservation(l.observations,l.requested_qty).kind==="review")));
+    const review=open.filter(o=>o.lines.some(l=>!trackingLineDelivered(l) && (l.source_green && !l.source_si || interpretTrackingObservation(l.observations,l.requested_qty).kind==="review")));
     stats.innerHTML=
       '<div class="tracking-metric"><span>Pedidos del periodo</span><strong>'+current.length+'</strong></div>'+
       '<div class="tracking-metric"><span>Sin finalizar</span><strong>'+open.length+'</strong></div>'+
@@ -154,20 +168,17 @@ export function initTracking({client,escapeHtml}) {
       if(state.value==="open" && o._state!=="open")return false;
       if(state.value==="due" && (o._state!=="open"||age(o.order_date)<Number(alertDays.value||7)))return false;
       if(state.value==="closed" && o._state==="open")return false;
-      if(state.value==="review" && (o._state!=="open"||!o.lines.some(l=>!l.drive_line_finalized && (l.source_green && !l.source_si || interpretTrackingObservation(l.observations,l.requested_qty).kind==="review"))))return false;
+      if(state.value==="review" && (o._state!=="open"||!o.lines.some(l=>!trackingLineDelivered(l) && (l.source_green && !l.source_si || interpretTrackingObservation(l.observations,l.requested_qty).kind==="review"))))return false;
       return !q||[o.order_reference,o.supplier,o.responsible,...o.lines.flatMap(l=>[l.reference,l.description])].some(v=>String(v||"").toLocaleLowerCase("es").includes(q));
     });
     // Ordenar SOLO las coincidencias del periodo, no volver a mezclar registros fuera del rango.
-    visible.sort((a,b)=>{
-      const dateCmp=a.order_date.localeCompare(b.order_date)||a.source_row-b.source_row||a.id-b.id;
-      return sort.value==="newest" ? -dateCmp : dateCmp;
-    });
+    sortTrackingOrders(visible,sort.value);
     document.getElementById("trackingVisible").textContent=visible.length+" de "+current.length+" pedidos";
     if(!visible.length) {list.innerHTML='<div class="tracking-empty">No hay pedidos que coincidan con los filtros elegidos.</div>';return;}
     list.innerHTML=visible.slice(0,300).map(o=>{
       const closed=o._state!=="open", manual=o._state==="closed_manual", n=age(o.order_date);
-      const pending=o.lines.filter(line=>!line.drive_line_finalized);
-      const delivered=o.lines.filter(line=>line.drive_line_finalized);
+      const pending=o.lines.filter(line=>!trackingLineDelivered(line));
+      const delivered=o.lines.filter(line=>trackingLineDelivered(line));
       const badge=closed?(manual?"Finalizado manualmente":"Completo en Drive"):
         (delivered.length ? "Entrega parcial" : n>=Number(alertDays.value||7)?"Revisar plazo":"Pendiente");
       const cls=closed?"is-closed":n>=Number(alertDays.value||7)?"is-alert":"is-open";
