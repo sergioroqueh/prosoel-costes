@@ -37,6 +37,9 @@ function sharedText(si){
 function normalizeRef(raw){
   const t=String(raw||"").trim();
   if(!t)return "";
+  // String cells may contain meaningful leading zeros (e.g. albarán 038750).
+  // Scientific-notation numeric cells are normalized separately below.
+  if(/^0\d+$/.test(t)) return t;
   if(/^-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(t)) {
     const n=Number(t);
     if(Number.isSafeInteger(n))return String(n);
