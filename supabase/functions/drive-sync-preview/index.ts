@@ -119,7 +119,7 @@ Deno.serve(async request=>{
       const ids=existing.slice(i,i+120).map(o=>o.id);
       if(!ids.length)continue;
       const part=await pages((lo,hi)=>userDb.from("tracking_lines")
-        .select("order_id,source_row,reference,description,requested_qty,observations,drive_line_finalized")
+        .select("order_id,source_row,reference,description,requested_qty,observations,albaran,drive_line_finalized")
         .in("order_id",ids).order("id").range(lo,hi));
       existingLines.push(...part);
     }
