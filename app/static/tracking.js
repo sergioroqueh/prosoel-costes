@@ -187,6 +187,9 @@ export function initTracking({client,escapeHtml}) {
       '<div class="tracking-sync-note '+(scheduled?"tracking-sync-on":"")+'">'+
       (scheduled?"Sincronización automática configurada cada ":"Sincronización horaria prevista (" )+
       escapeHtml(syncSettings?.requested_interval_minutes??60)+' minutos'+(scheduled?'.':'), pendiente de autorizar la conexión permanente de Google.')+
+      '</div><div class="tracking-drive-connect-actions">'+
+      '<button type="button" class="tracking-refresh" id="trackingCheckGoogle" aria-label="Comprobar acceso de solo lectura a Google Drive">Comprobar conexión a Drive</button>'+
+      '<span id="trackingGoogleResult" role="status" aria-live="polite">No se ha comprobado la conexión técnica.</span>'+
       '</div></section>';
     const items=[...catalog].sort((a,b)=>{
       const ranks={approved:0,candidate:1,review:2,excluded:3};
@@ -298,6 +301,31 @@ export function initTracking({client,escapeHtml}) {
       b.setAttribute("aria-pressed",String(active));
     }
     render();
+  });
+  // Comprobar Google a través del servidor: el navegador nunca ve la clave privada.
+  list.addEventListener("click",async event=>{
+    const button=event.target.closest("#trackingCheckGoogle");
+    if(!button)return;
+    const result=list.querySelector("#trackingGoogleResult");
+    button.disabled=true;
+    result.textContent="Comprobando acceso privado…";
+    try {
+      const {data,error}=await client.functions.invoke("drive-connection-check",{body:{probe:true}});
+      if(error) {
+        result.textContent="No se pudo consultar el verificador. Comprueba tu sesión e inténtalo de nuevo.";
+        return;
+      }
+      const states={
+        connected:"Conexión verificada: Google permite leer el Excel aprobado. Sincronización horaria todavía inactiva.",
+        pending_credentials:"Pendiente de configurar la clave de la cuenta de servicio en Supabase.",
+        permission_missing:"La cuenta de servicio todavía no tiene acceso de lectura al Excel aprobado.",
+        google_auth_failed:"Google no ha aceptado la clave de servicio. Comprueba credenciales y Drive API.",
+        download_not_allowed:"Acceso de lectura detectado, pero falta permiso para descargar el Excel.",
+      };
+      result.textContent=states[data?.state]||String(data?.message||"No se completó la comprobación.");
+    } catch {
+      result.textContent="Error de conexión con el verificador. No se ha modificado ningún archivo.";
+    } finally {button.disabled=false;}
   });
   search.addEventListener("input",render);
   refresh.addEventListener("click",load);
