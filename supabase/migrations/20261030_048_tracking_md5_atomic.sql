@@ -209,16 +209,7 @@ begin
     synced_at=now(),sync_mode='scheduled' where id=p_source_id;
   update public.tracking_drive_catalog set last_imported_at=now(),
     last_imported_modified_at=p_modified_at,import_error=null,drive_modified_at=p_modified_at,
-    last_imported_md5=case when p_md5 ~ '^[a-fA-F0-9]{32}
-  return pg_catalog.jsonb_build_object('new_orders',created_orders,'new_lines',created_lines,
-    'status_changes',changed_status,'quantity_changes',changed_quantity,
-    'observation_changes',changed_notes,'albaran_changes',changed_albarans,
-    'total_orders',jsonb_array_length(p_orders),'total_lines',total_lines);
-end
-$$;
-revoke all on function public.tracking_apply_pilot_snapshot(text,jsonb,timestamptz,text,bigint) from public,anon,authenticated;
-grant execute on function public.tracking_apply_pilot_snapshot(text,jsonb,timestamptz,text,bigint) to service_role;
- then lower(p_md5) else null end
+    last_imported_md5=case when p_md5 ~ '^[a-fA-F0-9]{32}$' then lower(p_md5) else null end
     where file_id=p_source_id;
   return pg_catalog.jsonb_build_object('new_orders',created_orders,'new_lines',created_lines,
     'status_changes',changed_status,'quantity_changes',changed_quantity,
