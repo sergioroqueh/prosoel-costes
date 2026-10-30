@@ -67,7 +67,7 @@ export function initTracking({client,escapeHtml}) {
     let note=received?"Recibido · verde + SI en Drive":"Pendiente de confirmar entrega";
     if(!received && parsed.kind==="probable") note="Anotadas "+fmt(parsed.received)+" · Posible resto "+fmt(Math.max(0,Number(line.requested_qty)-parsed.received))+" (revisar)";
     if(!received && parsed.kind==="review") note="Observación libre: revisar";
-    if(!received && line.source_green && !line.source_si) note="Verde sin SI: revisar";
+    if(!received && line.source_green && !line.source_si) note+=" · Verde sin SI";
     return '<tr class="'+(received?"tracking-row-received":"tracking-row-pending")+'"><td><span class="tracking-ref">'+escapeHtml(line.reference || "—")+'</span><small>'+escapeHtml(line.description || "—")+'</small></td>'+
       '<td>'+escapeHtml(req)+'</td><td>'+escapeHtml(note)+'</td><td>'+escapeHtml(line.albaran || "—")+'</td>'+
       '<td>'+escapeHtml(line.observations || "—")+'</td></tr>';
@@ -76,9 +76,14 @@ export function initTracking({client,escapeHtml}) {
     if(!lines.length)return "";
     const shown=lines.slice(0,4);
     return '<div class="tracking-pending-materials"><strong>Material pendiente de entrega</strong>'+
-      shown.map(line=>'<div class="tracking-pending-item"><span class="tracking-pending-ref">'+escapeHtml(line.reference||"Sin referencia")+'</span>'+
-        '<span class="tracking-pending-description">'+escapeHtml(line.description||"Material sin descripción")+'</span>'+
-        '<span class="tracking-pending-qty">'+escapeHtml(fmt(line.requested_qty))+' solicitadas</span></div>').join("")+
+      shown.map(line=>{
+        const hint=interpretTrackingObservation(line.observations,line.requested_qty);
+        const quantity=hint.kind==="probable" ? 'Posible resto '+fmt(Math.max(0,Number(line.requested_qty)-hint.received))+
+          ' de '+fmt(line.requested_qty) : fmt(line.requested_qty)+' solicitadas';
+        return '<div class="tracking-pending-item"><span class="tracking-pending-ref">'+escapeHtml(line.reference||"Sin referencia")+'</span>'+
+          '<span class="tracking-pending-description">'+escapeHtml(line.description||"Material sin descripción")+'</span>'+
+          '<span class="tracking-pending-qty">'+escapeHtml(quantity)+'</span></div>';
+      }).join("")+
       (lines.length>shown.length?'<div class="tracking-pending-more">Y '+(lines.length-shown.length)+' materiales pendientes más · despliega el detalle</div>':"")+'</div>';
   }
 
