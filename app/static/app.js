@@ -2,6 +2,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./config.js";
 import { readProsoelXlsx } from "./order_import.js?v=20261008-v9";
 import { initOrderLookup } from "./order_lookup.js?v=20261030-v1";
+import { initTracking } from "./tracking.js?v=20261030-tracking-v1";
 import { initProjectLookup } from "./project_lookup.js?v=20261030-v1";
 import { mountPriceTimeline, PRICE_SERIES_COLORS } from "./price_comparison_chart.js?v=20261030-v1";
 
@@ -81,6 +82,8 @@ const moreResultsButton = document.getElementById("moreResultsButton");
 const resultsFooter = document.getElementById("resultsFooter");
 const costsTab = document.getElementById("costsTab");
 const orderLookupTab = document.getElementById("orderLookupTab");
+const trackingTab = document.getElementById("trackingTab");
+const trackingWorkspace = document.getElementById("trackingWorkspace");
 const orderLookupWorkspace = document.getElementById("orderLookupWorkspace");
 const reviewTab = document.getElementById("reviewTab");
 const costsWorkspace = document.getElementById("costsWorkspace");
@@ -153,6 +156,7 @@ let purchaseLinesInBulk = null;
 let purchaseCandidateInEditor = null;
 let purchaseEditIsSaving = false;
 let currentUserRole = "user";
+let trackingAllowed = false;
 // Personalización de navegación limitada a la cuenta concreta de Israel.
 // No reemplaza las políticas RLS ni altera el rol real del usuario.
 let isIsraelAccount = false;
@@ -430,6 +434,9 @@ function orderLabel(row) {
 }
 
 function showLogin(message = "") {
+  trackingAllowed = false;
+  trackingTab.classList.add("hidden");
+  trackingWorkspace.classList.add("hidden");
   authView.hidden = false;
   appView.hidden = true;
   authView.classList.remove("hidden");
@@ -438,6 +445,8 @@ function showLogin(message = "") {
 }
 
 function showApp(user) {
+  trackingAllowed = false;
+  trackingTab.classList.add("hidden");
   isIsraelAccount = String(user?.email || "").trim().toLowerCase() === "israel@prosoel.es";
   reviewTab.classList.toggle("hidden", isIsraelAccount);
   if (isIsraelAccount) activateWorkspace("costs");
@@ -463,6 +472,9 @@ async function verifyAccess(user) {
 
   currentUser.textContent = data.display_name || data.email;
   currentUserRole = data.role || "user";
+  // Gating visual despues de verificar app_users; el acceso real se protege con RLS.
+  trackingAllowed = String(data.email || "").trim().toLowerCase() === "compras@prosoel.es";
+  trackingTab.classList.toggle("hidden", !trackingAllowed);
   importTab.classList.toggle("hidden",currentUserRole!=="admin");
   return true;
 }
@@ -615,6 +627,7 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 
   if (event === "SIGNED_OUT" || !session) {
     currentUserRole = "user";
+    tracking.reset();
     showLogin();
     return;
   }
@@ -1329,22 +1342,27 @@ function activateWorkspace(which) {
   const reviewing = which === "review" && !isIsraelAccount;
   const importing = which === "import" && currentUserRole === "admin";
   const lookingUpOrder = which === "orders";
-  const costs = !reviewing && !importing && !lookingUpOrder;
+  const trackingView = which === "tracking" && trackingAllowed;
+  const costs = !reviewing && !importing && !lookingUpOrder && !trackingView;
   costsWorkspace.classList.toggle("hidden", !costs);
   orderLookupWorkspace.classList.toggle("hidden", !lookingUpOrder);
+  trackingWorkspace.classList.toggle("hidden", !trackingView);
   reviewWorkspace.classList.toggle("hidden", !reviewing);
   importWorkspace.classList.toggle("hidden", !importing);
   costsTab.classList.toggle("is-active", costs);
   orderLookupTab.classList.toggle("is-active", lookingUpOrder);
+  trackingTab.classList.toggle("is-active", trackingView);
   reviewTab.classList.toggle("is-active", reviewing);
   importTab.classList.toggle("is-active", importing);
   costsTab.setAttribute("aria-selected", String(costs));
   orderLookupTab.setAttribute("aria-selected", String(lookingUpOrder));
+  trackingTab.setAttribute("aria-selected", String(trackingView));
   reviewTab.setAttribute("aria-selected", String(reviewing));
   importTab.setAttribute("aria-selected", String(importing));
   if (reviewing && !reviewLoaded) runReviewSearch();
   if (importing && !importAuditLoaded) loadImportDashboard();
   if (lookingUpOrder) orderLookup.focus();
+  if (trackingView) tracking.open();
 }
 
 function renderReviewResults() {
@@ -2249,6 +2267,7 @@ purchaseEditDialog.addEventListener("close",()=>{
 
 costsTab.addEventListener("click", () => activateWorkspace("costs"));
 orderLookupTab.addEventListener("click", () => activateWorkspace("orders"));
+trackingTab.addEventListener("click", () => { if (trackingAllowed) activateWorkspace("tracking"); });
 reviewTab.addEventListener("click", () => activateWorkspace("review"));
 importTab.addEventListener("click", () => activateWorkspace("import"));
 reviewMoreButton.addEventListener("click", () => runReviewSearch({ append: true }));
@@ -2657,5 +2676,7 @@ const projectLookup = initProjectLookup({
 const orderLookup = initOrderLookup({
   client:supabase, money, number, displayDiscount, escapeHtml, projectLookup
 });
+
+const tracking = initTracking({client:supabase,escapeHtml});
 
 bootstrapSession();
