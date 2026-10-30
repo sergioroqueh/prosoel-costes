@@ -17,6 +17,20 @@ export function trackingEffectiveState(order, decision) {
   return "open";
 }
 
+// Contrato de recepción de este Excel: material verde Y SI (incluyendo SI combinado).
+export function trackingLineDelivered(line) {
+  return Boolean(line && line.source_green === true && line.source_si === true && line.drive_line_finalized === true);
+}
+
+// Orden en el periodo YA filtrado. El desempate respeta el orden físico de Drive.
+export function sortTrackingOrders(items, orderBy="oldest") {
+  return items.sort((a,b)=>{
+    const diff=String(a.order_date).localeCompare(String(b.order_date)) ||
+      Number(a.source_row)-Number(b.source_row) || Number(a.id)-Number(b.id);
+    return orderBy==="newest" ? -diff : diff;
+  });
+}
+
 export function initTracking({client,escapeHtml}) {
   const root = document.getElementById("trackingWorkspace");
   const dateFrom = document.getElementById("trackingFrom");
@@ -31,6 +45,7 @@ export function initTracking({client,escapeHtml}) {
   const source = document.getElementById("trackingSource");
   const refresh = document.getElementById("trackingRefresh");
   const alertDays = document.getElementById("trackingAlertDays");
+  const sort = document.getElementById("trackingSort");
   let orders = [], decisions = new Map(), sources = [], loaded = false, busy = false, generation = 0;
   const fmt = (value) => value == null ? "—" : new Intl.NumberFormat("es-ES",{maximumFractionDigits:3}).format(Number(value));
   const iso = (d) => [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");
@@ -48,13 +63,30 @@ export function initTracking({client,escapeHtml}) {
   function lineSummary(line) {
     const parsed=interpretTrackingObservation(line.observations,line.requested_qty);
     const req=line.requested_qty==null ? "—" : fmt(line.requested_qty);
-    let note="Sin recepción cuantificable";
-    if(parsed.kind==="probable") note="Anotadas "+fmt(parsed.received)+" · Posible resto "+fmt(Math.max(0,Number(line.requested_qty)-parsed.received))+" (revisar)";
-    if(parsed.kind==="review") note="Observación por interpretar";
-    return '<tr><td><span class="tracking-ref">'+escapeHtml(line.reference || "—")+'</span><small>'+escapeHtml(line.description || "—")+'</small></td>'+
+    const received=trackingLineDelivered(line);
+    let note=received?"Recibido · verde + SI en Drive":"Pendiente de confirmar entrega";
+    if(!received && parsed.kind==="probable") note="Anotadas "+fmt(parsed.received)+" · Posible resto "+fmt(Math.max(0,Number(line.requested_qty)-parsed.received))+" (revisar)";
+    if(!received && parsed.kind==="review") note="Observación libre: revisar";
+    if(!received && line.source_green && !line.source_si) note+=" · Verde sin SI";
+    return '<tr class="'+(received?"tracking-row-received":"tracking-row-pending")+'"><td><span class="tracking-ref">'+escapeHtml(line.reference || "—")+'</span><small>'+escapeHtml(line.description || "—")+'</small></td>'+
       '<td>'+escapeHtml(req)+'</td><td>'+escapeHtml(note)+'</td><td>'+escapeHtml(line.albaran || "—")+'</td>'+
       '<td>'+escapeHtml(line.observations || "—")+'</td></tr>';
   }
+  function pendingPreview(lines) {
+    if(!lines.length)return "";
+    const shown=lines.slice(0,4);
+    return '<div class="tracking-pending-materials"><strong>Material pendiente de entrega</strong>'+
+      shown.map(line=>{
+        const hint=interpretTrackingObservation(line.observations,line.requested_qty);
+        const quantity=hint.kind==="probable" ? 'Posible resto '+fmt(Math.max(0,Number(line.requested_qty)-hint.received))+
+          ' de '+fmt(line.requested_qty) : fmt(line.requested_qty)+' solicitadas';
+        return '<div class="tracking-pending-item"><span class="tracking-pending-ref">'+escapeHtml(line.reference||"Sin referencia")+'</span>'+
+          '<span class="tracking-pending-description">'+escapeHtml(line.description||"Material sin descripción")+'</span>'+
+          '<span class="tracking-pending-qty">'+escapeHtml(quantity)+'</span></div>';
+      }).join("")+
+      (lines.length>shown.length?'<div class="tracking-pending-more">Y '+(lines.length-shown.length)+' materiales pendientes más · despliega el detalle</div>':"")+'</div>';
+  }
+
   async function readPages(queryFactory, limit=12000) {
     const all=[], size=800;
     for(let off=0;off<limit;off+=size) {
@@ -86,7 +118,7 @@ export function initTracking({client,escapeHtml}) {
       for(let i=0;i<ids.length;i+=150) {
         const group=ids.slice(i,i+150);
         const lineList=await readPages((off,size)=>client.from("tracking_lines")
-          .select("id,order_id,source_row,reference,description,requested_qty,albaran,observations")
+          .select("id,order_id,source_row,reference,description,requested_qty,albaran,observations,source_green,source_si,drive_line_finalized")
           .in("order_id",group).order("source_row").range(off,off+size-1));
         const eventList=await readPages((off,size)=>client.from("tracking_decisions")
           .select("id,order_id,decision,reason,created_at")
@@ -122,7 +154,7 @@ export function initTracking({client,escapeHtml}) {
     const current=orders.map(o=>({...o,_state:trackingEffectiveState(o,decisions.get(o.id))}));
     const open=current.filter(o=>o._state==="open");
     const eligible=open.filter(o=>age(o.order_date)>=Number(alertDays.value||7));
-    const review=open.filter(o=>o.lines.some(l=>interpretTrackingObservation(l.observations,l.requested_qty).kind==="review"));
+    const review=open.filter(o=>o.lines.some(l=>!trackingLineDelivered(l) && (l.source_green && !l.source_si || interpretTrackingObservation(l.observations,l.requested_qty).kind==="review")));
     stats.innerHTML=
       '<div class="tracking-metric"><span>Pedidos del periodo</span><strong>'+current.length+'</strong></div>'+
       '<div class="tracking-metric"><span>Sin finalizar</span><strong>'+open.length+'</strong></div>'+
@@ -141,35 +173,48 @@ export function initTracking({client,escapeHtml}) {
       if(state.value==="open" && o._state!=="open")return false;
       if(state.value==="due" && (o._state!=="open"||age(o.order_date)<Number(alertDays.value||7)))return false;
       if(state.value==="closed" && o._state==="open")return false;
-      if(state.value==="review" && (o._state!=="open"||!o.lines.some(l=>interpretTrackingObservation(l.observations,l.requested_qty).kind==="review")))return false;
+      if(state.value==="review" && (o._state!=="open"||!o.lines.some(l=>!trackingLineDelivered(l) && (l.source_green && !l.source_si || interpretTrackingObservation(l.observations,l.requested_qty).kind==="review"))))return false;
       return !q||[o.order_reference,o.supplier,o.responsible,...o.lines.flatMap(l=>[l.reference,l.description])].some(v=>String(v||"").toLocaleLowerCase("es").includes(q));
     });
+    // Ordenar SOLO las coincidencias del periodo, no volver a mezclar registros fuera del rango.
+    sortTrackingOrders(visible,sort.value);
     document.getElementById("trackingVisible").textContent=visible.length+" de "+current.length+" pedidos";
     if(!visible.length) {list.innerHTML='<div class="tracking-empty">No hay pedidos que coincidan con los filtros elegidos.</div>';return;}
     list.innerHTML=visible.slice(0,300).map(o=>{
       const closed=o._state!=="open", manual=o._state==="closed_manual", n=age(o.order_date);
-      const badge=closed?(manual?"Finalizado manualmente":"Finalizado en Drive"):(n>=Number(alertDays.value||7)?"Revisar plazo":"Pendiente");
+      const pending=o.lines.filter(line=>!trackingLineDelivered(line));
+      const delivered=o.lines.filter(line=>trackingLineDelivered(line));
+      const badge=closed?(manual?"Finalizado manualmente":"Completo en Drive"):
+        (delivered.length ? "Entrega parcial" : n>=Number(alertDays.value||7)?"Revisar plazo":"Pendiente");
       const cls=closed?"is-closed":n>=Number(alertDays.value||7)?"is-alert":"is-open";
       const decision=decisions.get(o.id);
-      const desc=closed?"Cierre prevalente; no se calculan cantidades pendientes.":o.lines.some(x=>interpretTrackingObservation(x.observations,x.requested_qty).kind==="probable")?
-        "Existen cantidades anotadas, pendientes de verificar.":"No hay evidencia suficiente para cuantificar todas las entregas.";
+      const desc=closed?"Pedido cerrado. Las anotaciones parciales anteriores no generan reclamaciones.":
+        pending.length+" materiales sin marca verde + SI · "+delivered.length+" recibidos según Drive.";
+      const linesToShow=closed?o.lines:pending;
+      const table='<div class="tracking-table-wrap"><table><thead><tr><th>Referencia y concepto</th><th>Solicitado</th><th>Estado / cantidad</th><th>Albarán</th><th>Observaciones originales</th></tr></thead>'+
+        '<tbody>'+linesToShow.map(lineSummary).join("")+'</tbody></table></div>';
+      const deliveredDetail=!closed && delivered.length?
+        '<details class="tracking-details tracking-received-details"><summary>Ver '+delivered.length+' materiales ya recibidos</summary>'+
+        '<div class="tracking-table-wrap"><table><thead><tr><th>Referencia y concepto</th><th>Solicitado</th><th>Estado</th><th>Albarán</th><th>Observaciones</th></tr></thead><tbody>'+
+        delivered.map(lineSummary).join("")+'</tbody></table></div></details>':"";
       return '<article class="tracking-order '+cls+'"><div class="tracking-order-head"><div><div class="tracking-order-ref">'+escapeHtml(o.order_reference)+
         '<span class="tracking-badge">'+escapeHtml(badge)+'</span></div><div class="tracking-order-meta">'+
-        escapeHtml(o.supplier||"Sin proveedor")+' · '+escapeHtml(pretty(o.order_date))+' · '+n+' dias · '+o.lines.length+' materiales</div></div>'+
+        escapeHtml(o.supplier||"Sin proveedor")+' · '+escapeHtml(pretty(o.order_date))+' · '+n+' días · <strong>'+
+        pending.length+' pendientes</strong> / '+delivered.length+' recibidos</div></div>'+
         '<button type="button" class="tracking-action" data-action="'+(closed?"reopen":"close")+'" data-order-id="'+o.id+'"'+
-        (o.drive_finalized?' disabled title="El SI del Drive tiene prioridad: no se puede reabrir aqui"':'')+'>'+
+        (o.drive_finalized?' disabled title="Todas las líneas están marcadas recibidas en Drive"':'')+'>'+
         (closed?"Reabrir":"Marcar finalizado")+'</button></div>'+
         '<div class="tracking-order-note">'+escapeHtml(desc)+'</div>'+
-        (decision?'<div class="tracking-order-note">Ultima decision manual: '+escapeHtml(decision.decision==="closed"?"Cierre":"Reapertura")+
+        (!closed?pendingPreview(pending):"")+
+        (decision?'<div class="tracking-order-note">Última decisión manual: '+escapeHtml(decision.decision==="closed"?"Cierre":"Reapertura")+
           ' · '+escapeHtml(pretty(String(decision.created_at).slice(0,10)))+' · '+escapeHtml(decision.reason)+'</div>':"")+
-        '<details class="tracking-details"><summary>Ver las '+o.lines.length+' lineas de material</summary>'+
-        '<div class="tracking-table-wrap"><table><thead><tr><th>Referencia y concepto</th><th>Solicitado</th><th>Lectura prudente</th><th>Albaran</th><th>Observaciones originales</th></tr></thead>'+
-        '<tbody>'+o.lines.map(lineSummary).join("")+'</tbody></table></div></details></article>';
-    }).join("")+(visible.length>300?'<p class="tracking-empty">Mostrando los 300 primeros. Acota el rango para ver mas.</p>':"");
+        '<details class="tracking-details"><summary>'+(closed?"Ver todos los materiales recibidos":"Consultar detalle de los "+pending.length+" materiales pendientes")+
+        '</summary>'+table+'</details>'+deliveredDetail+'</article>';
+    }).join("")+(visible.length>300?'<p class="tracking-empty">Mostrando los 300 primeros. Acota el rango para ver más.</p>':"");
   }
   period.addEventListener("change",()=>{setPeriod(period.value);if(period.value!=="custom")load();});
   [dateFrom,dateTo].forEach(el=>el.addEventListener("change",()=>{period.value="custom";load();}));
-  [supplier,state,alertDays].forEach(el=>el.addEventListener("change",render));
+  [supplier,state,alertDays,sort].forEach(el=>el.addEventListener("change",render));
   search.addEventListener("input",render);
   refresh.addEventListener("click",load);
   list.addEventListener("click",async event=>{

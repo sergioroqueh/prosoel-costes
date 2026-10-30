@@ -7,7 +7,7 @@
 - El snapshot se guarda solo en la base privada con RLS, nunca como Excel, JSON o CSV dentro del repositorio público.
 
 ## Reglas funcionales
-1. `FINALIZADO = SI` del archivo de Drive siempre significa finalizado, aunque haya cantidades parciales contradictorias.
+1. **Lectura por MATERIAL, no por cabecera:** un material se considera recibido únicamente cuando su fila está verde y el `SI` de la columna M cubre esa fila (también a través de una celda M combinada). Un `SI` parcial en el pedido NO cierra las otras líneas. El pedido está finalizado en Drive solo cuando todas sus líneas cumplen esta condición. Una línea recibida prevalece sobre observaciones parciales contradictorias de esa misma línea.
 2. Cierres manuales registrados como eventos inmutables con usuario, motivo y fecha, sin escribir en Drive. La última decisión local prevalece cuando Drive NO está marcado SI. Reapertura reversible.
 3. Filtrado por fecha del pedido: 7/30/90 días y rango personalizado; predeterminado últimos 30. Se puede filtrar proveedor, estado, texto y plazo para revisión.
 4. **No interpretar arbitrariamente OBSERVACIONES**: el texto original siempre se ve. Una anotación numérica aislada tiene clasificación probable, no recepción confirmada. Todo texto mixto o inconsistente exige revisión. Sin anotación, no se inventan recepciones.
@@ -27,3 +27,16 @@ La conexión ChatGPT↔Drive usada para obtener la muestra no es una autorizaci�
 
 ## Despliegue
 El módulo se introduce como cambio aditivo. No habilitar a Israel hasta autorizarlo explícitamente mediante nueva política RLS revisada y comprobación de interfaz. El estado de cierre local jamás modifica el estado del Excel original.
+
+## Correccion de lectura por material — 2026-10-30
+La primera instantánea interpretaba cualquier SI como cierre del pedido (falso positivo).
+Se examinó el XLSX binario de Drive (valores, estilos verdes y merged ranges de columna M). Resultado corregido para la muestra:
+- 118 pedidos y 488 materiales.
+- 390 materiales confirmados con verde + SI; 36 materiales verdes sin SI, que **no se dan por finalizados**.
+- 91 pedidos totalmente finalizados, 9 con entregas parciales y 18 sin material confirmado.
+- Los pedidos parciales siguen abiertos: el panel muestra únicamente los materiales pendientes y permite desplegar los recibidos por separado.
+- Ejemplos QA: pedido de 15 líneas con 14 recibidas queda abierto con solo una pendiente; otro de dos líneas con un SI no cierra la primera.
+- Por defecto, **orden cronológico de antiguos a recientes** limitado al rango seleccionado. Selector de inverso disponible.
+- Se ocultan de la interfaz los filtros de almacén/proveedor y búsqueda de pedido/material/referencia, pero el código y sus datos se conservan.
+- Siempre conservar los colores y las celdas combinadas al procesar el XLSX futuro. **La exportación textual/CSV de Drive pierde esta información y NO basta para decidir recepciones.**
+- No reemplazar la política privada de Supabase ni la condición de cuenta Sergio hasta autorización explícita para Israel.

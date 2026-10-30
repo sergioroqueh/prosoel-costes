@@ -2797,3 +2797,23 @@ main { margin-top: 25px; }
   .tracking-filter-bottom,.tracking-order-head{align-items:stretch;flex-direction:column;}
   .tracking-refresh,.tracking-action{width:100%;}
 }
+
+/* Correcciones de control de recepciones por material. Los filtros siguen disponibles en la lógica interna. */
+.tracking-hidden-filter { display: none !important; }
+.tracking-filter-bottom { justify-content:flex-end; }
+.tracking-pending-materials { margin-top:15px;border:1px solid #d7e5ec;border-radius:12px;overflow:hidden;background:#f9fcfe; }
+.tracking-pending-materials > strong { display:block;padding:11px 14px;font-size:.82rem;font-weight:770;color:#174362;background:#eaf4f8;border-bottom:1px solid #d7e5ec; }
+.tracking-pending-item { display:grid;grid-template-columns:minmax(80px,140px) minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid #e2edf1;font-size:.83rem; }
+.tracking-pending-item:last-child { border-bottom:0; }
+.tracking-pending-ref {font-weight:790;color:#135b83;overflow-wrap:anywhere;}
+.tracking-pending-description {font-size:.83rem;color:#465d6c;}
+.tracking-pending-qty {text-align:right;color:#985827;font-weight:690;white-space:nowrap;}
+.tracking-pending-more {padding:10px 14px;font-size:.75rem;color:#536c80;}
+.tracking-row-pending td {background:#fffdf8;}
+.tracking-row-received td {background:#f2faf7;}
+.tracking-received-details {border-top:0; padding-top:0;}
+@media(max-width:640px) {
+ .tracking-pending-item {grid-template-columns:1fr auto;gap:4px 8px;}
+ .tracking-pending-description {grid-column:1/-1;grid-row:2;}
+ .tracking-pending-qty {grid-column:2;grid-row:1;}
+}

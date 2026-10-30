@@ -8,7 +8,7 @@
   <title>PROSOEL Costes</title>
   <meta name="theme-color" content="#134079">
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/prosoel-mark.svg?v=20261009-v17">
-  <link rel="stylesheet" href="./styles.css?v=20261030-tracking-sergio-v1">
+  <link rel="stylesheet" href="./styles.css?v=20261030-tracking-lineas-v2">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -294,7 +294,7 @@
             </select></label>
             <label>Desde<input id="trackingFrom" type="date"></label>
             <label>Hasta<input id="trackingTo" type="date"></label>
-            <label>Almacen / proveedor<select id="trackingSupplier"><option value="">Todos</option></select></label>
+            <label class="tracking-hidden-filter">Almacen / proveedor<select id="trackingSupplier"><option value="">Todos</option></select></label>
             <label>Estado<select id="trackingState">
               <option value="open" selected>Sin finalizar</option>
               <option value="due">Superan plazo</option>
@@ -303,8 +303,12 @@
               <option value="all">Todos</option>
             </select></label>
             <label>Dias para alerta<input id="trackingAlertDays" type="number" min="1" max="365" step="1" value="7"></label>
+            <label>Ordenar por<select id="trackingSort">
+              <option value="oldest" selected>Más antiguos primero</option>
+              <option value="newest">Más recientes primero</option>
+            </select></label>
           </div>
-          <div class="tracking-filter-bottom"><label class="tracking-search-label">Buscar pedido, material o referencia
+          <div class="tracking-filter-bottom"><label class="tracking-search-label tracking-hidden-filter">Buscar pedido, material o referencia
             <input id="trackingSearch" type="search" placeholder="Ej.: 26/829, GUARCONSA, A7-M8"></label>
             <button type="button" class="tracking-refresh" id="trackingRefresh">Actualizar vista</button>
           </div>
@@ -314,7 +318,7 @@
         </div>
         <div id="trackingStatus" class="tracking-status" role="status" aria-live="polite">Selecciona un periodo para consultar los pedidos.</div>
         <div id="trackingResults" class="tracking-results"></div>
-        <p class="tracking-footnote">La marca FINALIZADO = SI del Excel prevalece sobre observaciones parciales. Los cierres manuales se auditan y son reversibles; no modifican Drive. La copia de datos de esta BETA no se sincroniza automaticamente con Google Drive.</p>
+        <p class="tracking-footnote">Cada material se considera recibido cuando aparece en verde y su celda FINALIZADO indica SI, también si está combinada con otras filas. Un SI en otro material no cierra todo el pedido. Los cierres manuales se auditan y son reversibles; no modifican Drive. La copia de datos de esta BETA no se sincroniza automaticamente con Google Drive.</p>
       </section>
 
       <section id="reviewWorkspace" class="review-workspace hidden" role="tabpanel" aria-labelledby="reviewTab">
@@ -528,6 +532,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261030-tracking-sergio-v1"></script>
+  <script type="module" src="./app.js?v=20261030-tracking-lineas-v2"></script>
 </body>
 </html>
