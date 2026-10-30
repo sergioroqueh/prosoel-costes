@@ -209,10 +209,12 @@ export function initTracking({client,escapeHtml}) {
     const open=current.filter(o=>o._state==="open");
     const eligible=open.filter(o=>age(o.order_date)>=Number(alertDays.value||7));
     const review=open.filter(o=>o.lines.some(l=>!trackingLineDelivered(l) && (l.source_green && !l.source_si || interpretTrackingObservation(l.observations,l.requested_qty).kind==="review")));
+    const distinctWorks=new Set(open.map(o=>o.source_id)).size;
     stats.innerHTML=
       '<div class="tracking-metric"><span>Pedidos del periodo</span><strong>'+current.length+'</strong></div>'+
       '<div class="tracking-metric"><span>Sin finalizar</span><strong>'+open.length+'</strong></div>'+
       '<div class="tracking-metric tracking-metric-accent"><span>Superan plazo · '+escapeHtml(alertDays.value||"7")+' dias</span><strong>'+eligible.length+'</strong></div>'+
+      '<div class="tracking-metric"><span>Obras con pendientes</span><strong>'+distinctWorks+'</strong></div>'+
       '<div class="tracking-metric"><span>Observaciones para revisar</span><strong>'+review.length+'</strong></div>';
     const first=sources[0];
     const last=first?.synced_at ? new Date(first.synced_at).toLocaleString("es-ES") : "—";
@@ -234,7 +236,7 @@ export function initTracking({client,escapeHtml}) {
     sortTrackingOrders(visible,sort.value);
     document.getElementById("trackingVisible").textContent=visible.length+" de "+current.length+" pedidos";
     if(!visible.length) {list.innerHTML='<div class="tracking-empty">No hay pedidos que coincidan con los filtros elegidos.</div>';return;}
-    list.innerHTML=visible.slice(0,300).map(o=>{
+    const renderCard=(o)=>{
       const closed=o._state!=="open", manual=o._state==="closed_manual", n=age(o.order_date);
       const pending=o.lines.filter(line=>!trackingLineDelivered(line));
       const delivered=o.lines.filter(line=>trackingLineDelivered(line));
@@ -264,7 +266,26 @@ export function initTracking({client,escapeHtml}) {
           ' · '+escapeHtml(pretty(String(decision.created_at).slice(0,10)))+' · '+escapeHtml(decision.reason)+'</div>':"")+
         '<details class="tracking-details"><summary>'+(closed?"Ver todos los materiales recibidos":"Consultar detalle de los "+pending.length+" materiales pendientes")+
         '</summary>'+table+'</details>'+deliveredDetail+'</article>';
-    }).join("")+(visible.length>300?'<p class="tracking-empty">Mostrando los 300 primeros. Acota el rango para ver más.</p>':"");
+    };
+    const shown=visible.slice(0,300);
+    const overflow=visible.length>300?'<p class="tracking-empty">Mostrando los 300 primeros. Acota el rango para ver más.</p>':"";
+    if(viewMode==="works") {
+      const grouped=new Map();
+      for(const order of shown){
+        const name=folderName(order.source_id);
+        if(!grouped.has(name)) grouped.set(name,[]);
+        grouped.get(name).push(order);
+      }
+      // Los grupos se ordenan por la primera fecha pendiente, no por el nombre de la obra.
+      list.innerHTML=[...grouped.entries()].map(([name,items],i)=>{
+        const pendingCount=items.reduce((n,o)=>n+(o._state==="open"?o.lines.filter(l=>!trackingLineDelivered(l)).length:0),0);
+        return '<details class="tracking-project-group" '+(i<2?'open':'')+'><summary><span>'+
+          escapeHtml(name)+'</span><small>'+items.length+' pedidos · '+pendingCount+' materiales pendientes</small></summary>'+
+          '<div class="tracking-project-cards">'+items.map(renderCard).join("")+'</div></details>';
+      }).join("")+overflow;
+    } else {
+      list.innerHTML=shown.map(renderCard).join("")+overflow;
+    }
   }
   period.addEventListener("change",()=>{setPeriod(period.value);if(period.value!=="custom")load();});
   [dateFrom,dateTo].forEach(el=>el.addEventListener("change",()=>{period.value="custom";load();}));
