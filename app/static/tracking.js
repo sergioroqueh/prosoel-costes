@@ -46,6 +46,10 @@ export function initTracking({client,escapeHtml}) {
   const refresh = document.getElementById("trackingRefresh");
   const alertDays = document.getElementById("trackingAlertDays");
   const sort = document.getElementById("trackingSort");
+  const project = document.getElementById("trackingProject");
+  const viewButtons=[...root.querySelectorAll("[data-tracking-view]")];
+  let viewMode="queue";
+  let catalog=[],folders=[],syncSettings=null;
   let orders = [], decisions = new Map(), sources = [], loaded = false, busy = false, generation = 0;
   const fmt = (value) => value == null ? "—" : new Intl.NumberFormat("es-ES",{maximumFractionDigits:3}).format(Number(value));
   const iso = (d) => [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");
@@ -105,9 +109,17 @@ export function initTracking({client,escapeHtml}) {
     busy=true; refresh.disabled=true; status.textContent="Consultando pedidos autorizados…";
     const request=++generation;
     try {
-      const src=await client.from("tracking_sources").select("id,display_name,drive_url,synced_at,modified_at_source,sync_mode").order("display_name");
-      if(src.error) throw src.error;
+      const [src,cat,folderResults,settings]=await Promise.all([
+        client.from("tracking_sources").select("id,display_name,drive_url,synced_at,modified_at_source,sync_mode").order("display_name"),
+        client.from("tracking_drive_catalog").select("file_id,folder_id,source_title,status,reason,drive_modified_at,last_imported_at,automatic_import_enabled").order("source_title").limit(1000),
+        client.from("tracking_drive_folders").select("folder_id,folder_label,classification").limit(1000),
+        client.from("tracking_sync_settings").select("requested_interval_minutes,automatic_sync_enabled,auth_setup").eq("id",1).maybeSingle()
+      ]);
+      if(src.error||cat.error||folderResults.error||settings.error) throw (src.error||cat.error||folderResults.error||settings.error);
       sources=src.data || [];
+      catalog=cat.data || [];
+      folders=folderResults.data || [];
+      syncSettings=settings.data || null;
       if(!sources.length) {orders=[];decisions.clear();loaded=true;render();status.textContent="No hay fuentes importadas para este usuario.";return;}
       const rows=await readPages((off,size)=>client.from("tracking_orders")
         .select("id,source_id,source_row,order_reference,order_date,supplier,responsible,delivery_location,drive_finalized,reception_date")
@@ -134,7 +146,7 @@ export function initTracking({client,escapeHtml}) {
       for(const d of events.sort((a,b)=>b.created_at.localeCompare(a.created_at)||b.id-a.id))
         if(!decisions.has(d.order_id))decisions.set(d.order_id,d);
       loaded=true;
-      updateSuppliers();render();
+      updateSuppliers();updateProjects();render();
       status.textContent=orders.length+" pedidos recuperados del periodo seleccionado. La actualizacion de Drive no es automatica todavia.";
     } catch(e) {
       console.error("Seguimiento:",e);
@@ -149,27 +161,71 @@ export function initTracking({client,escapeHtml}) {
     for(const s of values)supplier.add(new Option(s,s));
     supplier.value=values.includes(old)?old:"";
   }
+  function folderName(id) {
+    const origin=catalog.find(c=>c.file_id===id);
+    if(!origin)return sources.find(s=>s.id===id)?.display_name || "Obra no identificada";
+    return folders.find(f=>f.folder_id===origin.folder_id)?.folder_label || origin.source_title;
+  }
+  function updateProjects() {
+    const before=project.value;
+    const ids=[...new Set(orders.map(o=>o.source_id))];
+    project.replaceChildren(new Option("Todas las obras cargadas",""));
+    for(const id of ids.sort((a,b)=>folderName(a).localeCompare(folderName(b),"es")))
+      project.add(new Option(folderName(id),id));
+    project.value=ids.includes(before)?before:"";
+  }
+  function renderSources() {
+    const counts={
+      approved:catalog.filter(x=>x.status==="approved").length,
+      candidate:catalog.filter(x=>x.status==="candidate").length,
+      review:catalog.filter(x=>x.status==="review").length,
+      excluded:folders.filter(x=>x.classification==="excluded"||x.classification==="archive").length
+    };
+    const scheduled=Boolean(syncSettings?.automatic_sync_enabled && syncSettings?.auth_setup==="validated");
+    const headline='<section class="tracking-source-overview"><h3>Fuentes de pedidos de Drive</h3>'+
+      '<p>'+counts.approved+' libro aprobado · '+counts.candidate+' candidatos · '+counts.review+' por revisar · '+counts.excluded+' carpetas apartadas</p>'+
+      '<div class="tracking-sync-note '+(scheduled?"tracking-sync-on":"")+'">'+
+      (scheduled?"Sincronización automática configurada cada ":"Sincronización horaria prevista (" )+
+      escapeHtml(syncSettings?.requested_interval_minutes??60)+' minutos'+(scheduled?'.':'), pendiente de autorizar la conexión permanente de Google.')+
+      '</div></section>';
+    const items=[...catalog].sort((a,b)=>{
+      const ranks={approved:0,candidate:1,review:2,excluded:3};
+      return (ranks[a.status]??9)-(ranks[b.status]??9)||
+        folderName(a.file_id).localeCompare(folderName(b.file_id),"es");
+    });
+    const cards=items.map(x=>{
+      const label=x.status==="approved"?"Importado":x.status==="candidate"?"Pendiente de validar":x.status==="review"?"Revisión manual":"Excluido";
+      const date=x.drive_modified_at?new Date(x.drive_modified_at).toLocaleDateString("es-ES"):"Sin fecha";
+      return '<article class="tracking-source-item"><div><strong>'+escapeHtml(folderName(x.file_id))+
+        '</strong><small>'+escapeHtml(x.source_title)+' · modificado '+escapeHtml(date)+'</small></div>'+
+        '<span class="tracking-source-state tracking-source-state-'+escapeHtml(x.status)+'">'+escapeHtml(label)+'</span></article>';
+    }).join("");
+    list.innerHTML=headline+'<div class="tracking-source-list">'+cards+'</div>';
+    document.getElementById("trackingVisible").textContent=items.length+" libros identificados";
+  }
   function render() {
     if(!loaded)return;
-    const current=orders.map(o=>({...o,_state:trackingEffectiveState(o,decisions.get(o.id))}));
+    const current=orders.filter(o=>!project.value || o.source_id===project.value).map(o=>({...o,_state:trackingEffectiveState(o,decisions.get(o.id))}));
     const open=current.filter(o=>o._state==="open");
     const eligible=open.filter(o=>age(o.order_date)>=Number(alertDays.value||7));
     const review=open.filter(o=>o.lines.some(l=>!trackingLineDelivered(l) && (l.source_green && !l.source_si || interpretTrackingObservation(l.observations,l.requested_qty).kind==="review")));
+    const distinctWorks=new Set(open.map(o=>o.source_id)).size;
     stats.innerHTML=
       '<div class="tracking-metric"><span>Pedidos del periodo</span><strong>'+current.length+'</strong></div>'+
       '<div class="tracking-metric"><span>Sin finalizar</span><strong>'+open.length+'</strong></div>'+
       '<div class="tracking-metric tracking-metric-accent"><span>Superan plazo · '+escapeHtml(alertDays.value||"7")+' dias</span><strong>'+eligible.length+'</strong></div>'+
+      '<div class="tracking-metric"><span>Obras con pendientes</span><strong>'+distinctWorks+'</strong></div>'+
       '<div class="tracking-metric"><span>Observaciones para revisar</span><strong>'+review.length+'</strong></div>';
-    const s=sources[0];
-    if(s) {
-      const validUrl=/^https:\/\/docs\.google\.com\/spreadsheets\//.test(s.drive_url||"");
-      source.innerHTML='<span>Fuente: '+escapeHtml(s.display_name)+'</span> · <strong>Copia puntual, no sincronizacion en vivo</strong> · '+
-        escapeHtml(new Date(s.synced_at).toLocaleString("es-ES"))+
-        (validUrl?' · <a href="'+escapeHtml(s.drive_url)+'" target="_blank" rel="noopener noreferrer">Abrir original en Drive</a>':"");
-    } else source.textContent="Sin fuente conectada";
+    const first=sources[0];
+    const last=first?.synced_at ? new Date(first.synced_at).toLocaleString("es-ES") : "—";
+    source.textContent=sources.length+" fuentes importadas · "+catalog.filter(c=>c.status==="candidate").length+
+      " candidatos por validar · última copia: "+last+
+      " · Google Drive aún no se sincroniza automáticamente";
+    if(viewMode==="sources") {renderSources();return;}
     const q=search.value.trim().toLocaleLowerCase("es");
     const visible=current.filter(o=>{
       if(supplier.value && o.supplier!==supplier.value)return false;
+      if(project.value && o.source_id!==project.value)return false;
       if(state.value==="open" && o._state!=="open")return false;
       if(state.value==="due" && (o._state!=="open"||age(o.order_date)<Number(alertDays.value||7)))return false;
       if(state.value==="closed" && o._state==="open")return false;
@@ -180,7 +236,7 @@ export function initTracking({client,escapeHtml}) {
     sortTrackingOrders(visible,sort.value);
     document.getElementById("trackingVisible").textContent=visible.length+" de "+current.length+" pedidos";
     if(!visible.length) {list.innerHTML='<div class="tracking-empty">No hay pedidos que coincidan con los filtros elegidos.</div>';return;}
-    list.innerHTML=visible.slice(0,300).map(o=>{
+    const renderCard=(o)=>{
       const closed=o._state!=="open", manual=o._state==="closed_manual", n=age(o.order_date);
       const pending=o.lines.filter(line=>!trackingLineDelivered(line));
       const delivered=o.lines.filter(line=>trackingLineDelivered(line));
@@ -210,11 +266,39 @@ export function initTracking({client,escapeHtml}) {
           ' · '+escapeHtml(pretty(String(decision.created_at).slice(0,10)))+' · '+escapeHtml(decision.reason)+'</div>':"")+
         '<details class="tracking-details"><summary>'+(closed?"Ver todos los materiales recibidos":"Consultar detalle de los "+pending.length+" materiales pendientes")+
         '</summary>'+table+'</details>'+deliveredDetail+'</article>';
-    }).join("")+(visible.length>300?'<p class="tracking-empty">Mostrando los 300 primeros. Acota el rango para ver más.</p>':"");
+    };
+    const shown=visible.slice(0,300);
+    const overflow=visible.length>300?'<p class="tracking-empty">Mostrando los 300 primeros. Acota el rango para ver más.</p>':"";
+    if(viewMode==="works") {
+      const grouped=new Map();
+      for(const order of shown){
+        const name=folderName(order.source_id);
+        if(!grouped.has(name)) grouped.set(name,[]);
+        grouped.get(name).push(order);
+      }
+      // Los grupos se ordenan por la primera fecha pendiente, no por el nombre de la obra.
+      list.innerHTML=[...grouped.entries()].map(([name,items],i)=>{
+        const pendingCount=items.reduce((n,o)=>n+(o._state==="open"?o.lines.filter(l=>!trackingLineDelivered(l)).length:0),0);
+        return '<details class="tracking-project-group" '+(i<2?'open':'')+'><summary><span>'+
+          escapeHtml(name)+'</span><small>'+items.length+' pedidos · '+pendingCount+' materiales pendientes</small></summary>'+
+          '<div class="tracking-project-cards">'+items.map(renderCard).join("")+'</div></details>';
+      }).join("")+overflow;
+    } else {
+      list.innerHTML=shown.map(renderCard).join("")+overflow;
+    }
   }
   period.addEventListener("change",()=>{setPeriod(period.value);if(period.value!=="custom")load();});
   [dateFrom,dateTo].forEach(el=>el.addEventListener("change",()=>{period.value="custom";load();}));
-  [supplier,state,alertDays,sort].forEach(el=>el.addEventListener("change",render));
+  [supplier,state,alertDays,sort,project].forEach(el=>el.addEventListener("change",render));
+  for(const button of viewButtons) button.addEventListener("click",()=>{
+    viewMode=button.dataset.trackingView;
+    for(const b of viewButtons){
+      const active=b===button;
+      b.classList.toggle("is-active",active);
+      b.setAttribute("aria-pressed",String(active));
+    }
+    render();
+  });
   search.addEventListener("input",render);
   refresh.addEventListener("click",load);
   list.addEventListener("click",async event=>{
@@ -234,5 +318,5 @@ export function initTracking({client,escapeHtml}) {
     status.textContent="Decision registrada con auditoria. Drive permanece intacto.";
     await load();
   });
-  return {open(){if(!loaded)load();else render();},reset(){++generation;orders=[];decisions.clear();sources=[];loaded=false;list.replaceChildren();stats.replaceChildren();source.textContent="";status.textContent="Selecciona un periodo para consultar pedidos.";setPeriod("30");period.value="30";}};
+  return {open(){if(!loaded)load();else render();},reset(){++generation;orders=[];decisions.clear();sources=[];catalog=[];folders=[];syncSettings=null;loaded=false;viewMode="queue";for(const b of viewButtons){const active=b.dataset.trackingView==="queue";b.classList.toggle("is-active",active);b.setAttribute("aria-pressed",String(active));}list.replaceChildren();stats.replaceChildren();source.textContent="";status.textContent="Selecciona un periodo para consultar pedidos.";setPeriod("30");period.value="30";}};
 }
