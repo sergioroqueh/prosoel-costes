@@ -205,7 +205,7 @@ export function initTracking({client,escapeHtml}) {
   }
   function render() {
     if(!loaded)return;
-    const current=orders.map(o=>({...o,_state:trackingEffectiveState(o,decisions.get(o.id))}));
+    const current=orders.filter(o=>!project.value || o.source_id===project.value).map(o=>({...o,_state:trackingEffectiveState(o,decisions.get(o.id))}));
     const open=current.filter(o=>o._state==="open");
     const eligible=open.filter(o=>age(o.order_date)>=Number(alertDays.value||7));
     const review=open.filter(o=>o.lines.some(l=>!trackingLineDelivered(l) && (l.source_green && !l.source_si || interpretTrackingObservation(l.observations,l.requested_qty).kind==="review")));
