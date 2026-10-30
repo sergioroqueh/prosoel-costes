@@ -139,7 +139,7 @@ async function runOnce(db) {
    for(let i=0;i<known.length;i+=120){
      const ids=known.slice(i,i+120).map(o=>o.id);
      existingLines.push(...await readPaged((low,high)=>db.from("tracking_lines")
-       .select("order_id,source_row,reference,description,requested_qty,observations,drive_line_finalized")
+       .select("order_id,source_row,reference,description,requested_qty,observations,albaran,drive_line_finalized")
        .in("order_id",ids).order("id").range(low,high)));
    }
    const diff=compareSource(snapshot.orders,known,existingLines);
