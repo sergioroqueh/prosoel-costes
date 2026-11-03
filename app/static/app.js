@@ -473,7 +473,7 @@ async function verifyAccess(user) {
   currentUser.textContent = data.display_name || data.email;
   currentUserRole = data.role || "user";
   // Gating visual despues de verificar app_users; el acceso real se protege con RLS.
-  trackingAllowed = String(data.email || "").trim().toLowerCase() === "compras@prosoel.es";
+  trackingAllowed = ["compras@prosoel.es","israel@prosoel.es"].includes(String(data.email || "").trim().toLowerCase());
   trackingTab.classList.toggle("hidden", !trackingAllowed);
   importTab.classList.toggle("hidden",currentUserRole!=="admin");
   return true;
@@ -2677,6 +2677,6 @@ const orderLookup = initOrderLookup({
   client:supabase, money, number, displayDiscount, escapeHtml, projectLookup
 });
 
-const tracking = initTracking({client:supabase,escapeHtml});
+const tracking = initTracking({client:supabase,escapeHtml,canManageSources:()=>trackingAllowed&&!isIsraelAccount});
 
 bootstrapSession();
