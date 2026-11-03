@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { readPedidosXlsx, compareSource } from "./parser.ts";
+import { readLegacyRecentXlsx } from "./legacy.ts";
 
 // Backend-only hourly worker. The entrypoint is public at network level but ALWAYS
 // validates the cryptographically random cron credential held in Supabase Vault.
@@ -71,14 +72,14 @@ async function readPaged(build,limit=20000) {
  }
  throw new Error("oversized_source");
 }
-async function runOnce(db,slot=0) {
+async function runOnce(db,slot=0,forceCheck=false) {
  const config=await db.from("tracking_sync_settings")
    .select("requested_interval_minutes,automatic_sync_enabled,auth_setup").eq("id",1).single();
  if(config.error)throw new Error("sync_settings_unreadable");
  if(!config.data.automatic_sync_enabled||config.data.auth_setup!=="validated")
    return {state:"disabled",message:"La sincronización automática no está habilitada."};
  const catalog=await db.from("tracking_drive_catalog")
-   .select("file_id,source_title,status,automatic_import_enabled,last_imported_modified_at,last_imported_md5")
+   .select("file_id,source_title,status,automatic_import_enabled,last_imported_modified_at,last_imported_md5,priority_from,historical_review_policy")
    .eq("status","approved").eq("automatic_import_enabled",true).order("file_id").limit(100);
  if(catalog.error)throw new Error("catalog_unreadable");
  if((catalog.data||[]).length<1)return {state:"disabled",message:"No hay fuentes aprobadas para sincronizar."};
@@ -120,7 +121,7 @@ async function runOnce(db,slot=0) {
    const prior=source.last_imported_modified_at && new Date(source.last_imported_modified_at).getTime()===new Date(meta.modifiedTime).getTime();
    const md5Matches=!meta.md5Checksum || !source.last_imported_md5 ||
       meta.md5Checksum.toLowerCase()===source.last_imported_md5.toLowerCase();
-   if(prior&&md5Matches){
+   if(prior&&md5Matches&&!forceCheck){
      await complete("skipped","Sin cambios en Google Drive.");
      return {state:"unchanged",source:source.source_title};
    }
@@ -129,8 +130,41 @@ async function runOnce(db,slot=0) {
    const bytes=await result.arrayBuffer();
    if(bytes.byteLength>12000000)throw new Error("xlsx_too_large");
    let snapshot;
-   try{snapshot=readPedidosXlsx(bytes);}
-   catch(e){throw new Error("xlsx_validation_"+String(e?.message||"unknown").slice(0,100));}
+   const legacy=source.priority_from==="2026-07-01"&&source.historical_review_policy==="defer_before_priority";
+   if(legacy){
+     let parsed;
+     try{parsed=readLegacyRecentXlsx(bytes,"2026-07-01");}
+     catch(e){throw new Error("legacy_parser_"+String(e?.message||"unknown").slice(0,90));}
+     if(!parsed.compatible || parsed.orders.length===0)throw new Error("legacy_template_requires_review");
+     const stored=await db.from("tracking_legacy_review")
+       .select("source_row,source_sheet,order_reference,order_date,reason,issues_json,review_status")
+       .eq("source_id",source.file_id).order("source_row").limit(500);
+     if(stored.error)throw new Error("cannot_verify_legacy_quarantine");
+     const oldReview=stored.data||[];
+     const encodeIssue=x=>[x.source_row,x.reason,x.qty_raw||"",x.reference||""].join("|");
+     const reviewKey=x=>[
+       x.source_row,x.source_sheet,x.order_reference||"",x.order_date||"",
+       x.reason, (x.issues||x.issues_json||[]).map(encodeIssue).sort().join(";")
+     ].join("::");
+     const oldKeys=oldReview.map(reviewKey).sort();
+     const newKeys=parsed.review.map(reviewKey).sort();
+     if(oldReview.some(x=>x.review_status!=="pending")||
+       oldKeys.length!==newKeys.length||
+       oldKeys.some((x,i)=>x!==newKeys[i])){
+       await complete("partial","La revisión histórica cambió: necesita comprobarse sin generar reclamaciones.",
+         parsed.summary,{quarantine_changed:1});
+       return {state:"needs_review",source:source.source_title,reason:"quarantine_changed"};
+     }
+     snapshot={orders:parsed.orders,summary:{
+       orders:parsed.summary.accepted_orders,lines:parsed.summary.lines,
+       received:parsed.summary.received,completed:parsed.summary.completed,
+       partial:parsed.summary.partial,noneReceived:parsed.summary.noneReceived,
+       review_records:parsed.summary.review_records
+     }};
+   } else {
+     try{snapshot=readPedidosXlsx(bytes);}
+     catch(e){throw new Error("xlsx_validation_"+String(e?.message||"unknown").slice(0,100));}
+   }
    const known=await readPaged((low,high)=>db.from("tracking_orders")
       .select("id,source_row,order_reference,order_date,drive_finalized")
       .eq("source_id",source.file_id).order("id").range(low,high));
@@ -179,7 +213,7 @@ Deno.serve(async (request)=>{
    const slot=payload.slot??0;
    if(!Number.isInteger(slot)||slot<0||slot>10000)
      return reply(400,"bad_slot","Índice de sincronización inválido.");
-   const response=await runOnce(db,slot);
+   const response=await runOnce(db,slot,payload.force_check===true);
    return reply(200,response.state,"Comprobación horaria ejecutada.",response);
  }catch(e){
    console.error("PROSOEL cron:",String(e?.message||"error").slice(0,140));
