@@ -1,4 +1,4 @@
--- Referencias de ofertas comerciales extraídas de pedidos XLSX (exclusivamente 2026).
+-- Referencias de ofertas comerciales: rescate histórico 2026; altas nuevas desde 2026.
 -- Independiente de los PDF, precios históricos y el campo legacy supplier_offer_reference.
 -- No se modifican pedidos ni líneas. El número de oferta es 1:N por pedido.
 
@@ -22,8 +22,8 @@ create index if not exists idx_supplier_offer_references_order
 create or replace function private.ensure_2026_supplier_ref_order()
 returns trigger language plpgsql set search_path = '' as $check$
 begin
-  if not exists (select 1 from public.orders o where o.id=new.order_id and o.order_year=2026) then
-    raise exception 'Las ofertas solo se vinculan a pedidos de 2026';
+  if not exists (select 1 from public.orders o where o.id=new.order_id and o.order_year>=2026) then
+    raise exception 'Las ofertas nuevas se vinculan a pedidos desde 2026';
   end if;
   return new;
 end
@@ -95,7 +95,7 @@ begin
 
     select count(*),min(o.id) into v_match_count,v_order_id
     from public.orders o
-    where o.order_year=2026 and btrim(o.source_sha256)=v_sha
+    where o.order_year>=2026 and btrim(o.source_sha256)=v_sha
       and o.source_filename=v_filename;
 
     if v_match_count<>1 then
@@ -143,4 +143,4 @@ grant execute on function public.record_2026_supplier_offer_references(jsonb)
   to authenticated;
 
 comment on table public.order_supplier_offer_references is
- 'Números de oferta extraídos de Excel 2026: históricos por número único/archivo y nuevos por SHA+nombre. No incluye PDF ni modifica importes.';
+ 'Referencias de Excel: histórico 2026 enlazado por número, nuevas altas desde 2026 por SHA y nombre. No incluye PDF ni modifica importes.';
