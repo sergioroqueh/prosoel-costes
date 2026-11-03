@@ -1,3 +1,5 @@
+import { fetchSupplierOfferRefsMap, supplierOfferRefsHtml } from "./supplier_offer_references.js?v=20261103-v2";
+
 // Busqueda de obra y pedidos: lecturas bajo el RLS existente, sin RPC ni escrituras.
 export const PROJECT_PAGE_SIZE = 20;
 
@@ -31,7 +33,7 @@ export async function findMatchingProjects(client, value) {
 
 export async function fetchProjectOrders(client, projectId, offset, pageSize = PROJECT_PAGE_SIZE) {
   const response = await client.from("orders")
-    .select("id,order_reference,order_year,order_number,order_subnumber,order_date,declared_total,source_filename,order_identity_status,suppliers(name)", { count: "exact" })
+    .select("id,order_reference,order_year,order_number,order_subnumber,order_date,declared_total,source_filename,order_identity_status,supplier_offer_reference,suppliers(name)", { count: "exact" })
     .eq("project_id", projectId)
     .order("order_date", { ascending: false, nullsFirst: false })
     .order("id", { ascending: false })
@@ -103,21 +105,22 @@ export function initProjectLookup({ client, money, number, displayDiscount, esca
   }
   function buildCard(order) {
     const id = String(order.id);
+    const offerSection = Number(order.order_year) >= 2026 && order.offerRefs?.length
+      ? '<p class="order-project-source"><strong>Ofertas del proveedor:</strong> ' +
+          supplierOfferRefsHtml(order.offerRefs, escapeHtml) + '</p>'
+      : "";
     const conflict = order.order_identity_status === "conflict"
       ? '<span class="order-project-conflict">Revisar identidad</span>' : "";
     return '<article class="order-project-card" data-project-order="' + escapeHtml(id) + '">' +
       '<div class="order-project-card-top"><div><span class="order-lookup-kicker">Pedido</span>' +
-      '<div class="order-heading-with-offer"><h3>' + escapeHtml(orderLabel(order)) + '</h3>' +
-      (order.supplier_offer_reference
-        ? '<span class="order-offer-label"><strong>Oferta:</strong> ' + escapeHtml(order.supplier_offer_reference) + '</span>'
-        : '') + '</div></div>' +
+      '<div class="order-heading-with-offer"><h3>' + escapeHtml(orderLabel(order)) + '</h3></div></div>' +
       '<span class="order-project-date">' + escapeHtml(dateLabel(order.order_date)) + '</span></div>' +
       '<div class="order-project-meta">' +
       '<span><strong>Proveedor:</strong> ' + escapeHtml(supplierName(order.suppliers)) + '</span>' +
       '<span><strong>Total declarado:</strong> ' + escapeHtml(money(order.declared_total)) + '</span>' +
       conflict + '</div>' +
       '<p class="order-project-source"><strong>Archivo:</strong> ' +
-      escapeHtml(order.source_filename || "No indicado") + '</p>' +
+      escapeHtml(order.source_filename || "No indicado") + '</p>' + offerSection +
       '<button type="button" class="order-project-expand" data-expand-order="' + escapeHtml(id) +
       '" aria-expanded="false" aria-controls="order-project-lines-' + escapeHtml(id) +
       '">Ver líneas del pedido ▾</button>' +
@@ -198,13 +201,17 @@ export function initProjectLookup({ client, money, number, displayDiscount, esca
     try {
       const page = await fetchProjectOrders(client, selected.id, start);
       if (requestGeneration !== generation) return;
+      const offerMap = await fetchSupplierOfferRefsMap(client, page.orders);
+      if (requestGeneration !== generation) return;
       total = page.total;
       const list = results.querySelector("[data-project-list]");
       if (!list) return;
       for (const order of page.orders) {
         if (orderIds.has(String(order.id))) continue;
         orderIds.add(String(order.id));
-        list.insertAdjacentHTML("beforeend", buildCard(order));
+        list.insertAdjacentHTML("beforeend", buildCard({
+          ...order, offerRefs: offerMap.get(String(order.id)) || [],
+        }));
       }
       offset = start + page.orders.length;
       if (offset === 0) {
