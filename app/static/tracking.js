@@ -149,7 +149,9 @@ export function initTracking({client,escapeHtml}) {
         if(!decisions.has(d.order_id))decisions.set(d.order_id,d);
       loaded=true;
       updateSuppliers();updateProjects();render();
-      status.textContent=orders.length+" pedidos recuperados del periodo seleccionado. La actualizacion de Drive no es automatica todavia.";
+      const connected=catalog.filter(c=>c.status==="approved" && c.automatic_import_enabled).length;
+      status.textContent=orders.length+" pedidos recuperados del periodo seleccionado. "+
+        (syncSettings?.automatic_sync_enabled&&connected?`Actualización programada de Drive activa para ${connected} fuentes; consulta la última ejecución en Fuentes Drive.`:"Actualización automática de Drive no activada para estas fuentes.");
     } catch(e) {
       console.error("Seguimiento:",e);
       status.textContent="No se pudieron recuperar los pedidos. Comprueba tu sesion y la conexion.";
@@ -265,8 +267,6 @@ export function initTracking({client,escapeHtml}) {
         (delivered.length ? "Entrega parcial" : n>=Number(alertDays.value||7)?"Revisar plazo":"Pendiente");
       const cls=closed?"is-closed":n>=Number(alertDays.value||7)?"is-alert":"is-open";
       const decision=decisions.get(o.id);
-      const desc=closed?"Pedido cerrado. Las anotaciones parciales anteriores no generan reclamaciones.":
-        pending.length+" materiales sin marca verde + SI · "+delivered.length+" recibidos según Drive.";
       const linesToShow=closed?o.lines:pending;
       const table='<div class="tracking-table-wrap"><table><thead><tr><th>Referencia y concepto</th><th>Solicitado</th><th>Estado / cantidad</th><th>Albarán</th><th>Observaciones originales</th></tr></thead>'+
         '<tbody>'+linesToShow.map(lineSummary).join("")+'</tbody></table></div>';
@@ -275,13 +275,13 @@ export function initTracking({client,escapeHtml}) {
         '<div class="tracking-table-wrap"><table><thead><tr><th>Referencia y concepto</th><th>Solicitado</th><th>Estado</th><th>Albarán</th><th>Observaciones</th></tr></thead><tbody>'+
         delivered.map(lineSummary).join("")+'</tbody></table></div></details>':"";
       return '<article class="tracking-order '+cls+'"><div class="tracking-order-head"><div><div class="tracking-order-ref">'+escapeHtml(o.order_reference)+
-        '<span class="tracking-badge">'+escapeHtml(badge)+'</span></div><div class="tracking-order-meta">'+
-        escapeHtml(o.supplier||"Sin proveedor")+' · '+escapeHtml(pretty(o.order_date))+' · '+n+' días · <strong>'+
+        '<span class="tracking-badge">'+escapeHtml(badge)+'</span></div>'+
+        '<div class="tracking-order-work"><span>OBRA</span> '+escapeHtml(folderName(o.source_id))+'</div>'+
+        '<div class="tracking-order-meta">'+escapeHtml(o.supplier||"Sin proveedor")+' · '+escapeHtml(pretty(o.order_date))+' · '+n+' días · <strong>'+
         pending.length+' pendientes</strong> / '+delivered.length+' recibidos</div></div>'+
         '<button type="button" class="tracking-action" data-action="'+(closed?"reopen":"close")+'" data-order-id="'+o.id+'"'+
         (o.drive_finalized?' disabled title="Todas las líneas están marcadas recibidas en Drive"':'')+'>'+
         (closed?"Reabrir":"Marcar finalizado")+'</button></div>'+
-        '<div class="tracking-order-note">'+escapeHtml(desc)+'</div>'+
         (!closed?pendingPreview(pending):"")+
         (decision?'<div class="tracking-order-note">Última decisión manual: '+escapeHtml(decision.decision==="closed"?"Cierre":"Reapertura")+
           ' · '+escapeHtml(pretty(String(decision.created_at).slice(0,10)))+' · '+escapeHtml(decision.reason)+'</div>':"")+

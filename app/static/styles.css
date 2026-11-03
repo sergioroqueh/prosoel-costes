@@ -2852,3 +2852,7 @@ main { margin-top: 25px; }
 @media(max-width:580px){.tracking-drive-connect-actions{align-items:stretch;flex-direction:column;}.tracking-drive-connect-actions span{flex:auto;}}
 
 .tracking-sync-status{font-size:.8rem;color:#516f7d;line-height:1.5;margin:12px 0 2px;}
+
+/* Identificación de obra en cada pedido, incluidas las vistas global y agrupada. */
+.tracking-order-work{margin-top:7px;font-size:.86rem;font-weight:760;line-height:1.45;color:#1d6580;overflow-wrap:anywhere;}
+.tracking-order-work span{font-size:.65rem;letter-spacing:.06em;font-weight:790;color:#69899a;margin-right:5px;}
