@@ -81,9 +81,11 @@ Deno.serve(async request=>{
     const db=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
     const {data:authData,error:authError}=await db.auth.getUser(jwt);
     if(authError||!authData?.user)return reply(401,"unauthenticated","Sesión inválida.");
-    if(String(authData.user.email||"").toLowerCase()!=="compras@prosoel.es")return reply(403,"forbidden","Acceso no autorizado.");
+    const actorEmail=String(authData.user.email||"").toLowerCase();
+    if(!["compras@prosoel.es","israel@prosoel.es"].includes(actorEmail))
+      return reply(403,"forbidden","Acceso no autorizado.");
     const userDb=createClient(url,key,{global:{headers:{Authorization:"Bearer "+jwt}},auth:{persistSession:false,autoRefreshToken:false}});
-    const {data:profile,error:profileError}=await userDb.from("app_users").select("email,active").eq("email","compras@prosoel.es").maybeSingle();
+    const {data:profile,error:profileError}=await userDb.from("app_users").select("email,active").eq("email",actorEmail).maybeSingle();
     if(profileError||!profile?.active)return reply(403,"forbidden","Cuenta inactiva.");
     // Solo fuentes importadas/aprobadas, bajo RLS de Sergio.
     let params={};try{params=await request.json()}catch {}
@@ -128,7 +130,7 @@ Deno.serve(async request=>{
       }};
       const stored=await userDb.from("tracking_legacy_review")
         .select("source_row,source_sheet,order_reference,order_date,reason,issues_json")
-        .eq("source_id",source.file_id).limit(500);
+        .eq("source_id",source.file_id).eq("review_status","pending").limit(500);
       if(stored.error)return reply(503,"legacy_reviews_unavailable","No se pueden comprobar sus revisiones.");
       const sig=rec=>{
         const issues=rec.issues||rec.issues_json||[];

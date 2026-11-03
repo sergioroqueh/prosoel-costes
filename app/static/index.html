@@ -8,7 +8,7 @@
   <title>PROSOEL Costes</title>
   <meta name="theme-color" content="#134079">
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/prosoel-mark.svg?v=20261009-v17">
-  <link rel="stylesheet" href="./styles.css?v=20261103-tracking-v4">
+  <link rel="stylesheet" href="./styles.css?v=20261103-official-israel-v1">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -98,7 +98,7 @@
                 aria-selected="true" aria-controls="costsWorkspace">Consultar precios</button>
         <button type="button" class="workspace-tab" id="orderLookupTab" role="tab"
                 aria-selected="false" aria-controls="orderLookupWorkspace">Buscar pedido</button>
-        <button type="button" class="workspace-tab hidden" id="trackingTab" role="tab" aria-selected="false" aria-controls="trackingWorkspace">Seguimiento de pedidos <span class="tab-pending">BETA</span></button>
+        <button type="button" class="workspace-tab hidden" id="trackingTab" role="tab" aria-selected="false" aria-controls="trackingWorkspace">Seguimiento de pedidos</button>
         <button type="button" class="workspace-tab" id="reviewTab" role="tab"
                 aria-selected="false" aria-controls="reviewWorkspace">Normalización <span class="tab-pending">Revisión</span></button>
         <button type="button" class="workspace-tab hidden" id="importTab" role="tab"
@@ -279,7 +279,6 @@
             <h2>Seguimiento de pedidos</h2>
             <p>Comprueba lo que falta por revisar, sin mezclar pedidos historicos fuera del periodo seleccionado.</p>
           </div>
-          <span class="tracking-beta-tag">BETA · SOLO SERGIO</span>
         </div>
         <div id="trackingSource" class="tracking-source" role="note">Cargando fuente…</div>
         <div class="tracking-metrics" id="trackingStats" aria-live="polite"></div>
@@ -543,6 +542,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261103-tracking-v4"></script>
+  <script type="module" src="./app.js?v=20261103-official-israel-v1"></script>
 </body>
 </html>

@@ -2,7 +2,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./config.js";
 import { readProsoelXlsx } from "./order_import.js?v=20261008-v9";
 import { initOrderLookup } from "./order_lookup.js?v=20261030-v1";
-import { initTracking } from "./tracking.js?v=20261103-tracking-v4";
+import { initTracking } from "./tracking.js?v=20261103-official-israel-v1";
 import { initProjectLookup } from "./project_lookup.js?v=20261030-v1";
 import { mountPriceTimeline, PRICE_SERIES_COLORS } from "./price_comparison_chart.js?v=20261030-v1";
 
@@ -473,7 +473,7 @@ async function verifyAccess(user) {
   currentUser.textContent = data.display_name || data.email;
   currentUserRole = data.role || "user";
   // Gating visual despues de verificar app_users; el acceso real se protege con RLS.
-  trackingAllowed = String(data.email || "").trim().toLowerCase() === "compras@prosoel.es";
+  trackingAllowed = ["compras@prosoel.es","israel@prosoel.es"].includes(String(data.email || "").trim().toLowerCase());
   trackingTab.classList.toggle("hidden", !trackingAllowed);
   importTab.classList.toggle("hidden",currentUserRole!=="admin");
   return true;
@@ -2677,6 +2677,6 @@ const orderLookup = initOrderLookup({
   client:supabase, money, number, displayDiscount, escapeHtml, projectLookup
 });
 
-const tracking = initTracking({client:supabase,escapeHtml});
+const tracking = initTracking({client:supabase,escapeHtml,canManageSources:()=>trackingAllowed&&!isIsraelAccount});
 
 bootstrapSession();

@@ -340,7 +340,13 @@ export function readLegacyRecentXlsx(buffer,fromDate="2026-07-01") {
     if(!description && !qRaw)continue;
     if(!description){active._issues.push({source_row:n,reason:"missing_description",qty_raw:qRaw});continue;}
     const m=qRaw.match(quantity);
-    const qty=m?Number(m[1].replace(",",".")):null;
+    // Excepción verificada en TALLER (26/822, fila 928, ref. 9ZG635M6BTSH):
+    // "300 uds (2 CAJAS)" son 300 unidades. Las cajas son sólo embalaje.
+    // No se extiende esta regla a otras cantidades o embalajes ambiguos.
+    const isTaller300=active.order_reference==="26/822" && n===928 &&
+      read(n,"G").trim()==="9ZG635M6BTSH" &&
+      /^300\s+uds\.?\s*\(\s*2\s+cajas\s*\)$/i.test(qRaw.replace(/\s+/g," "));
+    const qty=isTaller300?300:m?Number(m[1].replace(",",".")):null;
     if(qty===null||!Number.isFinite(qty)||qty<0){
       active._issues.push({source_row:n,reason:"ambiguous_quantity",qty_raw:qRaw,
         description,reference:read(n,"G")});

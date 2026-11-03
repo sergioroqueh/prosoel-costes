@@ -2730,7 +2730,7 @@ main { margin-top: 25px; }
 .tracking-hero { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:28px 30px; border-radius:22px; background:linear-gradient(120deg,#0b2342 0%,#143e5d 60%,#1b5362 100%); color:#fff; box-shadow:0 16px 38px rgba(6,25,43,.12); }
 .tracking-hero h2 {font-size:clamp(1.5rem,2.5vw,2.25rem);margin:7px 0;letter-spacing:-.04em;color:#fff;}
 .tracking-hero p {margin:0;color:#c8d9df;font-size:.91rem;}
-.tracking-beta-tag {font-size:.72rem;font-weight:750;letter-spacing:.12em;color:#b8eecf;border:1px solid rgba(178,236,201,.35);padding:10px 14px;border-radius:50px;white-space:nowrap;}
+
 .tracking-source {font-size:.81rem;line-height:1.6;color:var(--text-muted,#65778b);padding:14px 2px;}
 .tracking-source strong {color:#ab6511;}
 .tracking-source a {color:var(--primary,#1168aa);font-weight:700;text-decoration:underline;text-underline-offset:3px;}
@@ -2964,3 +2964,6 @@ main { margin-top: 25px; }
 }
 
 #trackingWorkspace .tracking-register-footer strong{overflow-wrap:anywhere;word-break:break-word;}
+
+/* Seguimiento liberado: acento corporativo visible sobre cabecera oscura. */
+#trackingWorkspace .tracking-hero .search-kicker{color:#ffac78;font-size:.76rem;font-weight:850;letter-spacing:.13em;text-shadow:0 1px 1px rgba(0,0,0,.18);}
