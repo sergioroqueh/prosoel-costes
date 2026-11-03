@@ -345,7 +345,7 @@ export function readLegacyRecentXlsx(buffer,fromDate="2026-07-01") {
     // No se extiende esta regla a otras cantidades o embalajes ambiguos.
     const isTaller300=active.order_reference==="26/822" && n===928 &&
       read(n,"G").trim()==="9ZG635M6BTSH" &&
-      /^300\\s+uds\\.?\\s*\\(\\s*2\\s+cajas\\s*\\)$/i.test(qRaw.replace(/\\s+/g," "));
+      /^300\s+uds\.?\s*\(\s*2\s+cajas\s*\)$/i.test(qRaw.replace(/\s+/g," "));
     const qty=isTaller300?300:m?Number(m[1].replace(",",".")):null;
     if(qty===null||!Number.isFinite(qty)||qty<0){
       active._issues.push({source_row:n,reason:"ambiguous_quantity",qty_raw:qRaw,
