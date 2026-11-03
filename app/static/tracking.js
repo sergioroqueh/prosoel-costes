@@ -255,7 +255,22 @@ export function initTracking({client,escapeHtml}) {
         '</strong><small>'+escapeHtml(x.source_title)+' · '+escapeHtml(detail)+escapeHtml(date)+escapeHtml(issue)+'</small></div>'+
         '<span class="tracking-source-state tracking-source-state-'+escapeHtml(x.status)+'">'+escapeHtml(label)+'</span></article>';
     }).join("");
-    list.innerHTML=headline+reviewHeader+'<div class="tracking-source-list">'+cards+'</div>';
+    const pendingWork=newWorkRequests.filter(x=>x.status==="pending").length;
+    const registerWork='<details class="tracking-register-work">'+
+      '<summary> <span>+ Registrar nueva obra</span><small>Introduce el enlace de su Excel; la importación necesita validación</small></summary>'+
+      '<div class="tracking-register-work-body"><div class="tracking-register-grid">'+
+      '<label>Nombre de la obra<input id="trackingNewWorkName" type="text" maxlength="120" placeholder="Ej.: NUEVA OBRA · GETAFE"></label>'+
+      '<label>Enlace privado del Excel XLSX en Google Drive<input id="trackingNewWorkUrl" type="url" placeholder="https://drive.google.com/file/d/…/view"></label></div>'+
+      '<div class="tracking-register-footer"><p>Comparte el XLSX como Lector con <strong>prosoel-pedidos-reader@prosoel-pedidos.iam.gserviceaccount.com</strong>. '+
+      'Registrar no importa pedidos ni activa reclamaciones. Revisaremos la estructura antes de conectarlo.</p>'+
+      '<button type="button" class="tracking-refresh tracking-refresh-primary" id="trackingRegisterWork">Registrar obra</button></div>'+
+      '<span id="trackingRegisterResult" role="status" aria-live="polite"></span></div></details>';
+    const requestsBlock=newWorkRequests.length?'<div class="tracking-request-list"><h4>Obras solicitadas ('+
+      newWorkRequests.length+' · '+pendingWork+' pendientes)</h4>'+
+      newWorkRequests.slice(0,20).map(x=>'<div class="tracking-request-row"><strong>'+escapeHtml(x.work_name)+
+      '</strong><span>'+escapeHtml(x.status==="pending"?"Pendiente de validar":x.status==="reviewed"?"Revisada":"No incorporada")+
+      '</span></div>').join("")+'</div>':"";
+    list.innerHTML=headline+registerWork+requestsBlock+reviewHeader+'<div class="tracking-source-list">'+cards+'</div>';
     document.getElementById("trackingVisible").textContent=items.length+" libros identificados";
   }
   function render() {
@@ -404,6 +419,63 @@ export function initTracking({client,escapeHtml}) {
     } catch {
       result.textContent="No se pudo comparar. No se ha modificado ningún dato.";
     } finally {button.disabled=false;}
+  });
+  // Alta supervisada: no concede permisos de Google ni aprueba la importación.
+  list.addEventListener("click",async event=>{
+    const button=event.target.closest("#trackingRegisterWork");
+    if(!button)return;
+    const result=list.querySelector("#trackingRegisterResult");
+    const workName=String(list.querySelector("#trackingNewWorkName")?.value||"").trim();
+    const rawUrl=String(list.querySelector("#trackingNewWorkUrl")?.value||"").trim();
+    if(workName.length<4||workName.length>120){result.textContent="Introduce un nombre de obra de 4 a 120 caracteres.";return;}
+    let fileId=null;
+    try {
+      const url=new URL(rawUrl);
+      const validHost=url.hostname==="docs.google.com"||url.hostname==="drive.google.com";
+      const validPath=url.hostname==="docs.google.com"?
+        url.pathname.match(/^\\/spreadsheets\\/d\\/([A-Za-z0-9_-]{16,128})(?:\\/|$)/):
+        url.pathname.match(/^\\/file\\/d\\/([A-Za-z0-9_-]{16,128})(?:\\/|$)/);
+      if(url.protocol!=="https:"||!validHost||!validPath)throw new Error("invalid");
+      fileId=validPath[1];
+    } catch {
+      result.textContent="Utiliza el enlace completo a un Excel de Google Drive, no a una carpeta.";
+      return;
+    }
+    if(catalog.some(c=>c.file_id===fileId)||newWorkRequests.some(x=>x.file_id===fileId)){
+      result.textContent="Este Excel ya está registrado o pendiente de revisión.";
+      return;
+    }
+    button.disabled=true;result.textContent="Registrando solicitud privada…";
+    try{
+      const {error}=await client.from("tracking_new_work_requests")
+        .insert({work_name:workName,drive_url:rawUrl,file_id:fileId});
+      if(error){
+        result.textContent=error.code==="23505"?"Este Excel ya se había solicitado.":"No se pudo registrar la obra. Comprueba tu sesión.";
+        return;
+      }
+      await load();
+      manualStatus.textContent="Nueva obra registrada: "+workName+". Pendiente de validar; no genera reclamaciones.";
+    }catch{
+      result.textContent="No se pudo registrar la obra.";
+    }finally{button.disabled=false;}
+  });
+  // Actualización real de Drive: la cola privada procesa cada archivo en orden.
+  manualRefresh.addEventListener("click",async()=>{
+    if(busy)return;
+    const selected=project.value||null;
+    const target=selected?folderName(selected):"todas las obras aprobadas";
+    if(!selected&&!window.confirm("¿Solicitar la actualización de todas las obras aprobadas? Se revisarán progresivamente, sin descargas simultáneas."))return;
+    manualRefresh.disabled=true;
+    manualStatus.textContent="Registrando actualización de "+target+"…";
+    try{
+      const {data,error}=await client.rpc("tracking_request_manual_refresh",{p_file_id:selected});
+      if(error){manualStatus.textContent="No se pudo solicitar la actualización. Comprueba la obra y tu sesión.";return;}
+      const queued=Number(data?.queued||0);
+      manualStatus.textContent=queued>0
+        ? "Actualización solicitada para "+queued+" obra(s). Se comprobarán progresivamente desde Drive. Pulsa «Actualizar vista» para consultar los resultados."
+        : "La obra ya tiene una comprobación pendiente o reciente; no se ha duplicado.";
+    }catch{manualStatus.textContent="No se pudo solicitar la actualización."}
+    finally{manualRefresh.disabled=false;}
   });
   search.addEventListener("input",render);
   refresh.addEventListener("click",load);
