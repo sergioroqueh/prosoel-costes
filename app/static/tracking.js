@@ -433,8 +433,8 @@ export function initTracking({client,escapeHtml}) {
       const url=new URL(rawUrl);
       const validHost=url.hostname==="docs.google.com"||url.hostname==="drive.google.com";
       const validPath=url.hostname==="docs.google.com"?
-        url.pathname.match(/^\\/spreadsheets\\/d\\/([A-Za-z0-9_-]{16,128})(?:\\/|$)/):
-        url.pathname.match(/^\\/file\\/d\\/([A-Za-z0-9_-]{16,128})(?:\\/|$)/);
+        url.pathname.match(new RegExp("^/spreadsheets/d/([A-Za-z0-9_-]{16,128})(?:/|$)")):
+        url.pathname.match(new RegExp("^/file/d/([A-Za-z0-9_-]{16,128})(?:/|$)"));
       if(url.protocol!=="https:"||!validHost||!validPath)throw new Error("invalid");
       fileId=validPath[1];
     } catch {
