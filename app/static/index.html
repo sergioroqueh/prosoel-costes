@@ -285,7 +285,6 @@
         <div class="tracking-metrics" id="trackingStats" aria-live="polite"></div>
         <div class="tracking-view-switch" role="group" aria-label="Organizar seguimiento">
           <button class="tracking-view-button is-active" type="button" data-tracking-view="queue" aria-pressed="true">Reclamaciones</button>
-          <button class="tracking-view-button" type="button" data-tracking-view="works" aria-pressed="false">Por obra</button>
           <button class="tracking-view-button" type="button" data-tracking-view="sources" aria-pressed="false">Fuentes Drive</button>
         </div>
         <div class="tracking-filter-panel">
@@ -299,7 +298,7 @@
             </select></label>
             <label>Desde<input id="trackingFrom" type="date"></label>
             <label>Hasta<input id="trackingTo" type="date"></label>
-            <label class="tracking-hidden-filter">Almacen / proveedor<select id="trackingSupplier"><option value="">Todos</option></select></label>
+            <label>Almacén / proveedor<select id="trackingSupplier"><option value="">Todos los almacenes</option></select></label>
             <label>Obra<select id="trackingProject"><option value="">Todas las obras cargadas</option></select></label>
             <label>Estado<select id="trackingState">
               <option value="open" selected>Sin finalizar</option>
@@ -314,17 +313,23 @@
               <option value="newest">Más recientes primero</option>
             </select></label>
           </div>
-          <div class="tracking-filter-bottom"><label class="tracking-search-label tracking-hidden-filter">Buscar pedido, material o referencia
-            <input id="trackingSearch" type="search" placeholder="Ej.: 26/829, GUARCONSA, A7-M8"></label>
-            <button type="button" class="tracking-refresh" id="trackingRefresh">Actualizar vista</button>
+          <div class="tracking-filter-bottom">
+            <label class="tracking-search-label tracking-hidden-filter">Buscar pedido, material o referencia
+              <input id="trackingSearch" type="search" placeholder="Ej.: 26/829, GUARCONSA, A7-M8"></label>
+            <span class="tracking-refresh-hint">«Actualizar vista» consulta Supabase. «Sincronizar Drive» solicita datos actuales.</span>
+            <div class="tracking-filter-actions">
+              <button type="button" class="tracking-refresh tracking-refresh-primary" id="trackingManualRefresh">Sincronizar Drive</button>
+              <button type="button" class="tracking-refresh" id="trackingRefresh">Actualizar vista</button>
+            </div>
           </div>
+          <div id="trackingManualStatus" class="tracking-manual-status" role="status" aria-live="polite"></div>
         </div>
         <div class="tracking-list-head"><div><h3>Pedidos del periodo</h3><span id="trackingVisible" class="muted"></span></div>
           <span class="tracking-disclaimer">Los pendientes son candidatos a revisar, no entregas faltantes confirmadas.</span>
         </div>
         <div id="trackingStatus" class="tracking-status" role="status" aria-live="polite">Selecciona un periodo para consultar los pedidos.</div>
         <div id="trackingResults" class="tracking-results"></div>
-        <p class="tracking-footnote">Cada material se considera recibido cuando aparece en verde y su celda FINALIZADO indica SI, también si está combinada con otras filas. Un SI en otro material no cierra todo el pedido. Los cierres manuales se auditan y son reversibles; no modifican Drive. La copia de datos de esta BETA no se sincroniza automáticamente con Google Drive. El catálogo de fuentes no importa ni activa archivos hasta validar su estructura y permisos.</p>
+        <p class="tracking-footnote">Los pendientes se contrastan con cada material de la hoja. Los cierres manuales son reversibles y no modifican Drive. Las obras aprobadas se sincronizan de forma programada; puedes solicitar una comprobación adicional. Las obras nuevas pasan por validación antes de importar materiales o generar reclamaciones.</p>
       </section>
 
       <section id="reviewWorkspace" class="review-workspace hidden" role="tabpanel" aria-labelledby="reviewTab">
