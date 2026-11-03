@@ -1,10 +1,11 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./config.js";
-import { readProsoelXlsx } from "./order_import.js?v=20261008-v9";
-import { initOrderLookup } from "./order_lookup.js?v=20261030-v1";
+import { readProsoelXlsx } from "./order_import.js?v=20261103-offers-v2";
+import { initOrderLookup } from "./order_lookup.js?v=20261103-offers-v2";
 import { initTracking } from "./tracking.js?v=20261103-official-israel-v1";
-import { initProjectLookup } from "./project_lookup.js?v=20261030-v1";
+import { initProjectLookup } from "./project_lookup.js?v=20261103-offers-v2";
 import { mountPriceTimeline, PRICE_SERIES_COLORS } from "./price_comparison_chart.js?v=20261030-v1";
+import { fetchSupplierOfferRefsMap, supplierOfferRefsHtml } from "./supplier_offer_references.js?v=20261103-v2";
 
 const supabase = createClient(
   SUPABASE_URL,
@@ -137,6 +138,7 @@ const importAuditRows = document.getElementById("importAuditRows");
 
 let searchGeneration = 0;
 let detailGeneration = 0;
+let activeSupplierOfferMap = new Map();
 let visibleRows = [];
 let totalResults = 0;
 let selectedResultKey = null;
@@ -886,6 +888,9 @@ async function openMaterial(materialId) {
     return;
   }
 
+  const supplierRefs = await fetchSupplierOfferRefsMap(supabase, pricesResponse.data || []);
+  if (requestId !== detailGeneration) return;
+  activeSupplierOfferMap = supplierRefs;
   detail.commercial_variants = variantsResponse.data || [];
   renderMaterialDetail(detail, pricesResponse.data || []);
 }
@@ -910,6 +915,9 @@ async function openHistorical(row) {
     return;
   }
 
+  const supplierRefs = await fetchSupplierOfferRefsMap(supabase, data || []);
+  if (requestId !== detailGeneration) return;
+  activeSupplierOfferMap = supplierRefs;
   renderHistoricalDetail(row, data || []);
 }
 
@@ -989,6 +997,9 @@ function renderMaterialDetail(detail, rows) {
         escapeHtml(displayDiscount(latest.discount_raw)) +
         "</p>"
     );
+    const offerRefs = supplierOfferRefsHtml(
+      activeSupplierOfferMap.get(String(latest.order_id)), escapeHtml);
+    if (offerRefs) html.push('<p class="price-origin-offer"><strong>Oferta del proveedor:</strong> ' + offerRefs + '</p>');
     html.push('<button class="action-button" id="showLatestOrigin" type="button">Ver línea de origen</button>');
     html.push('<div id="latestOriginDetail" class="origin-detail hidden"></div>');
     html.push("</div>");
@@ -1197,6 +1208,9 @@ async function showReferenceComparison(reference, detailRequestId) {
     button.textContent = "Reintentar comparativa";
     return;
   }
+  const supplierRefs = await fetchSupplierOfferRefsMap(supabase, data || []);
+  if (detailRequestId !== detailGeneration || !area.isConnected) return;
+  activeSupplierOfferMap = supplierRefs;
   renderReferenceComparison(area, reference, data || []);
   // Solo una tabla de Procedencia en la ficha: ahora incluye todos los pedidos
   // de la referencia exacta, no solamente la variante inicialmente elegida.
@@ -1230,9 +1244,12 @@ function historyTableHtml(rows) {
     return '<div class="empty-state">No hay líneas históricas asociadas.</div>';
   }
 
+  const showOffers = rows.some(row => Number(row.order_year) >= 2026 &&
+    (activeSupplierOfferMap.get(String(row.order_id)) || []).length > 0);
   const html = [];
   html.push('<div class="history-wrap"><table class="history-table"><thead><tr>');
-  html.push("<th>Fecha</th><th>Pedido</th><th>Proveedor</th><th>Cant.</th><th>PVP</th><th>Dto.</th><th>Neto</th><th>Origen</th>");
+  html.push("<th>Fecha</th><th>Pedido</th><th>Proveedor</th><th>Cant.</th><th>PVP</th><th>Dto.</th><th>Neto</th><th>Origen</th>" +
+    (showOffers ? "<th>Oferta proveedor</th>" : ""));
   html.push("</tr></thead><tbody>");
 
   // El orden de la tabla es siempre por fecha de compra (más reciente primero).
@@ -1254,8 +1271,11 @@ function historyTableHtml(rows) {
     html.push('<td title="Original: ' + escapeHtml(row.discount_raw ?? "—") + '">' + escapeHtml(displayDiscount(row.discount_raw)) + "</td>");
     html.push("<td><strong>" + money(row.net_unit_price) + "</strong></td>");
     html.push('<td><button class="origin-link" type="button" data-origin-index="' + index + '">Ver origen</button></td>');
+    if (showOffers) {
+      html.push('<td>' + supplierOfferRefsHtml(activeSupplierOfferMap.get(String(row.order_id)), escapeHtml) + '</td>');
+    }
     html.push("</tr>");
-    html.push('<tr id="origin-row-' + index + '" class="hidden"><td colspan="8" class="origin-detail-cell"><div class="origin-detail">' + originHtml(row) + "</div></td></tr>");
+    html.push('<tr id="origin-row-' + index + '" class="hidden"><td colspan="' + (showOffers ? 9 : 8) + '" class="origin-detail-cell"><div class="origin-detail">' + originHtml(row) + "</div></td></tr>");
   });
 
   html.push("</tbody></table></div>");
@@ -1291,6 +1311,8 @@ function originHtml(row) {
   if (row.order_excluded) parts.push("<strong>Excluido el pedido completo:</strong> Sí");
   if (row.line_review_reason) parts.push("<strong>Motivo de revisión:</strong> " + escapeHtml(row.line_review_reason));
   if (row.order_review_reason) parts.push("<strong>Motivo de exclusión del pedido:</strong> " + escapeHtml(row.order_review_reason));
+  const offerRefs = supplierOfferRefsHtml(activeSupplierOfferMap.get(String(row.order_id)), escapeHtml);
+  if (offerRefs) parts.push("<strong>Oferta del proveedor:</strong> " + offerRefs);
   parts.push("<strong>Archivo origen:</strong> " + escapeHtml(row.source_filename || "—"));
   return parts.join("<br>");
 }
@@ -2468,7 +2490,7 @@ function importMessage(message, isError=false) {
   importStatus.textContent=message;
   importStatus.classList.toggle("is-error",isError);
 }
-function showImportPreview({payload,warnings,computedTotal}, blocker=null) {
+function showImportPreview({payload,warnings,computedTotal,offerExtraction}, blocker=null) {
   const html=[];
   html.push('<h3>Vista previa — '+escapeHtml(payload.source_filename)+'</h3>');
   html.push('<div class="import-metrics">');
@@ -2482,6 +2504,9 @@ function showImportPreview({payload,warnings,computedTotal}, blocker=null) {
     ["Suma de líneas",money(computedTotal)],
     ["Revisión de totales",payload.validation_status==="valid"?"Cuadra":payload.validation_status==="incomplete_prices"?"Precios incompletos":"Diferencia detectada"],
   ];
+  if (offerExtraction?.references?.length) {
+    rows.push(["Números de oferta detectados",offerExtraction.references.join(" · ")]);
+  }
   for(const [label,value] of rows) {
     html.push('<div class="import-metric"><span>'+escapeHtml(label)+'</span><strong>'+escapeHtml(value)+'</strong></div>');
   }
@@ -2515,6 +2540,7 @@ function showImportPreview({payload,warnings,computedTotal}, blocker=null) {
 
 async function inspectNewOrderFile(){
   const generation=++importSelectionGeneration;
+  importSubmitButton.textContent="Confirmar importación";
   currentImport=null;
   importAcknowledged.checked=false;
   importSubmitButton.disabled=true;
@@ -2564,39 +2590,91 @@ async function inspectNewOrderFile(){
   }
 }
 
+// Siempre exige identidad de fichero exacta en los pedidos NUEVOS.
+async function saveNewOrderOfferRefs(importData) {
+  const {payload, offerExtraction} = importData;
+  if (Number(payload.order_year) < 2026 || !offerExtraction?.references?.length) {
+    return { references_inserted: 0, references_existing: 0 };
+  }
+  if (payload.order_identity_status === "conflict") {
+    throw new Error("Número de pedido no coincide con el Excel; ofertas pendientes de revisión.");
+  }
+  const item = {
+    source_sha256: payload.source_sha256,
+    source_filename: payload.source_filename,
+    references: offerExtraction.references.map(reference => ({
+      reference,
+      source_cell: offerExtraction.sourceCell,
+      source_text: String(offerExtraction.sourceText || "").slice(0, 2000),
+    })),
+  };
+  const {data,error} = await supabase.rpc("record_2026_supplier_offer_references", {p_items:[item]});
+  if (error) throw error;
+  if (Number(data?.files_matched)!==1 || Number(data?.unmatched_files||0)!==0 ||
+      Number(data?.rejected_records||0)!==0) {
+    throw new Error("Las ofertas no superaron la verificación de SHA-256 y nombre del pedido.");
+  }
+  return data;
+}
+
 async function commitNewOrder(){
   if(currentUserRole!=="admin"||!currentImport||currentImport.blocker||!importAcknowledged.checked)return;
-  const payload=currentImport.payload;
+  const record=currentImport;
+  const payload=record.payload;
   const generation=importSelectionGeneration;
+  const onlyOffers=Boolean(record.orderImported);
   importSubmitButton.disabled=true;
   importFile.disabled=true;
-  importMessage("Guardando pedido y todas sus líneas en una sola operación…");
-  const {data,error}=await supabase.rpc("import_new_prosoel_order",{p_order:payload});
-  if(generation!==importSelectionGeneration)return;
-  importFile.disabled=false;
-  const outcome=Array.isArray(data)?data[0]:data;
-  if(error){
-    importMessage(error.message||"La importación ha fallado. Ninguna línea ha quedado grabada parcialmente.",true);
-    importSubmitButton.disabled=false;
-    return;
-  }
-  if(!outcome){
-    importMessage("No se recibió confirmación de Supabase. Consulta el pedido antes de reintentar.",true);
-    return;
+  importMessage(onlyOffers?"Guardando ofertas pendientes…":"Guardando pedido y todas sus líneas…");
+  let outcome={result:"imported",imported_lines:payload.lines.length,detail:"Pedido ya guardado"};
+  if(!onlyOffers){
+    const {data,error}=await supabase.rpc("import_new_prosoel_order",{p_order:payload});
+    if(generation!==importSelectionGeneration)return;
+    if(error){
+      importFile.disabled=false;
+      importMessage(error.message||"La importación ha fallado. No se han grabado líneas parcialmente.",true);
+      importSubmitButton.disabled=false;
+      return;
+    }
+    outcome=Array.isArray(data)?data[0]:data;
+    if(!outcome){
+      importFile.disabled=false;
+      importMessage("No se recibió confirmación. Comprueba el pedido antes de reintentar.",true);
+      return;
+    }
   }
   if(outcome.result==="imported"){
+    record.orderImported=true;
+    let offerResult={references_inserted:0,references_existing:0};
+    try{
+      offerResult=await saveNewOrderOfferRefs(record);
+    }catch(error){
+      if(generation!==importSelectionGeneration)return;
+      importFile.disabled=false;
+      importSubmitButton.disabled=false;
+      importSubmitButton.textContent="Reintentar solo ofertas";
+      importMessage("Pedido guardado sin duplicar líneas. No se pudieron guardar sus ofertas: "+
+        (error?.message||"error de verificación")+". Reintenta solo las ofertas.",true);
+      return;
+    }
+    if(generation!==importSelectionGeneration)return;
+    importFile.disabled=false;
+    const offerCount=Number(offerResult.references_inserted||0)+Number(offerResult.references_existing||0);
     importMessage("Pedido guardado correctamente · "+outcome.imported_lines+
-      " líneas · Resultado de totales: "+outcome.detail+".");
+      " líneas · "+(offerCount ? offerCount+" ofertas vinculadas · " : "")+
+      "Revisión de totales: "+outcome.detail+".");
     currentImport=null;
+    importSubmitButton.textContent="Confirmar importación";
     importConfirmPanel.classList.add("hidden");
     importFile.value="";
-    reviewLoaded=false; // Refrescar la cola al volver a Normalización.
+    reviewLoaded=false;
     await Promise.all([loadCounter(),loadSuppliers(),loadImportDashboard()]);
   }else{
+    importFile.disabled=false;
     importMessage(outcome.result==="duplicate"
       ?"El mismo archivo ya figura en el histórico. No se ha duplicado."
       :outcome.result==="number_conflict"
-        ?"Ya existe ese número de pedido con otro archivo. Revisa antes de intentar otra importación."
+        ?"Ya existe ese número de pedido con otro archivo. Revisa antes de reintentar."
         :"Supabase no ha importado el archivo: "+(outcome.detail||outcome.result),true);
     importConfirmPanel.classList.add("hidden");
   }
