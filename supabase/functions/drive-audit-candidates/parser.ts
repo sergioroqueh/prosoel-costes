@@ -113,7 +113,7 @@ export function readPedidosXlsx(buffer){
   for(const row of allRows){
     if(row<3)continue;
     const id=read(row,"A");
-    if(/^\d{2}\/\d{1,5}(?:-[A-Za-z0-9]+)?$/.test(id)) {
+    if(/^\d{2}\/\d{1,5}(?:\.\d{1,3})?(?:-[A-Za-z0-9]+)?$/.test(id)) {
       const date=dateOrNull(rowMap.get(row)?.get("B"),strings);
       if(!date)fail("missing_order_date_"+row);
       current={source_row:row,order_reference:id,order_date:date,
@@ -128,7 +128,10 @@ export function readPedidosXlsx(buffer){
     const description=read(row,"H");
     const qtyText=read(row,"F");
     if(!description||!qtyText)continue;
-    const qty=Number(qtyText.replace(",","."));
+    // Only literal unit labels with unambiguous numeric quantities are normalized.
+    // Never infer package sizes, e.g. "2 cajas (24)" remains blocked for review.
+    const unitMatch=qtyText.match(/^(\d+(?:[.,]\d+)?)\s*(?:ud(?:s)?\.?|unidad(?:es)?\.?)$/i);
+    const qty=Number((unitMatch?unitMatch[1]:qtyText).replace(",","."));
     if(!Number.isFinite(qty)||qty<0)fail("invalid_quantity_"+row);
     const lineSi=read(row,"M").toUpperCase()==="SI" || mergedSi.get(row)===true;
     const green=getIsGreen(rowMap.get(row)?.get("H"));
