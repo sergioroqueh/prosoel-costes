@@ -68,10 +68,10 @@ export function initTracking({client,escapeHtml}) {
     const parsed=interpretTrackingObservation(line.observations,line.requested_qty);
     const req=line.requested_qty==null ? "—" : fmt(line.requested_qty);
     const received=trackingLineDelivered(line);
-    let note=received?"Recibido · verde + SI en Drive":"Pendiente de confirmar entrega";
+    let note=received?"Recibido":"Pendiente de entrega";
     if(!received && parsed.kind==="probable") note="Anotadas "+fmt(parsed.received)+" · Posible resto "+fmt(Math.max(0,Number(line.requested_qty)-parsed.received))+" (revisar)";
     if(!received && parsed.kind==="review") note="Observación libre: revisar";
-    if(!received && line.source_green && !line.source_si) note+=" · Verde sin SI";
+    // Las marcas técnicas originales permanecen en los datos, no en las tarjetas.
     return '<tr class="'+(received?"tracking-row-received":"tracking-row-pending")+'"><td><span class="tracking-ref">'+escapeHtml(line.reference || "—")+'</span><small>'+escapeHtml(line.description || "—")+'</small></td>'+
       '<td>'+escapeHtml(req)+'</td><td>'+escapeHtml(note)+'</td><td>'+escapeHtml(line.albaran || "—")+'</td>'+
       '<td>'+escapeHtml(line.observations || "—")+'</td></tr>';
@@ -153,8 +153,7 @@ export function initTracking({client,escapeHtml}) {
       loaded=true;
       updateSuppliers();updateProjects();render();
       const connected=catalog.filter(c=>c.status==="approved" && c.automatic_import_enabled).length;
-      status.textContent=orders.length+" pedidos recuperados del periodo seleccionado. "+
-        (syncSettings?.automatic_sync_enabled&&connected?`Actualización programada de Drive activa para ${connected} fuentes; consulta la última ejecución en Fuentes Drive.`:"Actualización automática de Drive no activada para estas fuentes.");
+      status.textContent=orders.length+" pedidos del período seleccionado.";
     } catch(e) {
       console.error("Seguimiento:",e);
       status.textContent="No se pudieron recuperar los pedidos. Comprueba tu sesion y la conexion.";
@@ -276,7 +275,7 @@ export function initTracking({client,escapeHtml}) {
       const closed=o._state!=="open", manual=o._state==="closed_manual", n=age(o.order_date);
       const pending=o.lines.filter(line=>!trackingLineDelivered(line));
       const delivered=o.lines.filter(line=>trackingLineDelivered(line));
-      const badge=closed?(manual?"Finalizado manualmente":"Completo en Drive"):
+      const badge=closed?(manual?"Finalizado manualmente":"Finalizado"):
         (delivered.length ? "Entrega parcial" : n>=Number(alertDays.value||7)?"Revisar plazo":"Pendiente");
       const cls=closed?"is-closed":n>=Number(alertDays.value||7)?"is-alert":"is-open";
       const decision=decisions.get(o.id);
@@ -289,11 +288,11 @@ export function initTracking({client,escapeHtml}) {
         delivered.map(lineSummary).join("")+'</tbody></table></div></details>':"";
       return '<article class="tracking-order '+cls+'"><div class="tracking-order-head"><div><div class="tracking-order-ref">'+escapeHtml(o.order_reference)+
         '<span class="tracking-badge">'+escapeHtml(badge)+'</span></div>'+
-        '<div class="tracking-order-work"><span>OBRA</span> '+escapeHtml(folderName(o.source_id))+'</div>'+
+        '<div class="tracking-order-work"><span class="tracking-work-label">Obra</span><strong>'+escapeHtml(folderName(o.source_id))+'</strong></div>'+
         '<div class="tracking-order-meta">'+escapeHtml(o.supplier||"Sin proveedor")+' · '+escapeHtml(pretty(o.order_date))+' · '+n+' días · <strong>'+
         pending.length+' pendientes</strong> / '+delivered.length+' recibidos</div></div>'+
         '<button type="button" class="tracking-action" data-action="'+(closed?"reopen":"close")+'" data-order-id="'+o.id+'"'+
-        (o.drive_finalized?' disabled title="Todas las líneas están marcadas recibidas en Drive"':'')+'>'+
+        (o.drive_finalized?' disabled title="Este pedido ya está finalizado"':'')+'>'+
         (closed?"Reabrir":"Marcar finalizado")+'</button></div>'+
         (!closed?pendingPreview(pending):"")+
         (decision?'<div class="tracking-order-note">Última decisión manual: '+escapeHtml(decision.decision==="closed"?"Cierre":"Reapertura")+
