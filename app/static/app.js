@@ -2503,9 +2503,10 @@ function showImportPreview({payload,warnings,computedTotal,offerExtraction}, blo
     ["Importe del pedido",money(payload.declared_total)],
     ["Suma de líneas",money(computedTotal)],
     ["Revisión de totales",payload.validation_status==="valid"?"Cuadra":payload.validation_status==="incomplete_prices"?"Precios incompletos":"Diferencia detectada"],
-    ["Números de oferta detectados",offerExtraction?.references?.length
-      ? offerExtraction.references.join(" · ") : "Sin oferta indicada"],
   ];
+  if (offerExtraction?.references?.length) {
+    rows.push(["Números de oferta detectados",offerExtraction.references.join(" · ")]);
+  }
   for(const [label,value] of rows) {
     html.push('<div class="import-metric"><span>'+escapeHtml(label)+'</span><strong>'+escapeHtml(value)+'</strong></div>');
   }
