@@ -2510,7 +2510,7 @@ function importMessage(message, isError=false) {
   importStatus.textContent=message;
   importStatus.classList.toggle("is-error",isError);
 }
-function showImportPreview({payload,warnings,computedTotal}, blocker=null) {
+function showImportPreview({payload,warnings,computedTotal,offerExtraction}, blocker=null) {
   const html=[];
   html.push('<h3>Vista previa — '+escapeHtml(payload.source_filename)+'</h3>');
   html.push('<div class="import-metrics">');
@@ -2523,6 +2523,8 @@ function showImportPreview({payload,warnings,computedTotal}, blocker=null) {
     ["Importe del pedido",money(payload.declared_total)],
     ["Suma de líneas",money(computedTotal)],
     ["Revisión de totales",payload.validation_status==="valid"?"Cuadra":payload.validation_status==="incomplete_prices"?"Precios incompletos":"Diferencia detectada"],
+    ["Ofertas proveedor detectadas (2026)",offerExtraction?.references?.length
+      ? offerExtraction.references.join(" · ") : "No hay número de oferta reconocido"],
   ];
   for(const [label,value] of rows) {
     html.push('<div class="import-metric"><span>'+escapeHtml(label)+'</span><strong>'+escapeHtml(value)+'</strong></div>');
@@ -2606,35 +2608,92 @@ async function inspectNewOrderFile(){
   }
 }
 
+async function saveOfferRefsAfterOrderImport(record) {
+  const {payload, offerExtraction} = record;
+  if (Number(payload.order_year) !== 2026 || !offerExtraction?.references?.length) {
+    return {references_inserted: 0, references_existing: 0};
+  }
+  if (payload.order_identity_status === "conflict") {
+    throw new Error("El número interno del Excel no coincide con el nombre. Referencias pendientes de revisión.");
+  }
+  const item = {
+    source_sha256: payload.source_sha256,
+    source_filename: payload.source_filename,
+    references: offerExtraction.references.map(reference => ({
+      reference,
+      source_cell: offerExtraction.sourceCell,
+      source_text: String(offerExtraction.sourceText || "").slice(0, 2000),
+    })),
+  };
+  const {data,error} = await supabase.rpc("record_2026_supplier_offer_references", {
+    p_items: [item],
+  });
+  if (error) throw error;
+  if (Number(data?.files_matched) !== 1 ||
+      Number(data?.unmatched_files || 0) !== 0 ||
+      Number(data?.rejected_records || 0) !== 0) {
+    throw new Error("El pedido está grabado, pero las ofertas requieren cotejo de SHA o revisión documental.");
+  }
+  return data;
+}
+
 async function commitNewOrder(){
   if(currentUserRole!=="admin"||!currentImport||currentImport.blocker||!importAcknowledged.checked)return;
   const payload=currentImport.payload;
   const generation=importSelectionGeneration;
+  const savedRecord=currentImport;
+  const retryOffersOnly=Boolean(savedRecord.orderImported);
   importSubmitButton.disabled=true;
   importFile.disabled=true;
-  importMessage("Guardando pedido y todas sus líneas en una sola operación…");
-  const {data,error}=await supabase.rpc("import_new_prosoel_order",{p_order:payload});
-  if(generation!==importSelectionGeneration)return;
-  importFile.disabled=false;
-  const outcome=Array.isArray(data)?data[0]:data;
-  if(error){
-    importMessage(error.message||"La importación ha fallado. Ninguna línea ha quedado grabada parcialmente.",true);
-    importSubmitButton.disabled=false;
-    return;
-  }
-  if(!outcome){
-    importMessage("No se recibió confirmación de Supabase. Consulta el pedido antes de reintentar.",true);
-    return;
+  importMessage(retryOffersOnly
+    ? "Reintentando guardar únicamente los números de oferta…"
+    : "Guardando pedido y todas sus líneas en una sola operación…");
+  let outcome={result:"imported",imported_lines:payload.lines.length,detail:"Pedido ya guardado"};
+  if(!retryOffersOnly){
+    const {data,error}=await supabase.rpc("import_new_prosoel_order",{p_order:payload});
+    if(generation!==importSelectionGeneration)return;
+    if(error){
+      importFile.disabled=false;
+      importMessage(error.message||"La importación ha fallado. Ninguna línea ha quedado grabada parcialmente.",true);
+      importSubmitButton.disabled=false;
+      return;
+    }
+    outcome=Array.isArray(data)?data[0]:data;
+    if(!outcome){
+      importFile.disabled=false;
+      importMessage("No se recibió confirmación de Supabase. Consulta el pedido antes de reintentar.",true);
+      return;
+    }
   }
   if(outcome.result==="imported"){
+    savedRecord.orderImported=true;
+    let offerResult={references_inserted:0,references_existing:0};
+    try {
+      offerResult=await saveOfferRefsAfterOrderImport(savedRecord);
+    } catch(error) {
+      if(generation!==importSelectionGeneration)return;
+      importFile.disabled=false;
+      importSubmitButton.disabled=false;
+      importSubmitButton.textContent="Reintentar guardar ofertas";
+      const message="Pedido guardado sin duplicar líneas, pero no se pudieron registrar sus ofertas: "+
+        (error?.message||"error desconocido")+". Puedes reintentar sin volver a grabar el pedido.";
+      importMessage(message,true);
+      return;
+    }
+    if(generation!==importSelectionGeneration)return;
+    importFile.disabled=false;
+    const totalOffers=Number(offerResult.references_inserted||0)+Number(offerResult.references_existing||0);
     importMessage("Pedido guardado correctamente · "+outcome.imported_lines+
-      " líneas · Resultado de totales: "+outcome.detail+".");
+      " líneas · "+totalOffers+" referencias de oferta de proveedor registradas · "+
+      "Resultado de totales: "+outcome.detail+".");
     currentImport=null;
+    importSubmitButton.textContent="Guardar pedido";
     importConfirmPanel.classList.add("hidden");
     importFile.value="";
-    reviewLoaded=false; // Refrescar la cola al volver a Normalización.
+    reviewLoaded=false;
     await Promise.all([loadCounter(),loadSuppliers(),loadImportDashboard()]);
   }else{
+    importFile.disabled=false;
     importMessage(outcome.result==="duplicate"
       ?"El mismo archivo ya figura en el histórico. No se ha duplicado."
       :outcome.result==="number_conflict"
