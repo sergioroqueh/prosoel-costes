@@ -27,7 +27,7 @@ alter table public.order_supplier_offer_references enable row level security;
 revoke all on public.order_supplier_offer_references from anon, authenticated;
 -- Solo se exponen a los usuarios los códigos. Las observaciones completas de
 -- obra quedan reservadas a la auditoría administrativa en la base de datos.
-grant select(order_id,offer_reference) on public.order_supplier_offer_references to authenticated;
+grant select(id,order_id,offer_reference) on public.order_supplier_offer_references to authenticated;
 
 create policy order_supplier_offer_references_read
  on public.order_supplier_offer_references for select to authenticated
