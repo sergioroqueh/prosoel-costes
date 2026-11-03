@@ -9,7 +9,8 @@ create table if not exists public.order_supplier_offer_references (
   source_filename text not null,
   source_sha256 char(64) not null,
   source_cell text not null default 'D4' check (source_cell='D4'),
-  source_observations text not null,
+  source_observations text not null default '',
+  link_method text not null default 'sha256' check (link_method in ('sha256','number_unique','number_filename')),
   created_at timestamptz not null default now(),
   unique(order_id, offer_reference)
 );
@@ -17,11 +18,21 @@ create table if not exists public.order_supplier_offer_references (
 create index if not exists idx_supplier_offer_references_order
  on public.order_supplier_offer_references(order_id);
 
--- Reutiliza la protección de año 2026 de la capa documental.
+-- Esta tabla es independiente de la futura capa de PDF. Valida 2026 por sí misma.
+create or replace function private.ensure_2026_supplier_ref_order()
+returns trigger language plpgsql set search_path = '' as $check$
+begin
+  if not exists (select 1 from public.orders o where o.id=new.order_id and o.order_year=2026) then
+    raise exception 'Las ofertas solo se vinculan a pedidos de 2026';
+  end if;
+  return new;
+end
+$check$;
+revoke all on function private.ensure_2026_supplier_ref_order() from public,anon,authenticated;
 drop trigger if exists trg_2026_offer_ref_order on public.order_supplier_offer_references;
 create trigger trg_2026_offer_ref_order
   before insert or update of order_id on public.order_supplier_offer_references
-  for each row execute function private.ensure_2026_offer_order();
+  for each row execute function private.ensure_2026_supplier_ref_order();
 
 alter table public.order_supplier_offer_references enable row level security;
 revoke all on public.order_supplier_offer_references from anon, authenticated;
@@ -131,4 +142,4 @@ grant execute on function public.record_2026_supplier_offer_references(jsonb)
   to authenticated;
 
 comment on table public.order_supplier_offer_references is
- 'Solo números de oferta explícitos del XLSX original, validados por SHA y nombre. No incluye PDF ni altera importes.';
+ 'Números de oferta extraídos de Excel 2026: históricos por número único/archivo y nuevos por SHA+nombre. No incluye PDF ni modifica importes.';
