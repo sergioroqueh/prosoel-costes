@@ -1,10 +1,11 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./config.js";
-import { readProsoelXlsx } from "./order_import.js?v=20261008-v9";
-import { initOrderLookup } from "./order_lookup.js?v=20261030-v1";
+import { readProsoelXlsx } from "./order_import.js?v=20261103-offers-v2";
+import { initOrderLookup } from "./order_lookup.js?v=20261103-offers-v2";
 import { initTracking } from "./tracking.js?v=20261103-official-israel-v1";
-import { initProjectLookup } from "./project_lookup.js?v=20261030-v1";
+import { initProjectLookup } from "./project_lookup.js?v=20261103-offers-v2";
 import { mountPriceTimeline, PRICE_SERIES_COLORS } from "./price_comparison_chart.js?v=20261030-v1";
+import { fetchSupplierOfferRefsMap, supplierOfferRefsHtml } from "./supplier_offer_references.js?v=20261103-v2";
 
 const supabase = createClient(
   SUPABASE_URL,
@@ -137,6 +138,7 @@ const importAuditRows = document.getElementById("importAuditRows");
 
 let searchGeneration = 0;
 let detailGeneration = 0;
+let activeSupplierOfferMap = new Map();
 let visibleRows = [];
 let totalResults = 0;
 let selectedResultKey = null;
@@ -886,6 +888,9 @@ async function openMaterial(materialId) {
     return;
   }
 
+  const supplierRefs = await fetchSupplierOfferRefsMap(supabase, pricesResponse.data || []);
+  if (requestId !== detailGeneration) return;
+  activeSupplierOfferMap = supplierRefs;
   detail.commercial_variants = variantsResponse.data || [];
   renderMaterialDetail(detail, pricesResponse.data || []);
 }
@@ -910,6 +915,9 @@ async function openHistorical(row) {
     return;
   }
 
+  const supplierRefs = await fetchSupplierOfferRefsMap(supabase, data || []);
+  if (requestId !== detailGeneration) return;
+  activeSupplierOfferMap = supplierRefs;
   renderHistoricalDetail(row, data || []);
 }
 
@@ -989,6 +997,9 @@ function renderMaterialDetail(detail, rows) {
         escapeHtml(displayDiscount(latest.discount_raw)) +
         "</p>"
     );
+    const offerRefs = supplierOfferRefsHtml(
+      activeSupplierOfferMap.get(String(latest.order_id)), escapeHtml);
+    if (offerRefs) html.push('<p class="price-origin-offer"><strong>Oferta del proveedor:</strong> ' + offerRefs + '</p>');
     html.push('<button class="action-button" id="showLatestOrigin" type="button">Ver línea de origen</button>');
     html.push('<div id="latestOriginDetail" class="origin-detail hidden"></div>');
     html.push("</div>");
@@ -1197,6 +1208,9 @@ async function showReferenceComparison(reference, detailRequestId) {
     button.textContent = "Reintentar comparativa";
     return;
   }
+  const supplierRefs = await fetchSupplierOfferRefsMap(supabase, data || []);
+  if (detailRequestId !== detailGeneration || !area.isConnected) return;
+  activeSupplierOfferMap = supplierRefs;
   renderReferenceComparison(area, reference, data || []);
   // Solo una tabla de Procedencia en la ficha: ahora incluye todos los pedidos
   // de la referencia exacta, no solamente la variante inicialmente elegida.
@@ -1230,9 +1244,12 @@ function historyTableHtml(rows) {
     return '<div class="empty-state">No hay líneas históricas asociadas.</div>';
   }
 
+  const showOffers = rows.some(row => Number(row.order_year) >= 2026 &&
+    (activeSupplierOfferMap.get(String(row.order_id)) || []).length > 0);
   const html = [];
   html.push('<div class="history-wrap"><table class="history-table"><thead><tr>');
-  html.push("<th>Fecha</th><th>Pedido</th><th>Proveedor</th><th>Cant.</th><th>PVP</th><th>Dto.</th><th>Neto</th><th>Origen</th>");
+  html.push("<th>Fecha</th><th>Pedido</th><th>Proveedor</th><th>Cant.</th><th>PVP</th><th>Dto.</th><th>Neto</th><th>Origen</th>" +
+    (showOffers ? "<th>Oferta proveedor</th>" : ""));
   html.push("</tr></thead><tbody>");
 
   // El orden de la tabla es siempre por fecha de compra (más reciente primero).
@@ -1254,8 +1271,11 @@ function historyTableHtml(rows) {
     html.push('<td title="Original: ' + escapeHtml(row.discount_raw ?? "—") + '">' + escapeHtml(displayDiscount(row.discount_raw)) + "</td>");
     html.push("<td><strong>" + money(row.net_unit_price) + "</strong></td>");
     html.push('<td><button class="origin-link" type="button" data-origin-index="' + index + '">Ver origen</button></td>');
+    if (showOffers) {
+      html.push('<td>' + supplierOfferRefsHtml(activeSupplierOfferMap.get(String(row.order_id)), escapeHtml) + '</td>');
+    }
     html.push("</tr>");
-    html.push('<tr id="origin-row-' + index + '" class="hidden"><td colspan="8" class="origin-detail-cell"><div class="origin-detail">' + originHtml(row) + "</div></td></tr>");
+    html.push('<tr id="origin-row-' + index + '" class="hidden"><td colspan="' + (showOffers ? 9 : 8) + '" class="origin-detail-cell"><div class="origin-detail">' + originHtml(row) + "</div></td></tr>");
   });
 
   html.push("</tbody></table></div>");
@@ -1291,6 +1311,8 @@ function originHtml(row) {
   if (row.order_excluded) parts.push("<strong>Excluido el pedido completo:</strong> Sí");
   if (row.line_review_reason) parts.push("<strong>Motivo de revisión:</strong> " + escapeHtml(row.line_review_reason));
   if (row.order_review_reason) parts.push("<strong>Motivo de exclusión del pedido:</strong> " + escapeHtml(row.order_review_reason));
+  const offerRefs = supplierOfferRefsHtml(activeSupplierOfferMap.get(String(row.order_id)), escapeHtml);
+  if (offerRefs) parts.push("<strong>Oferta del proveedor:</strong> " + offerRefs);
   parts.push("<strong>Archivo origen:</strong> " + escapeHtml(row.source_filename || "—"));
   return parts.join("<br>");
 }
@@ -2468,7 +2490,7 @@ function importMessage(message, isError=false) {
   importStatus.textContent=message;
   importStatus.classList.toggle("is-error",isError);
 }
-function showImportPreview({payload,warnings,computedTotal}, blocker=null) {
+function showImportPreview({payload,warnings,computedTotal,offerExtraction}, blocker=null) {
   const html=[];
   html.push('<h3>Vista previa — '+escapeHtml(payload.source_filename)+'</h3>');
   html.push('<div class="import-metrics">');
@@ -2481,6 +2503,8 @@ function showImportPreview({payload,warnings,computedTotal}, blocker=null) {
     ["Importe del pedido",money(payload.declared_total)],
     ["Suma de líneas",money(computedTotal)],
     ["Revisión de totales",payload.validation_status==="valid"?"Cuadra":payload.validation_status==="incomplete_prices"?"Precios incompletos":"Diferencia detectada"],
+    ["Números de oferta detectados",offerExtraction?.references?.length
+      ? offerExtraction.references.join(" · ") : "Sin oferta indicada"],
   ];
   for(const [label,value] of rows) {
     html.push('<div class="import-metric"><span>'+escapeHtml(label)+'</span><strong>'+escapeHtml(value)+'</strong></div>');
