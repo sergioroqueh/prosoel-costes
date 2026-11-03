@@ -49,7 +49,7 @@ export function initTracking({client,escapeHtml}) {
   const project = document.getElementById("trackingProject");
   const viewButtons=[...root.querySelectorAll("[data-tracking-view]")];
   let viewMode="queue";
-  let catalog=[],folders=[],syncSettings=null,syncHistory=[];
+  let catalog=[],folders=[],syncSettings=null,syncHistory=[],legacyReviews=[];
   let orders = [], decisions = new Map(), sources = [], loaded = false, busy = false, generation = 0;
   const fmt = (value) => value == null ? "—" : new Intl.NumberFormat("es-ES",{maximumFractionDigits:3}).format(Number(value));
   const iso = (d) => [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");
@@ -109,12 +109,14 @@ export function initTracking({client,escapeHtml}) {
     busy=true; refresh.disabled=true; status.textContent="Consultando pedidos autorizados…";
     const request=++generation;
     try {
-      const [src,cat,folderResults,settings,history]=await Promise.all([
+      const [src,cat,folderResults,settings,history,reviewResults]=await Promise.all([
         client.from("tracking_sources").select("id,display_name,drive_url,synced_at,modified_at_source,sync_mode").order("display_name"),
         client.from("tracking_drive_catalog").select("file_id,folder_id,source_title,status,reason,drive_modified_at,last_imported_at,automatic_import_enabled,validation_status,validation_error").order("source_title").limit(1000),
         client.from("tracking_drive_folders").select("folder_id,folder_label,classification").limit(1000),
         client.from("tracking_sync_settings").select("requested_interval_minutes,automatic_sync_enabled,auth_setup").eq("id",1).maybeSingle(),
-        client.from("tracking_sync_runs").select("state,finished_at,started_at,message,change_summary").order("started_at",{ascending:false}).limit(5)
+        client.from("tracking_sync_runs").select("state,finished_at,started_at,message,change_summary").order("started_at",{ascending:false}).limit(5),
+        client.from("tracking_legacy_review").select("source_id,source_row,order_reference,order_date,reason,issues_json,review_status")
+          .eq("review_status","pending").order("order_date",{ascending:false}).limit(100)
       ]);
       if(src.error||cat.error||folderResults.error||settings.error||history.error) throw (src.error||cat.error||folderResults.error||settings.error||history.error);
       sources=src.data || [];
@@ -122,6 +124,7 @@ export function initTracking({client,escapeHtml}) {
       folders=folderResults.data || [];
       syncSettings=settings.data || null;
       syncHistory=history.data || [];
+      legacyReviews=reviewResults.data || [];
       if(!sources.length) {orders=[];decisions.clear();loaded=true;render();status.textContent="No hay fuentes importadas para este usuario.";return;}
       const rows=await readPages((off,size)=>client.from("tracking_orders")
         .select("id,source_id,source_row,order_reference,order_date,supplier,responsible,delivery_location,drive_finalized,reception_date")
@@ -204,6 +207,16 @@ export function initTracking({client,escapeHtml}) {
       '<button type="button" class="tracking-refresh" id="trackingPreviewGoogle" aria-label="Comparar cambios sin modificar pedidos">Comparar con Drive (prueba)</button>'+
       '<span id="trackingGoogleResult" role="status" aria-live="polite">No se ha comprobado la conexión técnica.</span>'+
       '</div></section>';
+    const reviewHeader=legacyReviews.length?'<section class="tracking-legacy-review"><h3>Pedidos con datos por revisar ('+legacyReviews.length+')</h3>'+
+      '<p>Estos pedidos están guardados aparte. No generan reclamaciones automáticas.</p>'+
+      legacyReviews.map(r=>{
+        const issue=Array.isArray(r.issues_json)?r.issues_json.find(x=>x.qty_raw):null;
+        const original=issue?.qty_raw?' · Cantidad original: '+issue.qty_raw:'';
+        return '<article class="tracking-legacy-review-item"><strong>'+escapeHtml(folderName(r.source_id))+
+          ' · '+escapeHtml(r.order_reference||'Pedido sin referencia')+'</strong><span>'+
+          escapeHtml(r.order_date?pretty(r.order_date):'Fecha por comprobar')+
+          ' · Revisión necesaria'+escapeHtml(original)+'</span></article>';
+      }).join('')+'</section>':"";
     const items=[...catalog].sort((a,b)=>{
       const ranks={approved:0,candidate:1,review:2,excluded:3};
       return (ranks[a.status]??9)-(ranks[b.status]??9)||
@@ -223,7 +236,7 @@ export function initTracking({client,escapeHtml}) {
         '</strong><small>'+escapeHtml(x.source_title)+' · '+escapeHtml(detail)+escapeHtml(date)+escapeHtml(issue)+'</small></div>'+
         '<span class="tracking-source-state tracking-source-state-'+escapeHtml(x.status)+'">'+escapeHtml(label)+'</span></article>';
     }).join("");
-    list.innerHTML=headline+'<div class="tracking-source-list">'+cards+'</div>';
+    list.innerHTML=headline+reviewHeader+'<div class="tracking-source-list">'+cards+'</div>';
     document.getElementById("trackingVisible").textContent=items.length+" libros identificados";
   }
   function render() {
@@ -399,5 +412,5 @@ export function initTracking({client,escapeHtml}) {
     status.textContent="Decision registrada con auditoria. Drive permanece intacto.";
     await load();
   });
-  return {open(){if(!loaded)load();else render();},reset(){++generation;orders=[];decisions.clear();sources=[];catalog=[];folders=[];syncSettings=null;syncHistory=[];loaded=false;viewMode="queue";for(const b of viewButtons){const active=b.dataset.trackingView==="queue";b.classList.toggle("is-active",active);b.setAttribute("aria-pressed",String(active));}list.replaceChildren();stats.replaceChildren();source.textContent="";status.textContent="Selecciona un periodo para consultar pedidos.";setPeriod("30");period.value="30";}};
+  return {open(){if(!loaded)load();else render();},reset(){++generation;orders=[];decisions.clear();sources=[];catalog=[];folders=[];syncSettings=null;syncHistory=[];legacyReviews=[];loaded=false;viewMode="queue";for(const b of viewButtons){const active=b.dataset.trackingView==="queue";b.classList.toggle("is-active",active);b.setAttribute("aria-pressed",String(active));}list.replaceChildren();stats.replaceChildren();source.textContent="";status.textContent="Selecciona un periodo para consultar pedidos.";setPeriod("30");period.value="30";}};
 }
