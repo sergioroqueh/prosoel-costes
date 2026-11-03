@@ -157,9 +157,10 @@ let purchaseCandidateInEditor = null;
 let purchaseEditIsSaving = false;
 let currentUserRole = "user";
 let trackingAllowed = false;
-// Personalización de navegación limitada a la cuenta concreta de Israel.
-// No reemplaza las políticas RLS ni altera el rol real del usuario.
-let isIsraelAccount = false;
+// Los perfiles operativos tienen la misma vista reducida; RLS protege los datos.
+const LIMITED_ACCOUNT_EMAILS = new Set(["israel@prosoel.es", "ivivanco@prosoel.es"]);
+const TRACKING_ACCOUNT_EMAILS = new Set(["compras@prosoel.es", ...LIMITED_ACCOUNT_EMAILS]);
+let isLimitedAccount = false;
 let currentImport = null;
 let importSelectionGeneration = 0;
 let importAuditGeneration = 0;
@@ -447,9 +448,9 @@ function showLogin(message = "") {
 function showApp(user) {
   trackingAllowed = false;
   trackingTab.classList.add("hidden");
-  isIsraelAccount = String(user?.email || "").trim().toLowerCase() === "israel@prosoel.es";
-  reviewTab.classList.toggle("hidden", isIsraelAccount);
-  if (isIsraelAccount) activateWorkspace("costs");
+  isLimitedAccount = LIMITED_ACCOUNT_EMAILS.has(String(user?.email || "").trim().toLowerCase());
+  reviewTab.classList.toggle("hidden", isLimitedAccount);
+  if (isLimitedAccount) activateWorkspace("costs");
   authView.hidden = true;
   appView.hidden = false;
   authView.classList.add("hidden");
@@ -473,7 +474,7 @@ async function verifyAccess(user) {
   currentUser.textContent = data.display_name || data.email;
   currentUserRole = data.role || "user";
   // Gating visual despues de verificar app_users; el acceso real se protege con RLS.
-  trackingAllowed = ["compras@prosoel.es","israel@prosoel.es"].includes(String(data.email || "").trim().toLowerCase());
+  trackingAllowed = TRACKING_ACCOUNT_EMAILS.has(String(data.email || "").trim().toLowerCase());
   trackingTab.classList.toggle("hidden", !trackingAllowed);
   importTab.classList.toggle("hidden",currentUserRole!=="admin");
   return true;
@@ -1338,8 +1339,8 @@ const reviewRiskLabels = {
 };
 
 function activateWorkspace(which) {
-  // Israel no ve ni puede abrir la vista de Normalización desde la navegación.
-  const reviewing = which === "review" && !isIsraelAccount;
+  // Los perfiles operativos no ven ni pueden abrir Normalización.
+  const reviewing = which === "review" && !isLimitedAccount;
   const importing = which === "import" && currentUserRole === "admin";
   const lookingUpOrder = which === "orders";
   const trackingView = which === "tracking" && trackingAllowed;
@@ -2677,6 +2678,6 @@ const orderLookup = initOrderLookup({
   client:supabase, money, number, displayDiscount, escapeHtml, projectLookup
 });
 
-const tracking = initTracking({client:supabase,escapeHtml,canManageSources:()=>trackingAllowed&&!isIsraelAccount});
+const tracking = initTracking({client:supabase,escapeHtml,canManageSources:()=>trackingAllowed&&currentUserRole==="admin"});
 
 bootstrapSession();
