@@ -72,7 +72,7 @@ async function readPaged(build,limit=20000) {
  }
  throw new Error("oversized_source");
 }
-async function runOnce(db,slot=0,forceCheck=false) {
+async function runOnce(db,slot=0,forceCheck=false,preferredSourceId=null) {
  const config=await db.from("tracking_sync_settings")
    .select("requested_interval_minutes,automatic_sync_enabled,auth_setup").eq("id",1).single();
  if(config.error)throw new Error("sync_settings_unreadable");
@@ -84,7 +84,10 @@ async function runOnce(db,slot=0,forceCheck=false) {
  if(catalog.error)throw new Error("catalog_unreadable");
  if((catalog.data||[]).length<1)return {state:"disabled",message:"No hay fuentes aprobadas para sincronizar."};
  if((catalog.data||[]).length>60)throw new Error("too_many_sources_per_rotation");
- const source=catalog.data[slot%catalog.data.length];
+ const source=preferredSourceId
+   ? catalog.data.find(x=>x.file_id===preferredSourceId)
+   : catalog.data[slot%catalog.data.length];
+ if(!source)throw new Error("requested_source_not_authorized");
  const baseline=await db.from("tracking_sources").select("id").eq("id",source.file_id).maybeSingle();
  if(baseline.error||!baseline.data)throw new Error("source_not_previously_imported");
  const log=await db.from("tracking_sync_runs").insert({
@@ -213,8 +216,34 @@ Deno.serve(async (request)=>{
    const slot=payload.slot??0;
    if(!Number.isInteger(slot)||slot<0||slot>10000)
      return reply(400,"bad_slot","Índice de sincronización inválido.");
-   const response=await runOnce(db,slot,payload.force_check===true);
-   return reply(200,response.state,"Comprobación horaria ejecutada.",response);
+   const manual=payload.manual_queue===true;
+   let claimedId=null;
+   if(manual) {
+     const claim=await db.rpc("tracking_claim_manual_refresh");
+     if(claim.error)throw new Error("manual_queue_claim_failed");
+     claimedId=claim.data||null;
+     if(!claimedId)return reply(200,"idle","No hay solicitudes manuales pendientes.");
+   }
+   let response;
+   try{
+     response=await runOnce(db,slot,manual||payload.force_check===true,claimedId);
+   }catch(e){
+     if(manual&&claimedId) await db.from("tracking_manual_refresh_queue")
+       .update({status:"error",processed_at:new Date().toISOString(),message:"La ejecución necesita revisión"})
+       .eq("source_id",claimedId).eq("status","running");
+     throw e;
+   }
+   if(manual&&claimedId){
+     const succeeded=response.state==="success"||response.state==="unchanged";
+     const update=await db.from("tracking_manual_refresh_queue")
+       .update({
+         status:succeeded?"done":"error",
+         processed_at:new Date().toISOString(),
+         message:succeeded?"Drive comprobado correctamente":"Revisión necesaria: "+String(response.state||"error").slice(0,80)
+       }).eq("source_id",claimedId).eq("status","running");
+     if(update.error)throw new Error("manual_queue_finish_failed");
+   }
+   return reply(200,response.state,"Comprobación ejecutada.",response);
  }catch(e){
    console.error("PROSOEL cron:",String(e?.message||"error").slice(0,140));
    return reply(503,"sync_problem","No se pudo procesar la comprobación.");

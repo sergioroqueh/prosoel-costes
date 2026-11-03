@@ -22,7 +22,7 @@ export function trackingLineDelivered(line) {
   return Boolean(line && line.source_green === true && line.source_si === true && line.drive_line_finalized === true);
 }
 
-// Orden en el periodo YA filtrado. El desempate respeta el orden físico de Drive.
+// Orden dentro del período: primero fecha, después número de pedido natural.
 // El número de pedido desempata los pedidos con la misma fecha, incluso
 // cuando pertenecen a diferentes obras/Excel. numeric:true compara 9 < 10.
 const trackingOrderRefCollator = new Intl.Collator("es", {numeric:true,sensitivity:"base"});
@@ -50,12 +50,14 @@ export function initTracking({client,escapeHtml}) {
   const list = document.getElementById("trackingResults");
   const source = document.getElementById("trackingSource");
   const refresh = document.getElementById("trackingRefresh");
+  const manualRefresh = document.getElementById("trackingManualRefresh");
+  const manualStatus = document.getElementById("trackingManualStatus");
   const alertDays = document.getElementById("trackingAlertDays");
   const sort = document.getElementById("trackingSort");
   const project = document.getElementById("trackingProject");
   const viewButtons=[...root.querySelectorAll("[data-tracking-view]")];
   let viewMode="queue";
-  let catalog=[],folders=[],syncSettings=null,syncHistory=[],legacyReviews=[];
+  let catalog=[],folders=[],syncSettings=null,syncHistory=[],legacyReviews=[],newWorkRequests=[],manualQueue=[];
   let orders = [], decisions = new Map(), sources = [], loaded = false, busy = false, generation = 0;
   const fmt = (value) => value == null ? "—" : new Intl.NumberFormat("es-ES",{maximumFractionDigits:3}).format(Number(value));
   const iso = (d) => [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");
@@ -112,25 +114,43 @@ export function initTracking({client,escapeHtml}) {
     if(!dateFrom.value || !dateTo.value || dateFrom.value>dateTo.value) {
       status.textContent="Selecciona un rango de fechas valido.";return;
     }
-    busy=true; refresh.disabled=true; status.textContent="Consultando pedidos autorizados…";
+    busy=true; refresh.disabled=true;manualRefresh.disabled=true; status.textContent="Consultando pedidos autorizados…";
     const request=++generation;
     try {
-      const [src,cat,folderResults,settings,history,reviewResults]=await Promise.all([
+      const [src,cat,folderResults,settings,history,reviewResults,workRequests,refreshQueue]=await Promise.all([
         client.from("tracking_sources").select("id,display_name,drive_url,synced_at,modified_at_source,sync_mode").order("display_name"),
         client.from("tracking_drive_catalog").select("file_id,folder_id,source_title,status,reason,drive_modified_at,last_imported_at,automatic_import_enabled,validation_status,validation_error").order("source_title").limit(1000),
         client.from("tracking_drive_folders").select("folder_id,folder_label,classification").limit(1000),
         client.from("tracking_sync_settings").select("requested_interval_minutes,automatic_sync_enabled,auth_setup").eq("id",1).maybeSingle(),
         client.from("tracking_sync_runs").select("state,finished_at,started_at,message,change_summary").order("started_at",{ascending:false}).limit(5),
         client.from("tracking_legacy_review").select("source_id,source_row,order_reference,order_date,reason,issues_json,review_status")
-          .eq("review_status","pending").order("order_date",{ascending:false}).limit(100)
+          .eq("review_status","pending").order("order_date",{ascending:false}).limit(100),
+        client.from("tracking_new_work_requests").select("id,work_name,file_id,status,requested_at,review_note")
+          .order("requested_at",{ascending:false}).limit(50),
+        client.from("tracking_manual_refresh_queue").select("source_id,requested_at,processed_at,status,message")
+          .order("requested_at",{ascending:false}).limit(100)
       ]);
-      if(src.error||cat.error||folderResults.error||settings.error||history.error) throw (src.error||cat.error||folderResults.error||settings.error||history.error);
+      if(src.error||cat.error||folderResults.error||settings.error||history.error||reviewResults.error||workRequests.error||refreshQueue.error)
+        throw (src.error||cat.error||folderResults.error||settings.error||history.error||reviewResults.error||workRequests.error||refreshQueue.error);
       sources=src.data || [];
       catalog=cat.data || [];
       folders=folderResults.data || [];
       syncSettings=settings.data || null;
       syncHistory=history.data || [];
       legacyReviews=reviewResults.data || [];
+      newWorkRequests=workRequests.data || [];
+      manualQueue=refreshQueue.data || [];
+      const queued=manualQueue.filter(x=>x.status==="pending").length;
+      const running=manualQueue.filter(x=>x.status==="running").length;
+      const recently=manualQueue.filter(x=>Date.now()-new Date(x.requested_at).getTime()<30*60000);
+      if(queued||running)manualStatus.textContent=
+        "Actualización desde Drive: "+queued+" obra(s) en cola y "+running+
+        " comprobándose. Pulsa «Actualizar vista» para ver el progreso.";
+      else if(recently.length)manualStatus.textContent=
+        "Última solicitud manual: "+recently.filter(x=>x.status==="done").length+
+        " comprobaciones correctas y "+recently.filter(x=>x.status==="error").length+
+        " para revisar.";
+      else manualStatus.textContent="";
       if(!sources.length) {orders=[];decisions.clear();loaded=true;render();status.textContent="No hay fuentes importadas para este usuario.";return;}
       const rows=await readPages((off,size)=>client.from("tracking_orders")
         .select("id,source_id,source_row,order_reference,order_date,supplier,responsible,delivery_location,drive_finalized,reception_date")
@@ -163,13 +183,13 @@ export function initTracking({client,escapeHtml}) {
     } catch(e) {
       console.error("Seguimiento:",e);
       status.textContent="No se pudieron recuperar los pedidos. Comprueba tu sesion y la conexion.";
-    } finally {busy=false;refresh.disabled=false;}
+    } finally {busy=false;refresh.disabled=false;manualRefresh.disabled=false;}
   }
   function updateSuppliers() {
     const old=supplier.value;
     const values=[...new Set(orders.map(x=>x.supplier).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
     supplier.replaceChildren();
-    const all=new Option("Todos los almacenes / proveedores","");supplier.add(all);
+    const all=new Option("Todos los almacenes","");supplier.add(all);
     for(const s of values)supplier.add(new Option(s,s));
     supplier.value=values.includes(old)?old:"";
   }
@@ -205,7 +225,9 @@ export function initTracking({client,escapeHtml}) {
     const lastDate=latest?.finished_at?new Date(latest.finished_at).toLocaleString("es-ES"):"Sin ejecuciones todavía";
     const statusNote=latest?"Última ejecución: "+latest.state+" · "+lastDate+" · "+(latest.message||""):"Sin ejecuciones todavía.";
     const headline='<section class="tracking-source-overview"><h3>Fuentes de pedidos de Drive</h3>'+
-      '<p>'+counts.approved+' libros importados · '+counts.automatic+' en sincronización automática · '+counts.blocked+' bloqueados por validación/permisos · '+counts.review+' por revisar · '+counts.excluded+' carpetas apartadas</p>'+
+      '<p>'+counts.approved+' libros importados · '+counts.automatic+' en sincronización automática · '+
+      newWorkRequests.filter(x=>x.status==="pending").length+' altas nuevas pendientes · '+
+      counts.blocked+' fuentes bloqueadas por validación · '+counts.review+' por revisar</p>'+
       '<div class="tracking-sync-note '+(scheduled?"tracking-sync-on":"")+'">'+
       (scheduled?"Sincronización automática configurada cada ":"Sincronización horaria prevista (" )+
       escapeHtml(syncSettings?.requested_interval_minutes??60)+' minutos'+
@@ -246,7 +268,22 @@ export function initTracking({client,escapeHtml}) {
         '</strong><small>'+escapeHtml(x.source_title)+' · '+escapeHtml(detail)+escapeHtml(date)+escapeHtml(issue)+'</small></div>'+
         '<span class="tracking-source-state tracking-source-state-'+escapeHtml(x.status)+'">'+escapeHtml(label)+'</span></article>';
     }).join("");
-    list.innerHTML=headline+reviewHeader+'<div class="tracking-source-list">'+cards+'</div>';
+    const pendingWork=newWorkRequests.filter(x=>x.status==="pending").length;
+    const registerWork='<details class="tracking-register-work">'+
+      '<summary> <span>+ Registrar nueva obra</span><small>Introduce el enlace de su Excel; la importación necesita validación</small></summary>'+
+      '<div class="tracking-register-work-body"><div class="tracking-register-grid">'+
+      '<label>Nombre de la obra<input id="trackingNewWorkName" type="text" maxlength="120" placeholder="Ej.: NUEVA OBRA · GETAFE"></label>'+
+      '<label>Enlace privado del Excel XLSX en Google Drive<input id="trackingNewWorkUrl" type="url" placeholder="https://drive.google.com/file/d/…/view"></label></div>'+
+      '<div class="tracking-register-footer"><p>Comparte el XLSX como Lector con <strong>prosoel-pedidos-reader@prosoel-pedidos.iam.gserviceaccount.com</strong>. '+
+      'Registrar no importa pedidos ni activa reclamaciones. Revisaremos la estructura antes de conectarlo.</p>'+
+      '<button type="button" class="tracking-refresh tracking-refresh-primary" id="trackingRegisterWork">Registrar obra</button></div>'+
+      '<span id="trackingRegisterResult" role="status" aria-live="polite"></span></div></details>';
+    const requestsBlock=newWorkRequests.length?'<div class="tracking-request-list"><h4>Obras solicitadas ('+
+      newWorkRequests.length+' · '+pendingWork+' pendientes)</h4>'+
+      newWorkRequests.slice(0,20).map(x=>'<div class="tracking-request-row"><strong>'+escapeHtml(x.work_name)+
+      '</strong><span>'+escapeHtml(x.status==="pending"?"Pendiente de validar":x.status==="reviewed"?"Revisada":"No incorporada")+
+      '</span></div>').join("")+'</div>':"";
+    list.innerHTML=headline+registerWork+requestsBlock+reviewHeader+'<div class="tracking-source-list">'+cards+'</div>';
     document.getElementById("trackingVisible").textContent=items.length+" libros identificados";
   }
   function render() {
@@ -322,23 +359,7 @@ export function initTracking({client,escapeHtml}) {
     };
     const shown=visible.slice(0,300);
     const overflow=visible.length>300?'<p class="tracking-empty">Mostrando los 300 primeros. Acota el rango para ver más.</p>':"";
-    if(viewMode==="works") {
-      const grouped=new Map();
-      for(const order of shown){
-        const name=folderName(order.source_id);
-        if(!grouped.has(name)) grouped.set(name,[]);
-        grouped.get(name).push(order);
-      }
-      // Los grupos se ordenan por la primera fecha pendiente, no por el nombre de la obra.
-      list.innerHTML=[...grouped.entries()].map(([name,items],i)=>{
-        const pendingCount=items.reduce((n,o)=>n+(o._state==="open"?o.lines.filter(l=>!trackingLineDelivered(l)).length:0),0);
-        return '<details class="tracking-project-group" '+(i<2?'open':'')+'><summary><span>'+
-          escapeHtml(name)+'</span><small>'+items.length+' pedidos · '+pendingCount+' materiales pendientes</small></summary>'+
-          '<div class="tracking-project-cards">'+items.map(renderCard).join("")+'</div></details>';
-      }).join("")+overflow;
-    } else {
-      list.innerHTML=shown.map(renderCard).join("")+overflow;
-    }
+    list.innerHTML=shown.map(renderCard).join("")+overflow;
   }
   period.addEventListener("change",()=>{setPeriod(period.value);if(period.value!=="custom")load();});
   [dateFrom,dateTo].forEach(el=>el.addEventListener("change",()=>{period.value="custom";load();}));
@@ -412,6 +433,63 @@ export function initTracking({client,escapeHtml}) {
       result.textContent="No se pudo comparar. No se ha modificado ningún dato.";
     } finally {button.disabled=false;}
   });
+  // Alta supervisada: no concede permisos de Google ni aprueba la importación.
+  list.addEventListener("click",async event=>{
+    const button=event.target.closest("#trackingRegisterWork");
+    if(!button)return;
+    const result=list.querySelector("#trackingRegisterResult");
+    const workName=String(list.querySelector("#trackingNewWorkName")?.value||"").trim();
+    const rawUrl=String(list.querySelector("#trackingNewWorkUrl")?.value||"").trim();
+    if(workName.length<4||workName.length>120){result.textContent="Introduce un nombre de obra de 4 a 120 caracteres.";return;}
+    let fileId=null;
+    try {
+      const url=new URL(rawUrl);
+      const validHost=url.hostname==="docs.google.com"||url.hostname==="drive.google.com";
+      const validPath=url.hostname==="docs.google.com"?
+        url.pathname.match(new RegExp("^/spreadsheets/d/([A-Za-z0-9_-]{16,128})(?:/|$)")):
+        url.pathname.match(new RegExp("^/file/d/([A-Za-z0-9_-]{16,128})(?:/|$)"));
+      if(url.protocol!=="https:"||!validHost||!validPath)throw new Error("invalid");
+      fileId=validPath[1];
+    } catch {
+      result.textContent="Utiliza el enlace completo a un Excel de Google Drive, no a una carpeta.";
+      return;
+    }
+    if(catalog.some(c=>c.file_id===fileId)||newWorkRequests.some(x=>x.file_id===fileId)){
+      result.textContent="Este Excel ya está registrado o pendiente de revisión.";
+      return;
+    }
+    button.disabled=true;result.textContent="Registrando solicitud privada…";
+    try{
+      const {error}=await client.from("tracking_new_work_requests")
+        .insert({work_name:workName,drive_url:rawUrl,file_id:fileId});
+      if(error){
+        result.textContent=error.code==="23505"?"Este Excel ya se había solicitado.":"No se pudo registrar la obra. Comprueba tu sesión.";
+        return;
+      }
+      await load();
+      manualStatus.textContent="Nueva obra registrada: "+workName+". Pendiente de validar; no genera reclamaciones.";
+    }catch{
+      result.textContent="No se pudo registrar la obra.";
+    }finally{button.disabled=false;}
+  });
+  // Actualización real de Drive: la cola privada procesa cada archivo en orden.
+  manualRefresh.addEventListener("click",async()=>{
+    if(busy)return;
+    const selected=project.value||null;
+    const target=selected?folderName(selected):"todas las obras aprobadas";
+    if(!selected&&!window.confirm("¿Solicitar la actualización de todas las obras aprobadas? Se revisarán progresivamente, sin descargas simultáneas."))return;
+    manualRefresh.disabled=true;
+    manualStatus.textContent="Registrando actualización de "+target+"…";
+    try{
+      const {data,error}=await client.rpc("tracking_request_manual_refresh",{p_file_id:selected});
+      if(error){manualStatus.textContent="No se pudo solicitar la actualización. Comprueba la obra y tu sesión.";return;}
+      const queued=Number(data?.queued||0);
+      manualStatus.textContent=queued>0
+        ? "Actualización solicitada para "+queued+" obra(s). Se comprobarán progresivamente desde Drive. Pulsa «Actualizar vista» para consultar los resultados."
+        : "La obra ya tiene una comprobación pendiente o reciente; no se ha duplicado.";
+    }catch{manualStatus.textContent="No se pudo solicitar la actualización."}
+    finally{manualRefresh.disabled=false;}
+  });
   search.addEventListener("input",render);
   refresh.addEventListener("click",load);
   list.addEventListener("click",async event=>{
@@ -431,5 +509,5 @@ export function initTracking({client,escapeHtml}) {
     status.textContent="Decision registrada con auditoria. Drive permanece intacto.";
     await load();
   });
-  return {open(){if(!loaded)load();else render();},reset(){++generation;orders=[];decisions.clear();sources=[];catalog=[];folders=[];syncSettings=null;syncHistory=[];legacyReviews=[];loaded=false;viewMode="queue";for(const b of viewButtons){const active=b.dataset.trackingView==="queue";b.classList.toggle("is-active",active);b.setAttribute("aria-pressed",String(active));}list.replaceChildren();stats.replaceChildren();source.textContent="";status.textContent="Selecciona un periodo para consultar pedidos.";setPeriod("30");period.value="30";}};
+  return {open(){if(!loaded)load();else render();},reset(){++generation;orders=[];decisions.clear();sources=[];catalog=[];folders=[];syncSettings=null;syncHistory=[];legacyReviews=[];newWorkRequests=[];manualQueue=[];loaded=false;viewMode="queue";manualStatus.textContent="";for(const b of viewButtons){const active=b.dataset.trackingView==="queue";b.classList.toggle("is-active",active);b.setAttribute("aria-pressed",String(active));}list.replaceChildren();stats.replaceChildren();source.textContent="";status.textContent="Selecciona un periodo para consultar pedidos.";setPeriod("30");period.value="30";}};
 }
