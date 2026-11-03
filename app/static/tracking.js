@@ -23,10 +23,16 @@ export function trackingLineDelivered(line) {
 }
 
 // Orden en el periodo YA filtrado. El desempate respeta el orden físico de Drive.
+// El número de pedido desempata los pedidos con la misma fecha, incluso
+// cuando pertenecen a diferentes obras/Excel. numeric:true compara 9 < 10.
+const trackingOrderRefCollator = new Intl.Collator("es", {numeric:true,sensitivity:"base"});
 export function sortTrackingOrders(items, orderBy="oldest") {
   return items.sort((a,b)=>{
-    const diff=String(a.order_date).localeCompare(String(b.order_date)) ||
-      Number(a.source_row)-Number(b.source_row) || Number(a.id)-Number(b.id);
+    const diff=String(a.order_date||"").localeCompare(String(b.order_date||"")) ||
+      trackingOrderRefCollator.compare(String(a.order_reference||""),String(b.order_reference||"")) ||
+      String(a.source_id||"").localeCompare(String(b.source_id||"")) ||
+      Number(a.source_row||0)-Number(b.source_row||0) ||
+      Number(a.id||0)-Number(b.id||0);
     return orderBy==="newest" ? -diff : diff;
   });
 }
