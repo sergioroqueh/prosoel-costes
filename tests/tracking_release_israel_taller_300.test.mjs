@@ -9,6 +9,7 @@ const ui=read("app/static/tracking.js");
 const legacy=read("supabase/functions/drive-hourly-sync/legacy.ts");
 const worker=read("supabase/functions/drive-hourly-sync/index.ts");
 const security=read("supabase/migrations/20261103_063_tracking_access_sergio_israel.sql");
+const ignacio=read("supabase/migrations/20261103_065_tracking_access_ignacio.sql");
 const promotion=read("supabase/migrations/20261103_064_taller_26822_300_received.sql");
 
 test("Sin etiquetas BETA y con cabecera naranja corporativa visible",()=>{
@@ -17,15 +18,19 @@ test("Sin etiquetas BETA y con cabecera naranja corporativa visible",()=>{
  assert.match(css,/#trackingWorkspace \.tracking-hero \.search-kicker\{color:#ffac78/);
  assert.match(html,/LOGISTICA \/ CONTROL INTERNO/);
 });
-test("La pestaña está permitida a Sergio e Israel sin habilitar normalización",()=>{
- assert.match(app,/trackingAllowed = \["compras@prosoel\.es","israel@prosoel\.es"\]/);
- assert.match(app,/reviewTab\.classList\.toggle\("hidden", isIsraelAccount\)/);
- assert.match(app,/const reviewing = which === "review" && !isIsraelAccount/);
+test("Sergio, Israel e Ignacio tienen acceso sin habilitar normalización a operativos",()=>{
+ assert.match(app,/const LIMITED_ACCOUNT_EMAILS = new Set\(\["israel@prosoel\.es", "ivivanco@prosoel\.es"\]\)/);
+ assert.match(app,/const TRACKING_ACCOUNT_EMAILS = new Set/);
+ assert.match(app,/trackingAllowed = TRACKING_ACCOUNT_EMAILS\.has/);
+ assert.match(app,/reviewTab\.classList\.toggle\("hidden", isLimitedAccount\)/);
+ assert.match(app,/const reviewing = which === "review" && !isLimitedAccount/);
  assert.match(security,/private\.can_access_tracking\(\)/);
  assert.match(security,/actor_uid=\(select auth\.uid\(\)\)/);
+ assert.match(ignacio,/values \('ivivanco@prosoel\.es','Ignacio','user',true\)/);
+ assert.match(ignacio,/'compras@prosoel\.es','israel@prosoel\.es','ivivanco@prosoel\.es'/);
 });
 test("Las altas nuevas siguen limitadas a Sergio",()=>{
- assert.match(app,/canManageSources:\(\)=>trackingAllowed&&!isIsraelAccount/);
+ assert.match(app,/canManageSources:\(\)=>trackingAllowed&&currentUserRole==="admin"/);
  assert.match(ui,/canManageSources\(\)\?'<details class="tracking-register-work">/);
  assert.match(ui,/if\(!button\|\|!canManageSources\(\)\)return/);
  assert.doesNotMatch(security,/drop policy if exists "Sergio registra altas pendientes"/);
