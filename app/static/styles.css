@@ -2967,3 +2967,65 @@ main { margin-top: 25px; }
 
 /* Seguimiento liberado: acento corporativo visible sobre cabecera oscura. */
 #trackingWorkspace .tracking-hero .search-kicker{color:#ffac78;font-size:.76rem;font-weight:850;letter-spacing:.13em;text-shadow:0 1px 1px rgba(0,0,0,.18);}
+
+
+/* Enlaces a ofertas comerciales originales, únicamente cuando están verificadas. */
+.offer-document-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  padding: .24rem .48rem;
+  margin: .12rem .24rem .12rem 0;
+  border: 1px solid #a8c7e8;
+  border-radius: .55rem;
+  background: #eef5fc;
+  color: #173f73;
+  font-size: .84rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.offer-document-link:hover,
+.offer-document-link:focus-visible {
+  background: #e2effc;
+  border-color: #6698cd;
+  text-decoration: underline;
+}
+.price-origin-offer { margin: .4rem 0; }
+
+
+/* Referencias de ofertas por pedido: números sin confundirlos con un PDF. */
+.supplier-offer-ref {
+  display: inline-flex;
+  align-items: center;
+  background: #f3f6fb;
+  color: #153b6c;
+  border: 1px solid #c8d5e7;
+  border-radius: .42rem;
+  padding: .18rem .48rem;
+  margin: .1rem .2rem .1rem 0;
+  font-size: .82rem;
+  font-weight: 750;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.offer-recovery-panel {
+  margin: 1.25rem 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid #cfdae9;
+  border-left: 4px solid #e97732;
+  border-radius: .75rem;
+  background: #f9fbfd;
+}
+.offer-recovery-panel summary {
+  color: #163f73;
+  font-weight: 750;
+  cursor: pointer;
+  padding: .35rem 0;
+}
+.offer-recovery-panel p { margin: .65rem 0; }
+.offer-recovery-panel input[type="file"] { display: block; margin: .6rem 0; }
+.offer-recovery-panel .import-acknowledge { display: flex; gap: .55rem; align-items: start; margin: 1rem 0; }
+.offer-recovery-panel button { padding: .7rem 1rem; }

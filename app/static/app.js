@@ -1,10 +1,13 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./config.js";
 import { readProsoelXlsx } from "./order_import.js?v=20261008-v9";
-import { initOrderLookup } from "./order_lookup.js?v=20261030-v1";
+import { initOrderLookup } from "./order_lookup.js?v=20261103-offers-v1";
 import { initTracking } from "./tracking.js?v=20261103-official-israel-v1";
-import { initProjectLookup } from "./project_lookup.js?v=20261030-v1";
+import { initProjectLookup } from "./project_lookup.js?v=20261103-offers-v1";
 import { mountPriceTimeline, PRICE_SERIES_COLORS } from "./price_comparison_chart.js?v=20261030-v1";
+import { fetchVerifiedOfferMap, offerLinksHtml } from "./offer_documents.js?v=20261103-v1";
+import { fetchSupplierOfferRefsMap, supplierOfferRefsHtml } from "./supplier_offer_references.js?v=20261103-v1";
+import { initOffer2026BatchImport } from "./offers_2026_bulk_import.js?v=20261103-v1";
 
 const supabase = createClient(
   SUPABASE_URL,
@@ -137,6 +140,8 @@ const importAuditRows = document.getElementById("importAuditRows");
 
 let searchGeneration = 0;
 let detailGeneration = 0;
+let activeOfferMap = new Map(); // Solo enlaces de ofertas comerciales de 2026 verificadas.
+let activeSupplierOfferMap = new Map(); // Referencias literales, sin modificación de precios.
 let visibleRows = [];
 let totalResults = 0;
 let selectedResultKey = null;
@@ -886,6 +891,13 @@ async function openMaterial(materialId) {
     return;
   }
 
+  const [offers, supplierRefs] = await Promise.all([
+    fetchVerifiedOfferMap(supabase, pricesResponse.data || []),
+    fetchSupplierOfferRefsMap(supabase, pricesResponse.data || []),
+  ]);
+  if (requestId !== detailGeneration) return;
+  activeOfferMap = offers;
+  activeSupplierOfferMap = supplierRefs;
   detail.commercial_variants = variantsResponse.data || [];
   renderMaterialDetail(detail, pricesResponse.data || []);
 }
@@ -910,6 +922,13 @@ async function openHistorical(row) {
     return;
   }
 
+  const [offers, supplierRefs] = await Promise.all([
+    fetchVerifiedOfferMap(supabase, data || []),
+    fetchSupplierOfferRefsMap(supabase, data || []),
+  ]);
+  if (requestId !== detailGeneration) return;
+  activeOfferMap = offers;
+  activeSupplierOfferMap = supplierRefs;
   renderHistoricalDetail(row, data || []);
 }
 
@@ -989,6 +1008,12 @@ function renderMaterialDetail(detail, rows) {
         escapeHtml(displayDiscount(latest.discount_raw)) +
         "</p>"
     );
+    const latestOfferLink = Number(latest.order_year) === 2026
+      ? offerLinksHtml(activeOfferMap.get(String(latest.order_id)), escapeHtml) : "";
+    const latestOfferRefs = Number(latest.order_year) === 2026
+      ? supplierOfferRefsHtml(activeSupplierOfferMap.get(String(latest.order_id)), escapeHtml) : "";
+    if (latestOfferRefs) html.push('<p class="price-origin-offer">Nº oferta proveedor: ' + latestOfferRefs + '</p>');
+    if (latestOfferLink) html.push('<p class="price-origin-offer">Oferta comercial PDF: ' + latestOfferLink + '</p>');
     html.push('<button class="action-button" id="showLatestOrigin" type="button">Ver línea de origen</button>');
     html.push('<div id="latestOriginDetail" class="origin-detail hidden"></div>');
     html.push("</div>");
@@ -1197,6 +1222,13 @@ async function showReferenceComparison(reference, detailRequestId) {
     button.textContent = "Reintentar comparativa";
     return;
   }
+  const [offers, supplierRefs] = await Promise.all([
+    fetchVerifiedOfferMap(supabase, data || []),
+    fetchSupplierOfferRefsMap(supabase, data || []),
+  ]);
+  if (detailRequestId !== detailGeneration || !area.isConnected) return;
+  activeOfferMap = offers;
+  activeSupplierOfferMap = supplierRefs;
   renderReferenceComparison(area, reference, data || []);
   // Solo una tabla de Procedencia en la ficha: ahora incluye todos los pedidos
   // de la referencia exacta, no solamente la variante inicialmente elegida.
@@ -1232,7 +1264,7 @@ function historyTableHtml(rows) {
 
   const html = [];
   html.push('<div class="history-wrap"><table class="history-table"><thead><tr>');
-  html.push("<th>Fecha</th><th>Pedido</th><th>Proveedor</th><th>Cant.</th><th>PVP</th><th>Dto.</th><th>Neto</th><th>Origen</th>");
+  html.push("<th>Fecha</th><th>Pedido</th><th>Proveedor</th><th>Cant.</th><th>PVP</th><th>Dto.</th><th>Neto</th><th>Origen</th><th>Oferta</th>");
   html.push("</tr></thead><tbody>");
 
   // El orden de la tabla es siempre por fecha de compra (más reciente primero).
@@ -1254,8 +1286,13 @@ function historyTableHtml(rows) {
     html.push('<td title="Original: ' + escapeHtml(row.discount_raw ?? "—") + '">' + escapeHtml(displayDiscount(row.discount_raw)) + "</td>");
     html.push("<td><strong>" + money(row.net_unit_price) + "</strong></td>");
     html.push('<td><button class="origin-link" type="button" data-origin-index="' + index + '">Ver origen</button></td>');
+    const offerLink = Number(row.order_year) === 2026
+      ? offerLinksHtml(activeOfferMap.get(String(row.order_id)), escapeHtml) : "";
+    const offerRefs = Number(row.order_year) === 2026
+      ? supplierOfferRefsHtml(activeSupplierOfferMap.get(String(row.order_id)), escapeHtml) : "";
+    html.push('<td>' + ([offerRefs, offerLink].filter(Boolean).join(' ') || '—') + '</td>');
     html.push("</tr>");
-    html.push('<tr id="origin-row-' + index + '" class="hidden"><td colspan="8" class="origin-detail-cell"><div class="origin-detail">' + originHtml(row) + "</div></td></tr>");
+    html.push('<tr id="origin-row-' + index + '" class="hidden"><td colspan="9" class="origin-detail-cell"><div class="origin-detail">' + originHtml(row) + "</div></td></tr>");
   });
 
   html.push("</tbody></table></div>");
@@ -1291,6 +1328,12 @@ function originHtml(row) {
   if (row.order_excluded) parts.push("<strong>Excluido el pedido completo:</strong> Sí");
   if (row.line_review_reason) parts.push("<strong>Motivo de revisión:</strong> " + escapeHtml(row.line_review_reason));
   if (row.order_review_reason) parts.push("<strong>Motivo de exclusión del pedido:</strong> " + escapeHtml(row.order_review_reason));
+  const offerLink = Number(row.order_year) === 2026
+    ? offerLinksHtml(activeOfferMap.get(String(row.order_id)), escapeHtml) : "";
+  const offerRefs = Number(row.order_year) === 2026
+    ? supplierOfferRefsHtml(activeSupplierOfferMap.get(String(row.order_id)), escapeHtml) : "";
+  if (offerRefs) parts.push("<strong>Nº oferta del proveedor:</strong> " + offerRefs);
+  if (offerLink) parts.push("<strong>Oferta comercial PDF:</strong> " + offerLink);
   parts.push("<strong>Archivo origen:</strong> " + escapeHtml(row.source_filename || "—"));
   return parts.join("<br>");
 }
@@ -2468,7 +2511,7 @@ function importMessage(message, isError=false) {
   importStatus.textContent=message;
   importStatus.classList.toggle("is-error",isError);
 }
-function showImportPreview({payload,warnings,computedTotal}, blocker=null) {
+function showImportPreview({payload,warnings,computedTotal,offerExtraction}, blocker=null) {
   const html=[];
   html.push('<h3>Vista previa — '+escapeHtml(payload.source_filename)+'</h3>');
   html.push('<div class="import-metrics">');
@@ -2481,6 +2524,8 @@ function showImportPreview({payload,warnings,computedTotal}, blocker=null) {
     ["Importe del pedido",money(payload.declared_total)],
     ["Suma de líneas",money(computedTotal)],
     ["Revisión de totales",payload.validation_status==="valid"?"Cuadra":payload.validation_status==="incomplete_prices"?"Precios incompletos":"Diferencia detectada"],
+    ["Ofertas proveedor detectadas (2026)",offerExtraction?.references?.length
+      ? offerExtraction.references.join(" · ") : "No hay número de oferta reconocido"],
   ];
   for(const [label,value] of rows) {
     html.push('<div class="import-metric"><span>'+escapeHtml(label)+'</span><strong>'+escapeHtml(value)+'</strong></div>');
@@ -2564,35 +2609,92 @@ async function inspectNewOrderFile(){
   }
 }
 
+async function saveOfferRefsAfterOrderImport(record) {
+  const {payload, offerExtraction} = record;
+  if (Number(payload.order_year) !== 2026 || !offerExtraction?.references?.length) {
+    return {references_inserted: 0, references_existing: 0};
+  }
+  if (payload.order_identity_status === "conflict") {
+    throw new Error("El número interno del Excel no coincide con el nombre. Referencias pendientes de revisión.");
+  }
+  const item = {
+    source_sha256: payload.source_sha256,
+    source_filename: payload.source_filename,
+    references: offerExtraction.references.map(reference => ({
+      reference,
+      source_cell: offerExtraction.sourceCell,
+      source_text: String(offerExtraction.sourceText || "").slice(0, 2000),
+    })),
+  };
+  const {data,error} = await supabase.rpc("record_2026_supplier_offer_references", {
+    p_items: [item],
+  });
+  if (error) throw error;
+  if (Number(data?.files_matched) !== 1 ||
+      Number(data?.unmatched_files || 0) !== 0 ||
+      Number(data?.rejected_records || 0) !== 0) {
+    throw new Error("El pedido está grabado, pero las ofertas requieren cotejo de SHA o revisión documental.");
+  }
+  return data;
+}
+
 async function commitNewOrder(){
   if(currentUserRole!=="admin"||!currentImport||currentImport.blocker||!importAcknowledged.checked)return;
   const payload=currentImport.payload;
   const generation=importSelectionGeneration;
+  const savedRecord=currentImport;
+  const retryOffersOnly=Boolean(savedRecord.orderImported);
   importSubmitButton.disabled=true;
   importFile.disabled=true;
-  importMessage("Guardando pedido y todas sus líneas en una sola operación…");
-  const {data,error}=await supabase.rpc("import_new_prosoel_order",{p_order:payload});
-  if(generation!==importSelectionGeneration)return;
-  importFile.disabled=false;
-  const outcome=Array.isArray(data)?data[0]:data;
-  if(error){
-    importMessage(error.message||"La importación ha fallado. Ninguna línea ha quedado grabada parcialmente.",true);
-    importSubmitButton.disabled=false;
-    return;
-  }
-  if(!outcome){
-    importMessage("No se recibió confirmación de Supabase. Consulta el pedido antes de reintentar.",true);
-    return;
+  importMessage(retryOffersOnly
+    ? "Reintentando guardar únicamente los números de oferta…"
+    : "Guardando pedido y todas sus líneas en una sola operación…");
+  let outcome={result:"imported",imported_lines:payload.lines.length,detail:"Pedido ya guardado"};
+  if(!retryOffersOnly){
+    const {data,error}=await supabase.rpc("import_new_prosoel_order",{p_order:payload});
+    if(generation!==importSelectionGeneration)return;
+    if(error){
+      importFile.disabled=false;
+      importMessage(error.message||"La importación ha fallado. Ninguna línea ha quedado grabada parcialmente.",true);
+      importSubmitButton.disabled=false;
+      return;
+    }
+    outcome=Array.isArray(data)?data[0]:data;
+    if(!outcome){
+      importFile.disabled=false;
+      importMessage("No se recibió confirmación de Supabase. Consulta el pedido antes de reintentar.",true);
+      return;
+    }
   }
   if(outcome.result==="imported"){
+    savedRecord.orderImported=true;
+    let offerResult={references_inserted:0,references_existing:0};
+    try {
+      offerResult=await saveOfferRefsAfterOrderImport(savedRecord);
+    } catch(error) {
+      if(generation!==importSelectionGeneration)return;
+      importFile.disabled=false;
+      importSubmitButton.disabled=false;
+      importSubmitButton.textContent="Reintentar guardar ofertas";
+      const message="Pedido guardado sin duplicar líneas, pero no se pudieron registrar sus ofertas: "+
+        (error?.message||"error desconocido")+". Puedes reintentar sin volver a grabar el pedido.";
+      importMessage(message,true);
+      return;
+    }
+    if(generation!==importSelectionGeneration)return;
+    importFile.disabled=false;
+    const totalOffers=Number(offerResult.references_inserted||0)+Number(offerResult.references_existing||0);
     importMessage("Pedido guardado correctamente · "+outcome.imported_lines+
-      " líneas · Resultado de totales: "+outcome.detail+".");
+      " líneas · "+totalOffers+" referencias de oferta de proveedor registradas · "+
+      "Resultado de totales: "+outcome.detail+".");
     currentImport=null;
+    importSubmitButton.textContent="Guardar pedido";
     importConfirmPanel.classList.add("hidden");
     importFile.value="";
-    reviewLoaded=false; // Refrescar la cola al volver a Normalización.
+    reviewLoaded=false;
     await Promise.all([loadCounter(),loadSuppliers(),loadImportDashboard()]);
   }else{
+    importFile.disabled=false;
     importMessage(outcome.result==="duplicate"
       ?"El mismo archivo ya figura en el histórico. No se ha duplicado."
       :outcome.result==="number_conflict"
@@ -2679,5 +2781,6 @@ const orderLookup = initOrderLookup({
 });
 
 const tracking = initTracking({client:supabase,escapeHtml,canManageSources:()=>trackingAllowed&&currentUserRole==="admin"});
+initOffer2026BatchImport({client:supabase,isAdmin:()=>currentUserRole==="admin"});
 
 bootstrapSession();

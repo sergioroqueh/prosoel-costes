@@ -438,6 +438,18 @@
           </div>
         </div>
         <p class="import-notice">Seguridad: si el mismo archivo ya existe, se omite. Si coincide el número pero los archivos son distintos, la importación se detiene para revisión. Solo los administradores pueden confirmar.</p>
+        <details class="offer-recovery-panel">
+          <summary>Recuperar números de oferta de pedidos 2026</summary>
+          <p>Importación puntual del lote auditado a partir de los Excel originales. No cambia precios ni pedidos. Cada archivo debe coincidir por nombre y SHA-256.</p>
+          <label for="offer2026BatchFile">Lote auditado de ofertas (.json)</label>
+          <input type="file" id="offer2026BatchFile" accept=".json,application/json">
+          <div id="offer2026BatchPreview" class="hint" aria-live="polite"></div>
+          <label class="import-acknowledge"><input id="offer2026BatchConfirm" type="checkbox">
+            <span>He revisado el informe y autorizo registrar solamente las ofertas cuyo Excel coincida exactamente con Supabase.</span>
+          </label>
+          <button id="offer2026BatchSubmit" type="button" disabled>Verificar SHA e incorporar referencias</button>
+          <p id="offer2026BatchStatus" class="import-message" role="status" aria-live="polite">Selecciona un lote auditado y comprueba el resumen.</p>
+        </details>
         <section class="import-audit-panel" aria-labelledby="auditHeading">
           <div class="import-audit-head">
             <div>
@@ -542,6 +554,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261103-ignacio-v1"></script>
+  <script type="module" src="./app.js?v=20261103-ofertas-2026-v1"></script>
 </body>
 </html>
