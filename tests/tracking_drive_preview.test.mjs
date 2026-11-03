@@ -15,8 +15,9 @@ test("No se actualiza Drive ni Supabase en la previsualización",()=>{
   assert.doesNotMatch(endpoint,/\.insert\(|\.upsert\(|\.update\(|\.delete\(/);
   assert.doesNotMatch(endpoint,/method:\s*"(PUT|PATCH|DELETE)"/);
 });
-test("Sólo Sergio, fuente previamente aprobada y credencial de backend",()=>{
+test("Sergio e Israel autorizados, fuente aprobada y credencial de backend",()=>{
   assert.match(endpoint,/compras@prosoel\.es/);
+  assert.match(endpoint,/israel@prosoel\.es/);
   assert.match(endpoint,/getUser\(jwt\)/);
   assert.match(endpoint,/\.eq\("status","approved"\)/);
   assert.match(endpoint,/PROSOEL_GOOGLE_SERVICE_ACCOUNT_JSON/);
@@ -37,7 +38,7 @@ test("Diff detecta cambio de estado y movimientos sin alterar IDs",()=>{
   assert.ok(d.counts.row_moved>=1);
   assert.equal(d.requires_review,true);
 });
-test("BETA muestra conteos, no aplica cambios",()=>{
+test("Previsualización pública de UI muestra conteos, no aplica cambios",()=>{
   assert.match(client,/drive-sync-preview/);
   assert.match(client,/No se ha aplicado ningún cambio/);
 });
