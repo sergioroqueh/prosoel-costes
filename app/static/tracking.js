@@ -223,7 +223,11 @@ export function initTracking({client,escapeHtml,canManageSources=()=>false}) {
     const scheduled=Boolean(syncSettings?.automatic_sync_enabled && syncSettings?.auth_setup==="validated");
     const latest=syncHistory[0];
     const lastDate=latest?.finished_at?new Date(latest.finished_at).toLocaleString("es-ES"):"Sin ejecuciones todavía";
-    const statusNote=latest?"Última ejecución: "+latest.state+" · "+lastDate+" · "+(latest.message||""):"Sin ejecuciones todavía.";
+    // Presentación en español; el estado interno "skipped" se conserva intacto.
+    const syncStatusLabel=latest?.state==="skipped"?"Sin cambios":latest?.state;
+    const syncStatusDetail=latest?.state==="skipped"?"No es necesario actualizar":(latest?.message||"");
+    const statusNote=latest?"Última ejecución: "+syncStatusLabel+" · "+lastDate+
+      (syncStatusDetail?" · "+syncStatusDetail:""):"Sin ejecuciones todavía.";
     const headline='<section class="tracking-source-overview"><h3>Fuentes de pedidos de Drive</h3>'+
       '<p>'+counts.approved+' libros importados · '+counts.automatic+' en sincronización automática · '+
       newWorkRequests.filter(x=>x.status==="pending").length+' altas nuevas pendientes · '+
