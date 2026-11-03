@@ -270,12 +270,31 @@ export function readLegacyRecentXlsx(buffer,fromDate="2026-07-01") {
     inspected.push({sheet:name,header_ok:headerOK});
     if(headerOK)candidates.push({name,rows,read,sheet});
   }
-  if(candidates.length!==1){
-    return {compatible:false,reason:candidates.length===0?
-      "legacy_no_valid_pedidos_sheet":"legacy_multiple_pedidos_sheets",
+  // Books can have a separate archival worksheet. It is safe to choose
+  // PEDIDOS only when ALL other valid worksheets are explicitly archived and
+  // none of those archived sheets contains a July 2026+ dated order.
+  let chosen=null;
+  if(candidates.length===1)chosen=candidates[0];
+  else if(candidates.length>1) {
+    const main=candidates.filter(s=>s.name.trim().toUpperCase()==="PEDIDOS");
+    const secondary=candidates.filter(s=>s!==main[0]);
+    const allArchived=secondary.every(s=>/ANTIGU[OA]S?/.test(s.name.toUpperCase()));
+    const recentElsewhere=secondary.some(s=>[...s.rows.keys()].some(n=>{
+      if(n<3)return false;
+      const date=dateOrNull(s.rows.get(n)?.get("B"),shared);
+      return date!==null && date>=fromDate &&
+        (/^\\d{2}\\//.test(s.read(n,"A")) || Boolean(s.read(n,"H")));
+    }));
+    if(main.length===1&&allArchived&&!recentElsewhere)chosen=main[0];
+    else return {compatible:false,reason:recentElsewhere?
+      "recent_orders_in_secondary_sheet":"legacy_multiple_pedidos_sheets",
       sheet_check:inspected,summary:null,orders:[],review:[]};
   }
-  const {name:sheetName,rows,read,sheet}=candidates[0];
+  if(!chosen) {
+    return {compatible:false,reason:"legacy_no_valid_pedidos_sheet",
+      sheet_check:inspected,summary:null,orders:[],review:[]};
+  }
+  const {name:sheetName,rows,read,sheet}=chosen;
   const siMerged=new Set();
   for(const merge of items(sheet?.mergeCells?.mergeCell)){
     const m=String(merge["@_ref"]||"").match(/^M(\d+):M(\d+)$/);
