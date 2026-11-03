@@ -336,11 +336,12 @@ export function readLegacyRecentXlsx(buffer,fromDate="2026-07-01") {
     const receipt=dateOrNull(rows.get(n)?.get("L"),shared);
     if(receipt)active.reception_date=receipt;
   }
-  const accepted=[],seen=new Set();
+  const accepted=[];
+  const refCounts=new Map();
+  for(const order of all)refCounts.set(order.order_reference,(refCounts.get(order.order_reference)||0)+1);
   for(const order of all){
-    if(seen.has(order.order_reference))order._issues.push({
+    if(refCounts.get(order.order_reference)>1)order._issues.push({
       source_row:order.source_row,reason:"duplicate_order_reference"});
-    seen.add(order.order_reference);
     if(!order.lines.length)order._issues.push({
       source_row:order.source_row,reason:"order_without_materials"});
     order.drive_finalized=order.lines.length>0&&order.lines.every(x=>x.drive_line_finalized);
