@@ -283,7 +283,7 @@ export function readLegacyRecentXlsx(buffer,fromDate="2026-07-01") {
       if(n<3)return false;
       const date=dateOrNull(s.rows.get(n)?.get("B"),shared);
       return date!==null && date>=fromDate &&
-        (/^\\d{2}\\//.test(s.read(n,"A")) || Boolean(s.read(n,"H")));
+        (s.read(n,"A").includes("/") || Boolean(s.read(n,"H")));
     }));
     if(main.length===1&&allArchived&&!recentElsewhere)chosen=main[0];
     else return {compatible:false,reason:recentElsewhere?
