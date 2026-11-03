@@ -1,10 +1,11 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./config.js";
 import { readProsoelXlsx } from "./order_import.js?v=20261008-v9";
-import { initOrderLookup } from "./order_lookup.js?v=20261030-v1";
+import { initOrderLookup } from "./order_lookup.js?v=20261103-offers-v1";
 import { initTracking } from "./tracking.js?v=20261103-official-israel-v1";
-import { initProjectLookup } from "./project_lookup.js?v=20261030-v1";
+import { initProjectLookup } from "./project_lookup.js?v=20261103-offers-v1";
 import { mountPriceTimeline, PRICE_SERIES_COLORS } from "./price_comparison_chart.js?v=20261030-v1";
+import { fetchVerifiedOfferMap, offerLinksHtml } from "./offer_documents.js?v=20261103-v1";
 
 const supabase = createClient(
   SUPABASE_URL,
@@ -137,6 +138,7 @@ const importAuditRows = document.getElementById("importAuditRows");
 
 let searchGeneration = 0;
 let detailGeneration = 0;
+let activeOfferMap = new Map(); // Solo enlaces de ofertas comerciales de 2026 verificadas.
 let visibleRows = [];
 let totalResults = 0;
 let selectedResultKey = null;
@@ -886,6 +888,9 @@ async function openMaterial(materialId) {
     return;
   }
 
+  const offers = await fetchVerifiedOfferMap(supabase, pricesResponse.data || []);
+  if (requestId !== detailGeneration) return;
+  activeOfferMap = offers;
   detail.commercial_variants = variantsResponse.data || [];
   renderMaterialDetail(detail, pricesResponse.data || []);
 }
@@ -910,6 +915,9 @@ async function openHistorical(row) {
     return;
   }
 
+  const offers = await fetchVerifiedOfferMap(supabase, data || []);
+  if (requestId !== detailGeneration) return;
+  activeOfferMap = offers;
   renderHistoricalDetail(row, data || []);
 }
 
@@ -989,6 +997,9 @@ function renderMaterialDetail(detail, rows) {
         escapeHtml(displayDiscount(latest.discount_raw)) +
         "</p>"
     );
+    const latestOfferLink = Number(latest.order_year) === 2026
+      ? offerLinksHtml(activeOfferMap.get(String(latest.order_id)), escapeHtml) : "";
+    if (latestOfferLink) html.push('<p class="price-origin-offer">Oferta comercial: ' + latestOfferLink + '</p>');
     html.push('<button class="action-button" id="showLatestOrigin" type="button">Ver línea de origen</button>');
     html.push('<div id="latestOriginDetail" class="origin-detail hidden"></div>');
     html.push("</div>");
@@ -1197,6 +1208,9 @@ async function showReferenceComparison(reference, detailRequestId) {
     button.textContent = "Reintentar comparativa";
     return;
   }
+  const offers = await fetchVerifiedOfferMap(supabase, data || []);
+  if (detailRequestId !== detailGeneration || !area.isConnected) return;
+  activeOfferMap = offers;
   renderReferenceComparison(area, reference, data || []);
   // Solo una tabla de Procedencia en la ficha: ahora incluye todos los pedidos
   // de la referencia exacta, no solamente la variante inicialmente elegida.
@@ -1232,7 +1246,7 @@ function historyTableHtml(rows) {
 
   const html = [];
   html.push('<div class="history-wrap"><table class="history-table"><thead><tr>');
-  html.push("<th>Fecha</th><th>Pedido</th><th>Proveedor</th><th>Cant.</th><th>PVP</th><th>Dto.</th><th>Neto</th><th>Origen</th>");
+  html.push("<th>Fecha</th><th>Pedido</th><th>Proveedor</th><th>Cant.</th><th>PVP</th><th>Dto.</th><th>Neto</th><th>Origen</th><th>Oferta</th>");
   html.push("</tr></thead><tbody>");
 
   // El orden de la tabla es siempre por fecha de compra (más reciente primero).
@@ -1254,8 +1268,11 @@ function historyTableHtml(rows) {
     html.push('<td title="Original: ' + escapeHtml(row.discount_raw ?? "—") + '">' + escapeHtml(displayDiscount(row.discount_raw)) + "</td>");
     html.push("<td><strong>" + money(row.net_unit_price) + "</strong></td>");
     html.push('<td><button class="origin-link" type="button" data-origin-index="' + index + '">Ver origen</button></td>');
+    const offerLink = Number(row.order_year) === 2026
+      ? offerLinksHtml(activeOfferMap.get(String(row.order_id)), escapeHtml) : "";
+    html.push('<td>' + (offerLink || '—') + '</td>');
     html.push("</tr>");
-    html.push('<tr id="origin-row-' + index + '" class="hidden"><td colspan="8" class="origin-detail-cell"><div class="origin-detail">' + originHtml(row) + "</div></td></tr>");
+    html.push('<tr id="origin-row-' + index + '" class="hidden"><td colspan="9" class="origin-detail-cell"><div class="origin-detail">' + originHtml(row) + "</div></td></tr>");
   });
 
   html.push("</tbody></table></div>");
@@ -1291,6 +1308,9 @@ function originHtml(row) {
   if (row.order_excluded) parts.push("<strong>Excluido el pedido completo:</strong> Sí");
   if (row.line_review_reason) parts.push("<strong>Motivo de revisión:</strong> " + escapeHtml(row.line_review_reason));
   if (row.order_review_reason) parts.push("<strong>Motivo de exclusión del pedido:</strong> " + escapeHtml(row.order_review_reason));
+  const offerLink = Number(row.order_year) === 2026
+    ? offerLinksHtml(activeOfferMap.get(String(row.order_id)), escapeHtml) : "";
+  if (offerLink) parts.push("<strong>Oferta comercial original:</strong> " + offerLink);
   parts.push("<strong>Archivo origen:</strong> " + escapeHtml(row.source_filename || "—"));
   return parts.join("<br>");
 }
