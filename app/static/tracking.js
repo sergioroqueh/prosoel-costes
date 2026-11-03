@@ -174,10 +174,15 @@ export function initTracking({client,escapeHtml}) {
   }
   function updateProjects() {
     const before=project.value;
-    const ids=[...new Set(orders.map(o=>o.source_id))];
-    project.replaceChildren(new Option("Todas las obras cargadas",""));
-    for(const id of ids.sort((a,b)=>folderName(a).localeCompare(folderName(b),"es")))
-      project.add(new Option(folderName(id),id));
+    // El selector muestra TODAS las obras inventariadas, aunque no tengan pedidos
+    // en el período consultado o su Excel siga en cuarentena.
+    const ids=[...new Set(catalog.map(c=>c.file_id).filter(Boolean))];
+    project.replaceChildren(new Option("Todas las obras ("+ids.length+")",""));
+    for(const id of ids.sort((a,b)=>folderName(a).localeCompare(folderName(b),"es"))) {
+      const record=catalog.find(c=>c.file_id===id);
+      const suffix=record?.status!=="approved"?" · Pendiente de incorporar":"";
+      project.add(new Option(folderName(id)+suffix,id));
+    }
     project.value=ids.includes(before)?before:"";
   }
   function renderSources() {
@@ -265,12 +270,21 @@ export function initTracking({client,escapeHtml}) {
       if(state.value==="due" && (o._state!=="open"||age(o.order_date)<Number(alertDays.value||7)))return false;
       if(state.value==="closed" && o._state==="open")return false;
       if(state.value==="review" && (o._state!=="open"||!o.lines.some(l=>!trackingLineDelivered(l) && (l.source_green && !l.source_si || interpretTrackingObservation(l.observations,l.requested_qty).kind==="review"))))return false;
-      return !q||[o.order_reference,o.supplier,o.responsible,...o.lines.flatMap(l=>[l.reference,l.description])].some(v=>String(v||"").toLocaleLowerCase("es").includes(q));
+      return !q||[o.order_reference,folderName(o.source_id),o.supplier,o.responsible,...o.lines.flatMap(l=>[l.reference,l.description])].some(v=>String(v||"").toLocaleLowerCase("es").includes(q));
     });
     // Ordenar SOLO las coincidencias del periodo, no volver a mezclar registros fuera del rango.
     sortTrackingOrders(visible,sort.value);
     document.getElementById("trackingVisible").textContent=visible.length+" de "+current.length+" pedidos";
-    if(!visible.length) {list.innerHTML='<div class="tracking-empty">No hay pedidos que coincidan con los filtros elegidos.</div>';return;}
+    if(!visible.length) {
+      const selected=catalog.find(c=>c.file_id===project.value);
+      const noOrders=current.length===0 && Boolean(project.value);
+      const message=noOrders && selected?.status!=="approved"?
+        "Esta obra está registrada, pero su Excel está pendiente de incorporar. Todavía no genera reclamaciones.":
+        noOrders?"Esta obra está registrada, pero no tiene pedidos dentro de las fechas seleccionadas. Prueba a ampliar el rango.":
+        "No hay pedidos que coincidan con los filtros elegidos.";
+      list.innerHTML='<div class="tracking-empty">'+escapeHtml(message)+'</div>';
+      return;
+    }
     const renderCard=(o)=>{
       const closed=o._state!=="open", manual=o._state==="closed_manual", n=age(o.order_date);
       const pending=o.lines.filter(line=>!trackingLineDelivered(line));
