@@ -7,6 +7,7 @@ import { initProjectLookup } from "./project_lookup.js?v=20261103-offers-v1";
 import { mountPriceTimeline, PRICE_SERIES_COLORS } from "./price_comparison_chart.js?v=20261030-v1";
 import { fetchVerifiedOfferMap, offerLinksHtml } from "./offer_documents.js?v=20261103-v1";
 import { fetchSupplierOfferRefsMap, supplierOfferRefsHtml } from "./supplier_offer_references.js?v=20261103-v1";
+import { initOffer2026BatchImport } from "./offers_2026_bulk_import.js?v=20261103-v1";
 
 const supabase = createClient(
   SUPABASE_URL,
@@ -2780,5 +2781,6 @@ const orderLookup = initOrderLookup({
 });
 
 const tracking = initTracking({client:supabase,escapeHtml,canManageSources:()=>trackingAllowed&&currentUserRole==="admin"});
+initOffer2026BatchImport({client:supabase,isAdmin:()=>currentUserRole==="admin"});
 
 bootstrapSession();
