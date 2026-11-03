@@ -1,4 +1,5 @@
 import { fetchVerifiedOfferMap, offerLinksHtml } from "./offer_documents.js?v=20261103-v1";
+import { fetchSupplierOfferRefsMap, supplierOfferRefsHtml } from "./supplier_offer_references.js?v=20261103-v1";
 
 // Consulta de pedidos originales: solo lecturas, sin normalizar ni modificar precios.
 export function parseOrderReference(raw) {
@@ -60,11 +61,15 @@ export async function fetchOrdersByReference(client, parsed) {
     const group = byOrder.get(String(row.order_id));
     if (group) group.push(row);
   }
-  const offers = await fetchVerifiedOfferMap(client, orders);
+  const [offers, supplierRefs] = await Promise.all([
+    fetchVerifiedOfferMap(client, orders),
+    fetchSupplierOfferRefsMap(client, orders),
+  ]);
   return orders.map((order) => ({
     ...order,
     lines: byOrder.get(String(order.id)) || [],
     offers: offers.get(String(order.id)) || [],
+    supplierRefs: supplierRefs.get(String(order.id)) || [],
   }));
 }
 
@@ -115,10 +120,7 @@ export function initOrderLookup({ client, money, number, displayDiscount, escape
       const supplier = relationName(order.suppliers, "Proveedor sin identificar");
       const project = relationName(order.projects, "Obra sin identificar");
       html.push('<article class="order-lookup-card"><div class="order-lookup-card-head"><div>');
-      html.push('<div class="order-lookup-kicker">Pedido original</div><div class="order-heading-with-offer"><h3>' + escapeHtml(label) + '</h3>' +
-        (order.supplier_offer_reference
-          ? '<span class="order-offer-label"><strong>Oferta:</strong> ' + escapeHtml(order.supplier_offer_reference) + '</span>'
-          : '') + '</div>');
+      html.push('<div class="order-lookup-kicker">Pedido original</div><div class="order-heading-with-offer"><h3>' + escapeHtml(label) + '</h3></div>');
       html.push('</div><span class="order-lookup-linecount">' + order.lines.length +
         (order.lines.length === 1 ? " línea" : " líneas") + '</span></div>');
       html.push('<div class="order-lookup-facts">');
@@ -129,8 +131,11 @@ export function initOrderLookup({ client, money, number, displayDiscount, escape
       html.push('</div><p class="order-lookup-source"><strong>Archivo de origen:</strong> ' +
         escapeHtml(order.source_filename || "No indicado") + '</p>');
       if (Number(order.order_year) === 2026) {
+        const offerRefs = supplierOfferRefsHtml(order.supplierRefs, escapeHtml);
         const offerLinks = offerLinksHtml(order.offers, escapeHtml);
-        html.push('<p class="order-lookup-source"><strong>Oferta comercial:</strong> ' +
+        html.push('<p class="order-lookup-source"><strong>Nº oferta proveedor:</strong> ' +
+          (offerRefs || '<span class="muted">Sin referencia registrada</span>') + '</p>');
+        html.push('<p class="order-lookup-source"><strong>Oferta comercial PDF:</strong> ' +
           (offerLinks || '<span class="muted">PDF todavía no vinculado</span>') + '</p>');
       }
       if (order.order_identity_status === "conflict") {
