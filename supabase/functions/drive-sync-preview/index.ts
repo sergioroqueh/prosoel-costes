@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { readPedidosXlsx,compareSource } from "./parser.ts";
+import { readLegacyRecentXlsx } from "./legacy.ts";
 
 // Preview exclusivamente de lectura: no actualiza ninguna tabla ni modifica Drive.
 const allowedOrigin = "https://sergioroqueh.github.io";
@@ -90,7 +91,7 @@ Deno.serve(async request=>{
     if(chosen && !/^[a-zA-Z0-9_-]{16,128}$/.test(chosen))
       return reply(400,"invalid_source","Identificador inválido.");
     let sourceQuery=userDb.from("tracking_drive_catalog")
-      .select("file_id,source_title,drive_modified_at,status")
+      .select("file_id,source_title,drive_modified_at,status,priority_from,historical_review_policy")
       .eq("status","approved");
     if(chosen)sourceQuery=sourceQuery.eq("file_id",chosen);
     const {data:source,error:sourceError}=await sourceQuery
@@ -112,11 +113,34 @@ Deno.serve(async request=>{
     if(!raw.ok)return reply(503,"download_denied","No se ha podido descargar el Excel de forma privada.");
     const binary=await raw.arrayBuffer();
     if(binary.byteLength>12_000_000)return reply(409,"file_too_large","El Excel supera el tamaño de seguridad.");
-    let normalized;
-    try{normalized=readPedidosXlsx(binary);}catch(e){
-      // No mostrar contenido del fichero ni trazas internas ante errores.
-      return reply(422,"xlsx_not_validated", "La estructura del Excel necesita revisión antes de importar.",
-         {reason:String(e?.message||"invalid").slice(0,100)});
+    let normalized,legacyQuarantineChanged=false;
+    const isLegacy=source.priority_from==="2026-07-01"&&source.historical_review_policy==="defer_before_priority";
+    if(isLegacy){
+      let parsed;
+      try{parsed=readLegacyRecentXlsx(binary,"2026-07-01");}
+      catch(e){return reply(422,"legacy_invalid","El libro antiguo necesita revisión.");}
+      if(!parsed.compatible)return reply(422,"legacy_incompatible","No se ha podido validar su formato.");
+      normalized={orders:parsed.orders,summary:{
+        orders:parsed.summary.accepted_orders,lines:parsed.summary.lines,
+        received:parsed.summary.received,completed:parsed.summary.completed,
+        partial:parsed.summary.partial,noneReceived:parsed.summary.noneReceived,
+        review_records:parsed.summary.review_records
+      }};
+      const stored=await userDb.from("tracking_legacy_review")
+        .select("source_row,source_sheet,order_reference,order_date,reason,issues_json")
+        .eq("source_id",source.file_id).limit(500);
+      if(stored.error)return reply(503,"legacy_reviews_unavailable","No se pueden comprobar sus revisiones.");
+      const sig=rec=>{
+        const issues=rec.issues||rec.issues_json||[];
+        return [rec.source_row,rec.source_sheet,rec.order_reference||"",rec.order_date||"",
+          rec.reason,issues.map(x=>[x.source_row,x.reason,x.qty_raw||"",x.reference||""].join("|")).sort().join(";")].join("::");
+      };
+      const older=(stored.data||[]).map(sig).sort(),now=parsed.review.map(sig).sort();
+      legacyQuarantineChanged=older.length!==now.length||older.some((x,i)=>x!==now[i]);
+    } else {
+      try{normalized=readPedidosXlsx(binary);}
+      catch(e){return reply(422,"xlsx_not_validated","La estructura del Excel requiere revisión.",
+        {reason:String(e?.message||"invalid").slice(0,100)});}
     }
     const existing=await pages((lo,hi)=>userDb.from("tracking_orders")
        .select("id,source_row,order_reference,order_date,drive_finalized")
@@ -133,9 +157,11 @@ Deno.serve(async request=>{
     const diff=compareSource(normalized.orders,existing,existingLines);
     const summary=normalized.summary;
     const baselineMatched=existing.length===summary.orders&&existingLines.length===summary.lines;
-    return reply(200,!diff.requires_review?"preview_ready":"needs_review",
-      diff.requires_review?"La estructura ha cambiado y requiere revisión.":"Comparación realizada sin modificar pedidos.",
+    const reviewRequired=diff.requires_review||legacyQuarantineChanged;
+    return reply(200,!reviewRequired?"preview_ready":"needs_review",
+      reviewRequired?"La estructura o un pedido en revisión ha cambiado.":"Comparación realizada sin modificar pedidos.",
       {source:source.source_title,drive_modified_at:meta.modifiedTime,summary,diff,
+       legacy_quarantine_changed:legacyQuarantineChanged,
        baseline_matched:baselineMatched,automatic_sync:false});
   }catch(e){
     console.error("Drive preview failed",String(e?.message||"error").slice(0,120));
