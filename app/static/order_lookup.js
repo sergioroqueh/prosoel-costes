@@ -1,3 +1,5 @@
+import { fetchVerifiedOfferMap, offerLinksHtml } from "./offer_documents.js?v=20261103-v1";
+
 // Consulta de pedidos originales: solo lecturas, sin normalizar ni modificar precios.
 export function parseOrderReference(raw) {
   const match = String(raw ?? "").trim().toUpperCase()
@@ -18,7 +20,7 @@ export function parseOrderReference(raw) {
 // Conservar cada registro por separado, incluso cuando el numero se repite.
 export async function fetchOrdersByReference(client, parsed) {
   const ordersResponse = await client.from("orders")
-    .select("id,order_reference,order_year,order_number,order_subnumber,order_date,order_identity_status,validation_status,declared_total,source_filename,suppliers(name),projects(name)")
+    .select("id,order_reference,order_year,order_number,order_subnumber,order_date,order_identity_status,validation_status,declared_total,source_filename,supplier_offer_reference,suppliers(name),projects(name)")
     .eq("order_year", parsed.year)
     .eq("order_number", parsed.orderNumber)
     .order("id", { ascending: true })
@@ -58,7 +60,12 @@ export async function fetchOrdersByReference(client, parsed) {
     const group = byOrder.get(String(row.order_id));
     if (group) group.push(row);
   }
-  return orders.map((order) => ({ ...order, lines: byOrder.get(String(order.id)) || [] }));
+  const offers = await fetchVerifiedOfferMap(client, orders);
+  return orders.map((order) => ({
+    ...order,
+    lines: byOrder.get(String(order.id)) || [],
+    offers: offers.get(String(order.id)) || [],
+  }));
 }
 
 export function initOrderLookup({ client, money, number, displayDiscount, escapeHtml, projectLookup = null, classifyOriginalLine = null }) {
@@ -121,6 +128,11 @@ export function initOrderLookup({ client, money, number, displayDiscount, escape
       html.push(fact("Total declarado", money(order.declared_total)));
       html.push('</div><p class="order-lookup-source"><strong>Archivo de origen:</strong> ' +
         escapeHtml(order.source_filename || "No indicado") + '</p>');
+      if (Number(order.order_year) === 2026) {
+        const offerLinks = offerLinksHtml(order.offers, escapeHtml);
+        html.push('<p class="order-lookup-source"><strong>Oferta comercial:</strong> ' +
+          (offerLinks || '<span class="muted">PDF todavía no vinculado</span>') + '</p>');
+      }
       if (order.order_identity_status === "conflict") {
         html.push('<p class="order-lookup-warning">Este pedido tiene un conflicto de identidad pendiente de revisar.</p>');
       }
