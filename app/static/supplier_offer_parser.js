@@ -52,7 +52,7 @@ export function extractOffersFromObservation(input) {
 }
 
 export function inspectOfferHeader(ws, orderYear) {
-  if (Number(orderYear) !== 2026) {
+  if (Number(orderYear) < 2026) {
     return { references: [], status: "fuera_alcance", sourceCell: null, sourceText: null, detail: "" };
   }
   const sourceText = typeof ws.get(4, "D") === "string" ? ws.get(4, "D") : "";
