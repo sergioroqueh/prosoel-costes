@@ -2,7 +2,7 @@
 // Compatibilidad de lectura con las cuatro referencias ya guardadas en orders.
 export async function fetchSupplierOfferRefsMap(client, rows) {
   const orderIds = [...new Set((rows || [])
-    .filter(row => Number(row.order_year) === 2026)
+    .filter(row => Number(row.order_year) >= 2026)
     .map(row => Number(row.order_id ?? row.id))
     .filter(id => Number.isSafeInteger(id) && id > 0))];
   const map = new Map();
