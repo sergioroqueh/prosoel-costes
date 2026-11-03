@@ -6,6 +6,7 @@ import { initTracking } from "./tracking.js?v=20261103-official-israel-v1";
 import { initProjectLookup } from "./project_lookup.js?v=20261103-offers-v1";
 import { mountPriceTimeline, PRICE_SERIES_COLORS } from "./price_comparison_chart.js?v=20261030-v1";
 import { fetchVerifiedOfferMap, offerLinksHtml } from "./offer_documents.js?v=20261103-v1";
+import { fetchSupplierOfferRefsMap, supplierOfferRefsHtml } from "./supplier_offer_references.js?v=20261103-v1";
 
 const supabase = createClient(
   SUPABASE_URL,
@@ -139,6 +140,7 @@ const importAuditRows = document.getElementById("importAuditRows");
 let searchGeneration = 0;
 let detailGeneration = 0;
 let activeOfferMap = new Map(); // Solo enlaces de ofertas comerciales de 2026 verificadas.
+let activeSupplierOfferMap = new Map(); // Referencias literales, sin modificación de precios.
 let visibleRows = [];
 let totalResults = 0;
 let selectedResultKey = null;
@@ -888,9 +890,13 @@ async function openMaterial(materialId) {
     return;
   }
 
-  const offers = await fetchVerifiedOfferMap(supabase, pricesResponse.data || []);
+  const [offers, supplierRefs] = await Promise.all([
+    fetchVerifiedOfferMap(supabase, pricesResponse.data || []),
+    fetchSupplierOfferRefsMap(supabase, pricesResponse.data || []),
+  ]);
   if (requestId !== detailGeneration) return;
   activeOfferMap = offers;
+  activeSupplierOfferMap = supplierRefs;
   detail.commercial_variants = variantsResponse.data || [];
   renderMaterialDetail(detail, pricesResponse.data || []);
 }
@@ -915,9 +921,13 @@ async function openHistorical(row) {
     return;
   }
 
-  const offers = await fetchVerifiedOfferMap(supabase, data || []);
+  const [offers, supplierRefs] = await Promise.all([
+    fetchVerifiedOfferMap(supabase, data || []),
+    fetchSupplierOfferRefsMap(supabase, data || []),
+  ]);
   if (requestId !== detailGeneration) return;
   activeOfferMap = offers;
+  activeSupplierOfferMap = supplierRefs;
   renderHistoricalDetail(row, data || []);
 }
 
@@ -999,7 +1009,10 @@ function renderMaterialDetail(detail, rows) {
     );
     const latestOfferLink = Number(latest.order_year) === 2026
       ? offerLinksHtml(activeOfferMap.get(String(latest.order_id)), escapeHtml) : "";
-    if (latestOfferLink) html.push('<p class="price-origin-offer">Oferta comercial: ' + latestOfferLink + '</p>');
+    const latestOfferRefs = Number(latest.order_year) === 2026
+      ? supplierOfferRefsHtml(activeSupplierOfferMap.get(String(latest.order_id)), escapeHtml) : "";
+    if (latestOfferRefs) html.push('<p class="price-origin-offer">Nº oferta proveedor: ' + latestOfferRefs + '</p>');
+    if (latestOfferLink) html.push('<p class="price-origin-offer">Oferta comercial PDF: ' + latestOfferLink + '</p>');
     html.push('<button class="action-button" id="showLatestOrigin" type="button">Ver línea de origen</button>');
     html.push('<div id="latestOriginDetail" class="origin-detail hidden"></div>');
     html.push("</div>");
@@ -1208,9 +1221,13 @@ async function showReferenceComparison(reference, detailRequestId) {
     button.textContent = "Reintentar comparativa";
     return;
   }
-  const offers = await fetchVerifiedOfferMap(supabase, data || []);
+  const [offers, supplierRefs] = await Promise.all([
+    fetchVerifiedOfferMap(supabase, data || []),
+    fetchSupplierOfferRefsMap(supabase, data || []),
+  ]);
   if (detailRequestId !== detailGeneration || !area.isConnected) return;
   activeOfferMap = offers;
+  activeSupplierOfferMap = supplierRefs;
   renderReferenceComparison(area, reference, data || []);
   // Solo una tabla de Procedencia en la ficha: ahora incluye todos los pedidos
   // de la referencia exacta, no solamente la variante inicialmente elegida.
@@ -1270,7 +1287,9 @@ function historyTableHtml(rows) {
     html.push('<td><button class="origin-link" type="button" data-origin-index="' + index + '">Ver origen</button></td>');
     const offerLink = Number(row.order_year) === 2026
       ? offerLinksHtml(activeOfferMap.get(String(row.order_id)), escapeHtml) : "";
-    html.push('<td>' + (offerLink || '—') + '</td>');
+    const offerRefs = Number(row.order_year) === 2026
+      ? supplierOfferRefsHtml(activeSupplierOfferMap.get(String(row.order_id)), escapeHtml) : "";
+    html.push('<td>' + ([offerRefs, offerLink].filter(Boolean).join(' ') || '—') + '</td>');
     html.push("</tr>");
     html.push('<tr id="origin-row-' + index + '" class="hidden"><td colspan="9" class="origin-detail-cell"><div class="origin-detail">' + originHtml(row) + "</div></td></tr>");
   });
@@ -1310,7 +1329,10 @@ function originHtml(row) {
   if (row.order_review_reason) parts.push("<strong>Motivo de exclusión del pedido:</strong> " + escapeHtml(row.order_review_reason));
   const offerLink = Number(row.order_year) === 2026
     ? offerLinksHtml(activeOfferMap.get(String(row.order_id)), escapeHtml) : "";
-  if (offerLink) parts.push("<strong>Oferta comercial original:</strong> " + offerLink);
+  const offerRefs = Number(row.order_year) === 2026
+    ? supplierOfferRefsHtml(activeSupplierOfferMap.get(String(row.order_id)), escapeHtml) : "";
+  if (offerRefs) parts.push("<strong>Nº oferta del proveedor:</strong> " + offerRefs);
+  if (offerLink) parts.push("<strong>Oferta comercial PDF:</strong> " + offerLink);
   parts.push("<strong>Archivo origen:</strong> " + escapeHtml(row.source_filename || "—"));
   return parts.join("<br>");
 }
