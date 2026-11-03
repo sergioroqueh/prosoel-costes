@@ -2962,3 +2962,5 @@ main { margin-top: 25px; }
   #trackingWorkspace .tracking-filter-actions .tracking-refresh{flex:1;}
   #trackingWorkspace .tracking-filter-panel{padding:12px;}
 }
+
+#trackingWorkspace .tracking-register-footer strong{overflow-wrap:anywhere;word-break:break-word;}
