@@ -2967,3 +2967,22 @@ main { margin-top: 25px; }
 
 /* Seguimiento liberado: acento corporativo visible sobre cabecera oscura. */
 #trackingWorkspace .tracking-hero .search-kicker{color:#ffac78;font-size:.76rem;font-weight:850;letter-spacing:.13em;text-shadow:0 1px 1px rgba(0,0,0,.18);}
+
+
+/* Referencias comerciales de proveedor: solo visibles cuando existen */
+.supplier-offer-ref {
+  display: inline-flex;
+  align-items: center;
+  padding: .16rem .46rem;
+  margin: .1rem .18rem .1rem 0;
+  border: 1px solid #b9cde5;
+  border-radius: .48rem;
+  background: #edf4fc;
+  color: #163e70;
+  font-size: .82rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+.price-origin-offer { margin: .35rem 0; }
