@@ -25,7 +25,9 @@ create trigger trg_2026_offer_ref_order
 
 alter table public.order_supplier_offer_references enable row level security;
 revoke all on public.order_supplier_offer_references from anon, authenticated;
-grant select on public.order_supplier_offer_references to authenticated;
+-- Solo se exponen a los usuarios los códigos. Las observaciones completas de
+-- obra quedan reservadas a la auditoría administrativa en la base de datos.
+grant select(order_id,offer_reference) on public.order_supplier_offer_references to authenticated;
 
 create policy order_supplier_offer_references_read
  on public.order_supplier_offer_references for select to authenticated
@@ -96,7 +98,7 @@ begin
       if v_reference is null or length(v_reference) not between 3 and 64
          or v_reference !~ '^[A-Za-z0-9][A-Za-z0-9./ _-]{2,63}$'
          or length(regexp_replace(v_reference,'[^0-9]','','g'))<3
-         or v_cell<>'D4'
+         or v_cell is distinct from 'D4'
          or coalesce(length(v_source),0) not between 5 and 2000
          or v_source !~* 'OFERTAS?'
          or strpos(
