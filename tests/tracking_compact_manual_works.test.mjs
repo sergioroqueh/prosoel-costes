@@ -48,9 +48,13 @@ test("Dos filas de filtros en pantallas amplias y diseño responsive",()=>{
  assert.match(css,/@media\(max-width:560px\)/);
  assert.match(css,/tracking-register-work/);
 });
-test("Se mantiene BETA y no se da acceso a Israel",()=>{
- assert.match(html,/tracking-beta-tag/);
- assert.match(read("app/static/app.js"),/compras@prosoel\.es/);
- assert.match(sql,/compras@prosoel\.es/);
+test("Seguimiento liberado para Israel y Sergio, pero alta de obras solo Sergio",()=>{
+ const app=read("app/static/app.js");
+ const access=read("supabase/migrations/20261103_063_tracking_access_sergio_israel.sql");
+ assert.doesNotMatch(html,/tracking-beta-tag|>BETA</);
+ assert.match(app,/israel@prosoel\.es/);
+ assert.match(access,/private\.can_access_tracking/);
+ assert.match(js,/canManageSources\(\)/);
+ assert.match(sql,/Sergio registra altas pendientes/);
  assert.doesNotMatch(html,/data-tracking-view="works"/);
 });
