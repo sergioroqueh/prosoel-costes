@@ -141,7 +141,7 @@ async function runOnce(db,slot=0,forceCheck=false,preferredSourceId=null) {
      if(!parsed.compatible || parsed.orders.length===0)throw new Error("legacy_template_requires_review");
      const stored=await db.from("tracking_legacy_review")
        .select("source_row,source_sheet,order_reference,order_date,reason,issues_json,review_status")
-       .eq("source_id",source.file_id).order("source_row").limit(500);
+       .eq("source_id",source.file_id).eq("review_status","pending").order("source_row").limit(500);
      if(stored.error)throw new Error("cannot_verify_legacy_quarantine");
      const oldReview=stored.data||[];
      const encodeIssue=x=>[x.source_row,x.reason,x.qty_raw||"",x.reference||""].join("|");
