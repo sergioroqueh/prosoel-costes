@@ -2,6 +2,8 @@
 // Soporta la hoja HOJA PEDIDO y las plantillas 2024 de doble descuento.
 // Sin dependencias externas: ZIP/Deflate-raw del navegador + DOMParser + WebCrypto.
 
+import { inspectOfferHeader } from "./supplier_offer_parser.js?v=20261103-v2";
+
 const MB = 1024 * 1024;
 const decoder = new TextDecoder("utf-8");
 const validSheet = "HOJA PEDIDO";
@@ -277,6 +279,10 @@ export async function readProsoelXlsx(file){
   const order_date=excelDate(labelValue(ws,"FECHA:").value,ws.date1904);
   if(!order_date)throw new Error("No se ha podido leer la fecha de pedido en la hoja.");
   const year=Number(order_date.slice(0,4));
+  const offerExtraction = inspectOfferHeader(ws, year);
+  if (offerExtraction.status === "mencion_sin_codigo") {
+    warnings.push("Las observaciones mencionan una oferta pero no se reconoce su número; se requiere revisión.");
+  }
   const supplier=get("ALMACÉN:");
   if(!supplier)throw new Error("El pedido no contiene un almacén/proveedor reconocible.");
   const fromFile=/\bPEDIDO\b\s*-?\s*(\d+)(?:\s*[.-]\s*(\d+))?/i.exec(file.name);
@@ -307,5 +313,5 @@ export async function readProsoelXlsx(file){
     internal_order_reference:reference,validation_status:totalStatus,
     lines,
   };
-  return {payload,warnings,computedTotal:calculated};
+  return {payload,warnings,computedTotal:calculated,offerExtraction};
 }
