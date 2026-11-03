@@ -37,7 +37,7 @@ export function sortTrackingOrders(items, orderBy="oldest") {
   });
 }
 
-export function initTracking({client,escapeHtml}) {
+export function initTracking({client,escapeHtml,canManageSources=()=>false}) {
   const root = document.getElementById("trackingWorkspace");
   const dateFrom = document.getElementById("trackingFrom");
   const dateTo = document.getElementById("trackingTo");
@@ -269,7 +269,7 @@ export function initTracking({client,escapeHtml}) {
         '<span class="tracking-source-state tracking-source-state-'+escapeHtml(x.status)+'">'+escapeHtml(label)+'</span></article>';
     }).join("");
     const pendingWork=newWorkRequests.filter(x=>x.status==="pending").length;
-    const registerWork='<details class="tracking-register-work">'+
+    const registerWork=canManageSources()?'<details class="tracking-register-work">'+
       '<summary> <span>+ Registrar nueva obra</span><small>Introduce el enlace de su Excel; la importación necesita validación</small></summary>'+
       '<div class="tracking-register-work-body"><div class="tracking-register-grid">'+
       '<label>Nombre de la obra<input id="trackingNewWorkName" type="text" maxlength="120" placeholder="Ej.: NUEVA OBRA · GETAFE"></label>'+
@@ -277,8 +277,8 @@ export function initTracking({client,escapeHtml}) {
       '<div class="tracking-register-footer"><p>Comparte el XLSX como Lector con <strong>prosoel-pedidos-reader@prosoel-pedidos.iam.gserviceaccount.com</strong>. '+
       'Registrar no importa pedidos ni activa reclamaciones. Revisaremos la estructura antes de conectarlo.</p>'+
       '<button type="button" class="tracking-refresh tracking-refresh-primary" id="trackingRegisterWork">Registrar obra</button></div>'+
-      '<span id="trackingRegisterResult" role="status" aria-live="polite"></span></div></details>';
-    const requestsBlock=newWorkRequests.length?'<div class="tracking-request-list"><h4>Obras solicitadas ('+
+      '<span id="trackingRegisterResult" role="status" aria-live="polite"></span></div></details>':"";
+    const requestsBlock=canManageSources()&&newWorkRequests.length?'<div class="tracking-request-list"><h4>Obras solicitadas ('+
       newWorkRequests.length+' · '+pendingWork+' pendientes)</h4>'+
       newWorkRequests.slice(0,20).map(x=>'<div class="tracking-request-row"><strong>'+escapeHtml(x.work_name)+
       '</strong><span>'+escapeHtml(x.status==="pending"?"Pendiente de validar":x.status==="reviewed"?"Revisada":"No incorporada")+
@@ -436,7 +436,7 @@ export function initTracking({client,escapeHtml}) {
   // Alta supervisada: no concede permisos de Google ni aprueba la importación.
   list.addEventListener("click",async event=>{
     const button=event.target.closest("#trackingRegisterWork");
-    if(!button)return;
+    if(!button||!canManageSources())return;
     const result=list.querySelector("#trackingRegisterResult");
     const workName=String(list.querySelector("#trackingNewWorkName")?.value||"").trim();
     const rawUrl=String(list.querySelector("#trackingNewWorkUrl")?.value||"").trim();
