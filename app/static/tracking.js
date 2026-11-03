@@ -118,7 +118,7 @@ export function initTracking({client,escapeHtml}) {
         client.from("tracking_legacy_review").select("source_id,source_row,order_reference,order_date,reason,issues_json,review_status")
           .eq("review_status","pending").order("order_date",{ascending:false}).limit(100)
       ]);
-      if(src.error||cat.error||folderResults.error||settings.error||history.error||reviewResults.error) throw (src.error||cat.error||folderResults.error||settings.error||history.error||reviewResults.error);
+      if(src.error||cat.error||folderResults.error||settings.error||history.error) throw (src.error||cat.error||folderResults.error||settings.error||history.error);
       sources=src.data || [];
       catalog=cat.data || [];
       folders=folderResults.data || [];
