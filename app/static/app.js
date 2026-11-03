@@ -2539,6 +2539,7 @@ function showImportPreview({payload,warnings,computedTotal,offerExtraction}, blo
 
 async function inspectNewOrderFile(){
   const generation=++importSelectionGeneration;
+  importSubmitButton.textContent="Confirmar importación";
   currentImport=null;
   importAcknowledged.checked=false;
   importSubmitButton.disabled=true;
@@ -2588,39 +2589,91 @@ async function inspectNewOrderFile(){
   }
 }
 
+// Siempre exige identidad de fichero exacta en los pedidos NUEVOS.
+async function saveNewOrderOfferRefs(importData) {
+  const {payload, offerExtraction} = importData;
+  if (Number(payload.order_year) < 2026 || !offerExtraction?.references?.length) {
+    return { references_inserted: 0, references_existing: 0 };
+  }
+  if (payload.order_identity_status === "conflict") {
+    throw new Error("Número de pedido no coincide con el Excel; ofertas pendientes de revisión.");
+  }
+  const item = {
+    source_sha256: payload.source_sha256,
+    source_filename: payload.source_filename,
+    references: offerExtraction.references.map(reference => ({
+      reference,
+      source_cell: offerExtraction.sourceCell,
+      source_text: String(offerExtraction.sourceText || "").slice(0, 2000),
+    })),
+  };
+  const {data,error} = await supabase.rpc("record_2026_supplier_offer_references", {p_items:[item]});
+  if (error) throw error;
+  if (Number(data?.files_matched)!==1 || Number(data?.unmatched_files||0)!==0 ||
+      Number(data?.rejected_records||0)!==0) {
+    throw new Error("Las ofertas no superaron la verificación de SHA-256 y nombre del pedido.");
+  }
+  return data;
+}
+
 async function commitNewOrder(){
   if(currentUserRole!=="admin"||!currentImport||currentImport.blocker||!importAcknowledged.checked)return;
-  const payload=currentImport.payload;
+  const record=currentImport;
+  const payload=record.payload;
   const generation=importSelectionGeneration;
+  const onlyOffers=Boolean(record.orderImported);
   importSubmitButton.disabled=true;
   importFile.disabled=true;
-  importMessage("Guardando pedido y todas sus líneas en una sola operación…");
-  const {data,error}=await supabase.rpc("import_new_prosoel_order",{p_order:payload});
-  if(generation!==importSelectionGeneration)return;
-  importFile.disabled=false;
-  const outcome=Array.isArray(data)?data[0]:data;
-  if(error){
-    importMessage(error.message||"La importación ha fallado. Ninguna línea ha quedado grabada parcialmente.",true);
-    importSubmitButton.disabled=false;
-    return;
-  }
-  if(!outcome){
-    importMessage("No se recibió confirmación de Supabase. Consulta el pedido antes de reintentar.",true);
-    return;
+  importMessage(onlyOffers?"Guardando ofertas pendientes…":"Guardando pedido y todas sus líneas…");
+  let outcome={result:"imported",imported_lines:payload.lines.length,detail:"Pedido ya guardado"};
+  if(!onlyOffers){
+    const {data,error}=await supabase.rpc("import_new_prosoel_order",{p_order:payload});
+    if(generation!==importSelectionGeneration)return;
+    if(error){
+      importFile.disabled=false;
+      importMessage(error.message||"La importación ha fallado. No se han grabado líneas parcialmente.",true);
+      importSubmitButton.disabled=false;
+      return;
+    }
+    outcome=Array.isArray(data)?data[0]:data;
+    if(!outcome){
+      importFile.disabled=false;
+      importMessage("No se recibió confirmación. Comprueba el pedido antes de reintentar.",true);
+      return;
+    }
   }
   if(outcome.result==="imported"){
+    record.orderImported=true;
+    let offerResult={references_inserted:0,references_existing:0};
+    try{
+      offerResult=await saveNewOrderOfferRefs(record);
+    }catch(error){
+      if(generation!==importSelectionGeneration)return;
+      importFile.disabled=false;
+      importSubmitButton.disabled=false;
+      importSubmitButton.textContent="Reintentar solo ofertas";
+      importMessage("Pedido guardado sin duplicar líneas. No se pudieron guardar sus ofertas: "+
+        (error?.message||"error de verificación")+". Reintenta solo las ofertas.",true);
+      return;
+    }
+    if(generation!==importSelectionGeneration)return;
+    importFile.disabled=false;
+    const offerCount=Number(offerResult.references_inserted||0)+Number(offerResult.references_existing||0);
     importMessage("Pedido guardado correctamente · "+outcome.imported_lines+
-      " líneas · Resultado de totales: "+outcome.detail+".");
+      " líneas · "+(offerCount ? offerCount+" ofertas vinculadas · " : "")+
+      "Revisión de totales: "+outcome.detail+".");
     currentImport=null;
+    importSubmitButton.textContent="Confirmar importación";
     importConfirmPanel.classList.add("hidden");
     importFile.value="";
-    reviewLoaded=false; // Refrescar la cola al volver a Normalización.
+    reviewLoaded=false;
     await Promise.all([loadCounter(),loadSuppliers(),loadImportDashboard()]);
   }else{
+    importFile.disabled=false;
     importMessage(outcome.result==="duplicate"
       ?"El mismo archivo ya figura en el histórico. No se ha duplicado."
       :outcome.result==="number_conflict"
-        ?"Ya existe ese número de pedido con otro archivo. Revisa antes de intentar otra importación."
+        ?"Ya existe ese número de pedido con otro archivo. Revisa antes de reintentar."
         :"Supabase no ha importado el archivo: "+(outcome.detail||outcome.result),true);
     importConfirmPanel.classList.add("hidden");
   }
