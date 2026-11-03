@@ -2864,3 +2864,8 @@ main { margin-top: 25px; }
 .tracking-legacy-review-item{display:flex;gap:8px 14px;align-items:baseline;justify-content:space-between;flex-wrap:wrap;border-top:1px solid #efdfc6;padding:10px 0;font-size:.8rem;}
 .tracking-legacy-review-item strong{color:#6c4217;}
 .tracking-legacy-review-item span{color:#7a623b;overflow-wrap:anywhere;}
+
+/* Identificación clara de obra en cada pedido, sin depender del proveedor. */
+.tracking-order-work{display:flex;align-items:center;gap:9px;margin:9px 0 5px;flex-wrap:wrap;font-size:.86rem;color:#153f5a;}
+.tracking-order-work .tracking-work-label{display:inline-flex;align-items:center;padding:4px 8px;border-radius:7px;background:#e5f0f4;border:1px solid #ccdee7;color:#396e86;font-weight:780;font-size:.7rem;line-height:1.15;text-transform:uppercase;letter-spacing:.035em;margin:0;}
+.tracking-order-work strong{font-size:.88rem;font-weight:790;color:#153b57;overflow-wrap:anywhere;}
