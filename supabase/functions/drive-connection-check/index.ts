@@ -71,7 +71,7 @@ Deno.serve(async (request) => {
     const { data: authData, error: authError } = await db.auth.getUser(jwt);
     const email = String(authData?.user?.email || "").trim().toLowerCase();
     if (authError || !authData?.user) return reply(401, "unauthenticated", "Sesión no válida.");
-    if (email !== "compras@prosoel.es") return reply(403, "forbidden", "Cuenta no autorizada.");
+    if (!["compras@prosoel.es","israel@prosoel.es"].includes(email)) return reply(403, "forbidden", "Cuenta no autorizada.");
     // El query al catálogo se realiza con el JWT: RLS debe permitir sólo a Sergio.
     const userDb = createClient(url, key, {
       global: { headers: { Authorization: "Bearer " + jwt } },
