@@ -34,7 +34,7 @@ test("importación atómica, permisos mínimos y datos de revisión en tabla pri
  assert.match(sql,/tracking_initial_import\(p_source_id,p_orders/);
  assert.match(sql,/service_role_required/);
  assert.match(sql,/p_cutoff<>date '2026-07-01'/);
- assert.match(sql,/automatic_import_enabled=false/);
+ assert.match(sql,/f\.automatic_import_enabled then/);
  assert.match(cutoff,/legacy_order_before_priority_cutoff/);
  assert.match(importer,/tracking_verify_cron_token/);
  assert.match(importer,/tracking_import_legacy_recent/);
