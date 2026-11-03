@@ -130,7 +130,7 @@ Deno.serve(async request=>{
       }};
       const stored=await userDb.from("tracking_legacy_review")
         .select("source_row,source_sheet,order_reference,order_date,reason,issues_json")
-        .eq("source_id",source.file_id).limit(500);
+        .eq("source_id",source.file_id).eq("review_status","pending").limit(500);
       if(stored.error)return reply(503,"legacy_reviews_unavailable","No se pueden comprobar sus revisiones.");
       const sig=rec=>{
         const issues=rec.issues||rec.issues_json||[];
