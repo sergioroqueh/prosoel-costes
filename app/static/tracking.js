@@ -22,7 +22,7 @@ export function trackingLineDelivered(line) {
   return Boolean(line && line.source_green === true && line.source_si === true && line.drive_line_finalized === true);
 }
 
-// Orden en el periodo YA filtrado. El desempate respeta el orden físico de Drive.
+// Orden dentro del período: primero fecha, después número de pedido natural.
 // El número de pedido desempata los pedidos con la misma fecha, incluso
 // cuando pertenecen a diferentes obras/Excel. numeric:true compara 9 < 10.
 const trackingOrderRefCollator = new Intl.Collator("es", {numeric:true,sensitivity:"base"});
@@ -140,6 +140,17 @@ export function initTracking({client,escapeHtml}) {
       legacyReviews=reviewResults.data || [];
       newWorkRequests=workRequests.data || [];
       manualQueue=refreshQueue.data || [];
+      const queued=manualQueue.filter(x=>x.status==="pending").length;
+      const running=manualQueue.filter(x=>x.status==="running").length;
+      const recently=manualQueue.filter(x=>Date.now()-new Date(x.requested_at).getTime()<30*60000);
+      if(queued||running)manualStatus.textContent=
+        "Actualización desde Drive: "+queued+" obra(s) en cola y "+running+
+        " comprobándose. Pulsa «Actualizar vista» para ver el progreso.";
+      else if(recently.length)manualStatus.textContent=
+        "Última solicitud manual: "+recently.filter(x=>x.status==="done").length+
+        " comprobaciones correctas y "+recently.filter(x=>x.status==="error").length+
+        " para revisar.";
+      else manualStatus.textContent="";
       if(!sources.length) {orders=[];decisions.clear();loaded=true;render();status.textContent="No hay fuentes importadas para este usuario.";return;}
       const rows=await readPages((off,size)=>client.from("tracking_orders")
         .select("id,source_id,source_row,order_reference,order_date,supplier,responsible,delivery_location,drive_finalized,reception_date")
@@ -214,7 +225,9 @@ export function initTracking({client,escapeHtml}) {
     const lastDate=latest?.finished_at?new Date(latest.finished_at).toLocaleString("es-ES"):"Sin ejecuciones todavía";
     const statusNote=latest?"Última ejecución: "+latest.state+" · "+lastDate+" · "+(latest.message||""):"Sin ejecuciones todavía.";
     const headline='<section class="tracking-source-overview"><h3>Fuentes de pedidos de Drive</h3>'+
-      '<p>'+counts.approved+' libros importados · '+counts.automatic+' en sincronización automática · '+counts.blocked+' bloqueados por validación/permisos · '+counts.review+' por revisar · '+counts.excluded+' carpetas apartadas</p>'+
+      '<p>'+counts.approved+' libros importados · '+counts.automatic+' en sincronización automática · '+
+      newWorkRequests.filter(x=>x.status==="pending").length+' altas nuevas pendientes · '+
+      counts.blocked+' fuentes bloqueadas por validación · '+counts.review+' por revisar</p>'+
       '<div class="tracking-sync-note '+(scheduled?"tracking-sync-on":"")+'">'+
       (scheduled?"Sincronización automática configurada cada ":"Sincronización horaria prevista (" )+
       escapeHtml(syncSettings?.requested_interval_minutes??60)+' minutos'+
