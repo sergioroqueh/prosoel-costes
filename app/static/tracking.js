@@ -50,12 +50,14 @@ export function initTracking({client,escapeHtml}) {
   const list = document.getElementById("trackingResults");
   const source = document.getElementById("trackingSource");
   const refresh = document.getElementById("trackingRefresh");
+  const manualRefresh = document.getElementById("trackingManualRefresh");
+  const manualStatus = document.getElementById("trackingManualStatus");
   const alertDays = document.getElementById("trackingAlertDays");
   const sort = document.getElementById("trackingSort");
   const project = document.getElementById("trackingProject");
   const viewButtons=[...root.querySelectorAll("[data-tracking-view]")];
   let viewMode="queue";
-  let catalog=[],folders=[],syncSettings=null,syncHistory=[],legacyReviews=[];
+  let catalog=[],folders=[],syncSettings=null,syncHistory=[],legacyReviews=[],newWorkRequests=[],manualQueue=[];
   let orders = [], decisions = new Map(), sources = [], loaded = false, busy = false, generation = 0;
   const fmt = (value) => value == null ? "—" : new Intl.NumberFormat("es-ES",{maximumFractionDigits:3}).format(Number(value));
   const iso = (d) => [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");
@@ -112,25 +114,32 @@ export function initTracking({client,escapeHtml}) {
     if(!dateFrom.value || !dateTo.value || dateFrom.value>dateTo.value) {
       status.textContent="Selecciona un rango de fechas valido.";return;
     }
-    busy=true; refresh.disabled=true; status.textContent="Consultando pedidos autorizados…";
+    busy=true; refresh.disabled=true;manualRefresh.disabled=true; status.textContent="Consultando pedidos autorizados…";
     const request=++generation;
     try {
-      const [src,cat,folderResults,settings,history,reviewResults]=await Promise.all([
+      const [src,cat,folderResults,settings,history,reviewResults,workRequests,refreshQueue]=await Promise.all([
         client.from("tracking_sources").select("id,display_name,drive_url,synced_at,modified_at_source,sync_mode").order("display_name"),
         client.from("tracking_drive_catalog").select("file_id,folder_id,source_title,status,reason,drive_modified_at,last_imported_at,automatic_import_enabled,validation_status,validation_error").order("source_title").limit(1000),
         client.from("tracking_drive_folders").select("folder_id,folder_label,classification").limit(1000),
         client.from("tracking_sync_settings").select("requested_interval_minutes,automatic_sync_enabled,auth_setup").eq("id",1).maybeSingle(),
         client.from("tracking_sync_runs").select("state,finished_at,started_at,message,change_summary").order("started_at",{ascending:false}).limit(5),
         client.from("tracking_legacy_review").select("source_id,source_row,order_reference,order_date,reason,issues_json,review_status")
-          .eq("review_status","pending").order("order_date",{ascending:false}).limit(100)
+          .eq("review_status","pending").order("order_date",{ascending:false}).limit(100),
+        client.from("tracking_new_work_requests").select("id,work_name,file_id,status,requested_at,review_note")
+          .order("requested_at",{ascending:false}).limit(50),
+        client.from("tracking_manual_refresh_queue").select("source_id,requested_at,processed_at,status,message")
+          .order("requested_at",{ascending:false}).limit(100)
       ]);
-      if(src.error||cat.error||folderResults.error||settings.error||history.error) throw (src.error||cat.error||folderResults.error||settings.error||history.error);
+      if(src.error||cat.error||folderResults.error||settings.error||history.error||reviewResults.error||workRequests.error||refreshQueue.error)
+        throw (src.error||cat.error||folderResults.error||settings.error||history.error||reviewResults.error||workRequests.error||refreshQueue.error);
       sources=src.data || [];
       catalog=cat.data || [];
       folders=folderResults.data || [];
       syncSettings=settings.data || null;
       syncHistory=history.data || [];
       legacyReviews=reviewResults.data || [];
+      newWorkRequests=workRequests.data || [];
+      manualQueue=refreshQueue.data || [];
       if(!sources.length) {orders=[];decisions.clear();loaded=true;render();status.textContent="No hay fuentes importadas para este usuario.";return;}
       const rows=await readPages((off,size)=>client.from("tracking_orders")
         .select("id,source_id,source_row,order_reference,order_date,supplier,responsible,delivery_location,drive_finalized,reception_date")
@@ -163,13 +172,13 @@ export function initTracking({client,escapeHtml}) {
     } catch(e) {
       console.error("Seguimiento:",e);
       status.textContent="No se pudieron recuperar los pedidos. Comprueba tu sesion y la conexion.";
-    } finally {busy=false;refresh.disabled=false;}
+    } finally {busy=false;refresh.disabled=false;manualRefresh.disabled=false;}
   }
   function updateSuppliers() {
     const old=supplier.value;
     const values=[...new Set(orders.map(x=>x.supplier).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
     supplier.replaceChildren();
-    const all=new Option("Todos los almacenes / proveedores","");supplier.add(all);
+    const all=new Option("Todos los almacenes","");supplier.add(all);
     for(const s of values)supplier.add(new Option(s,s));
     supplier.value=values.includes(old)?old:"";
   }
@@ -322,23 +331,7 @@ export function initTracking({client,escapeHtml}) {
     };
     const shown=visible.slice(0,300);
     const overflow=visible.length>300?'<p class="tracking-empty">Mostrando los 300 primeros. Acota el rango para ver más.</p>':"";
-    if(viewMode==="works") {
-      const grouped=new Map();
-      for(const order of shown){
-        const name=folderName(order.source_id);
-        if(!grouped.has(name)) grouped.set(name,[]);
-        grouped.get(name).push(order);
-      }
-      // Los grupos se ordenan por la primera fecha pendiente, no por el nombre de la obra.
-      list.innerHTML=[...grouped.entries()].map(([name,items],i)=>{
-        const pendingCount=items.reduce((n,o)=>n+(o._state==="open"?o.lines.filter(l=>!trackingLineDelivered(l)).length:0),0);
-        return '<details class="tracking-project-group" '+(i<2?'open':'')+'><summary><span>'+
-          escapeHtml(name)+'</span><small>'+items.length+' pedidos · '+pendingCount+' materiales pendientes</small></summary>'+
-          '<div class="tracking-project-cards">'+items.map(renderCard).join("")+'</div></details>';
-      }).join("")+overflow;
-    } else {
-      list.innerHTML=shown.map(renderCard).join("")+overflow;
-    }
+    list.innerHTML=shown.map(renderCard).join("")+overflow;
   }
   period.addEventListener("change",()=>{setPeriod(period.value);if(period.value!=="custom")load();});
   [dateFrom,dateTo].forEach(el=>el.addEventListener("change",()=>{period.value="custom";load();}));
@@ -431,5 +424,5 @@ export function initTracking({client,escapeHtml}) {
     status.textContent="Decision registrada con auditoria. Drive permanece intacto.";
     await load();
   });
-  return {open(){if(!loaded)load();else render();},reset(){++generation;orders=[];decisions.clear();sources=[];catalog=[];folders=[];syncSettings=null;syncHistory=[];legacyReviews=[];loaded=false;viewMode="queue";for(const b of viewButtons){const active=b.dataset.trackingView==="queue";b.classList.toggle("is-active",active);b.setAttribute("aria-pressed",String(active));}list.replaceChildren();stats.replaceChildren();source.textContent="";status.textContent="Selecciona un periodo para consultar pedidos.";setPeriod("30");period.value="30";}};
+  return {open(){if(!loaded)load();else render();},reset(){++generation;orders=[];decisions.clear();sources=[];catalog=[];folders=[];syncSettings=null;syncHistory=[];legacyReviews=[];newWorkRequests=[];manualQueue=[];loaded=false;viewMode="queue";manualStatus.textContent="";for(const b of viewButtons){const active=b.dataset.trackingView==="queue";b.classList.toggle("is-active",active);b.setAttribute("aria-pressed",String(active));}list.replaceChildren();stats.replaceChildren();source.textContent="";status.textContent="Selecciona un periodo para consultar pedidos.";setPeriod("30");period.value="30";}};
 }
