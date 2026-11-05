@@ -82,7 +82,7 @@ test("Los nombres de pestaña Excel no colisionan ni exceden 31 caracteres",()=>
 });
 
 test("La exportación es XLSX local y no altera pedidos ni requiere nuevos permisos",()=>{
-  assert.match(exportSrc,/xlsx@0\.18\.5\/\+esm/);
+  assert.match(exportSrc,/xlsx-0\.20\.3\/package\/xlsx\.mjs/);
   assert.match(exportSrc,/bookType:"xlsx"/);
   assert.match(exportSrc,/URL\.createObjectURL\(blob\)/);
   assert.doesNotMatch(exportSrc,/\.from\(|\.insert\(|\.update\(|functions\.invoke|fetch\(/);
