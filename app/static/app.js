@@ -2741,7 +2741,9 @@ async function commitNewOrder(){
       importUpdateReasonWrap.classList.add("hidden");
       importPreview.classList.add("hidden");
       reviewLoaded=false;
-      await Promise.all([loadCounter(),loadSuppliers(),loadImportDashboard()]);
+      // El guardado ya fue confirmado. Un fallo refrescando indicadores
+      // no debe anunciar erróneamente que la revisión no se guardó.
+      await Promise.allSettled([loadCounter(),loadSuppliers(),loadImportDashboard()]);
     }catch(error){
       console.error("No se pudo actualizar el pedido",error);
       importMessage("No se actualizó el pedido: "+(error?.message||"error de validación")+
