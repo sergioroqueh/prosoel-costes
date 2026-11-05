@@ -126,6 +126,9 @@ const importStatus = document.getElementById("importStatus");
 const importPreview = document.getElementById("importPreview");
 const importConfirmPanel = document.getElementById("importConfirmPanel");
 const importAcknowledged = document.getElementById("importAcknowledged");
+const importAcknowledgedText = document.getElementById("importAcknowledgedText");
+const importUpdateReasonWrap = document.getElementById("importUpdateReasonWrap");
+const importUpdateReason = document.getElementById("importUpdateReason");
 const importSubmitButton = document.getElementById("importSubmitButton");
 const importAuditYear = document.getElementById("importAuditYear");
 const importAuditRefresh = document.getElementById("importAuditRefresh");
@@ -2485,12 +2488,61 @@ async function loadImportDashboard() {
 importAuditRefresh.addEventListener("click",loadImportDashboard);
 importAuditYear.addEventListener("change",loadImportDashboard);
 
-// --- V9: alta controlada de pedidos nuevos (solo administradores).
+// --- Importación y revisiones con confirmación explícita (solo administradores).
+function orderLineCompareKey(l){
+  return String(l.supplier_reference||"")+"\u001f"+String(l.description_original||"");
+}
+function orderLineValueChanged(before,after){
+  const numberEqual=(a,b)=>a==null&&b==null || a!=null&&b!=null&&Number(a)===Number(b);
+  return before.supplier_reference!==after.supplier_reference ||
+    before.description_original!==after.description_original ||
+    !numberEqual(before.quantity,after.quantity) ||
+    !numberEqual(before.net_unit_price,after.net_unit_price) ||
+    !numberEqual(before.total_price,after.total_price) ||
+    !numberEqual(before.pvp,after.pvp) ||
+    String(before.discount_raw||"")!==String(after.discount_raw||"");
+}
+function diffImportedOrder(oldLines,newLines){
+  const used=new Set(), mapped=Array(newLines.length).fill(-1);
+  for(let i=0;i<newLines.length;i++){
+    let best=-1,dist=Infinity;
+    for(let j=0;j<oldLines.length;j++){
+      if(used.has(j)||orderLineCompareKey(oldLines[j])!==orderLineCompareKey(newLines[i]))continue;
+      const distance=Math.abs(Number(oldLines[j].source_row||j)-Number(newLines[i].source_row||i));
+      if(distance<dist){best=j;dist=distance;}
+    }
+    if(best>=0){mapped[i]=best;used.add(best);}
+  }
+  // El SQL aplica la misma reserva en dos pasadas, evitando convertir una
+  // línea nueva intercalada en una modificación de material antiguo.
+  for(let i=0;i<newLines.length;i++){
+    if(mapped[i]>=0)continue;
+    const j=oldLines.findIndex((l,j)=>!used.has(j)&&Number(l.line_number)===i+1);
+    if(j>=0){mapped[i]=j;used.add(j);}
+  }
+  const added=[],changed=[],removed=[];
+  for(let i=0;i<newLines.length;i++){
+    const j=mapped[i];
+    if(j<0)added.push(newLines[i]);
+    else if(orderLineValueChanged(oldLines[j],newLines[i]))changed.push({before:oldLines[j],after:newLines[i]});
+  }
+  for(let j=0;j<oldLines.length;j++)if(!used.has(j))removed.push(oldLines[j]);
+  return {added,changed,removed};
+}
+function canSubmitOrderImport(){
+  return Boolean(currentImport&&!currentImport.blocker&&importAcknowledged.checked&&
+    (currentImport.mode!=="update"||importUpdateReason.value.trim().length>=5));
+}
+function refreshImportConfirm(){
+  importSubmitButton.disabled=!canSubmitOrderImport();
+}
+importUpdateReason.addEventListener("input",refreshImportConfirm);
+
 function importMessage(message, isError=false) {
   importStatus.textContent=message;
   importStatus.classList.toggle("is-error",isError);
 }
-function showImportPreview({payload,warnings,computedTotal,offerExtraction}, blocker=null) {
+function showImportPreview({payload,warnings,computedTotal,offerExtraction}, blocker=null, updateInfo=null) {
   const html=[];
   html.push('<h3>Vista previa — '+escapeHtml(payload.source_filename)+'</h3>');
   html.push('<div class="import-metrics">');
@@ -2512,6 +2564,26 @@ function showImportPreview({payload,warnings,computedTotal,offerExtraction}, blo
   }
   html.push('</div>');
   html.push('<p class="import-digest">Huella SHA-256 del Excel: <code>'+escapeHtml(payload.source_sha256)+'</code></p>');
+  if(updateInfo){
+    const old=updateInfo.existing, changes=updateInfo.diff;
+    html.push('<div class="import-revision-preview"><strong>Actualización del pedido existente '+escapeHtml(old.order_reference||"")+'</strong>'+
+      '<p>Versión anterior: '+escapeHtml(old.source_filename||"")+' · '+escapeHtml(String(updateInfo.oldLines.length))+
+      ' materiales · '+escapeHtml(money(old.declared_total))+'</p>'+
+      '<p>Versión nueva: '+escapeHtml(String(payload.lines.length))+
+      ' materiales · '+escapeHtml(money(payload.declared_total))+'</p>'+
+      '<p><strong>'+changes.added.length+' añadidos · '+changes.changed.length+
+      ' modificados · '+changes.removed.length+' eliminados</strong></p>');
+    const makeItem=(row,prefix)=>'<li>'+escapeHtml(prefix+' '+(row.supplier_reference||"Sin referencia")+' · '+row.description_original+
+      ' · '+row.quantity+' ud. · '+money(row.total_price))+'</li>';
+    const previews=[
+      ...changes.added.map(x=>makeItem(x,"Añadido:")),
+      ...changes.changed.map(x=>makeItem(x.after,"Modificado:")),
+      ...changes.removed.map(x=>makeItem(x,"Eliminado:"))
+    ];
+    if(previews.length)html.push('<ul>'+previews.slice(0,12).join("")+'</ul>');
+    if(previews.length>12)html.push('<p>Otros '+(previews.length-12)+' cambios no mostrados.</p>');
+    html.push('<p>Se conservarán el número de pedido y las decisiones sobre materiales sin cambios. La versión anterior quedará auditada.</p></div>');
+  }
   if(blocker){
     html.push('<p class="import-warning-block"><strong>Importación bloqueada:</strong> '+escapeHtml(blocker)+'</p>');
   }
@@ -2534,13 +2606,20 @@ function showImportPreview({payload,warnings,computedTotal,offerExtraction}, blo
   importPreview.innerHTML=html.join("");
   importPreview.classList.remove("hidden");
   importConfirmPanel.classList.toggle("hidden",!!blocker);
+  importUpdateReasonWrap.classList.toggle("hidden",!updateInfo||!!blocker);
+  importAcknowledgedText.textContent=updateInfo
+    ?"He revisado el Excel anterior y el nuevo, y autorizo actualizar este mismo pedido sin crear duplicados."
+    :"He comprobado el número, año, proveedor, cantidades y precios, y autorizo incorporar este pedido al histórico.";
+  importSubmitButton.textContent=updateInfo?"Confirmar actualización":"Confirmar importación";
   importAcknowledged.checked=false;
-  importSubmitButton.disabled=true;
+  refreshImportConfirm();
 }
 
 async function inspectNewOrderFile(){
   const generation=++importSelectionGeneration;
   importSubmitButton.textContent="Confirmar importación";
+  importUpdateReason.value="";
+  importUpdateReasonWrap.classList.add("hidden");
   currentImport=null;
   importAcknowledged.checked=false;
   importSubmitButton.disabled=true;
@@ -2559,13 +2638,13 @@ async function inspectNewOrderFile(){
       .select("id,order_reference,source_sha256").eq("source_sha256",p.source_sha256).maybeSingle();
     if(generation!==importSelectionGeneration)return;
     if(duplicate.error)throw duplicate.error;
-    let blocker=null;
+    let blocker=null,updateInfo=null;
     if(duplicate.data){
-      blocker="Este mismo archivo ya se importó ("+
-        (duplicate.data.order_reference||"pedido #"+duplicate.data.id)+"). No se creará un duplicado.";
+      blocker="Este mismo archivo ya está registrado ("+
+        (duplicate.data.order_reference||"pedido #"+duplicate.data.id)+"). No es necesario actualizarlo.";
     }else{
       const reused=await supabase.from("orders")
-        .select("id,order_reference,order_subnumber,source_sha256")
+        .select("id,order_reference,order_subnumber,source_sha256,source_filename,supplier_id,order_date,declared_total")
         .eq("order_year",p.order_year).eq("order_number",p.order_number)
         .limit(40);
       if(generation!==importSelectionGeneration)return;
@@ -2573,13 +2652,30 @@ async function inspectNewOrderFile(){
       const sameNumber=(reused.data||[]).find((item)=>
         String(item.order_subnumber||"")===String(p.order_subnumber||""));
       if(sameNumber){
-        blocker="Ya existe "+(sameNumber.order_reference||"ese número de pedido")+
-          " con un archivo diferente. No se incorporará sin resolver la numeración.";
+        const [supplierResult,lineResult]=await Promise.all([
+          supabase.from("suppliers").select("name").eq("id",sameNumber.supplier_id).single(),
+          supabase.from("order_lines")
+            .select("id,line_number,source_row,quantity,supplier_reference,description_original,pvp,discount_raw,net_unit_price,total_price")
+            .eq("order_id",sameNumber.id).order("line_number",{ascending:true}).limit(250)
+        ]);
+        if(generation!==importSelectionGeneration)return;
+        if(supplierResult.error||lineResult.error)throw supplierResult.error||lineResult.error;
+        if(p.order_identity_status==="conflict"||
+           String(supplierResult.data?.name||"").trim().toLocaleLowerCase("es")!==
+             String(p.supplier||"").trim().toLocaleLowerCase("es")||
+           sameNumber.order_date!==p.order_date){
+          blocker="Existe "+(sameNumber.order_reference||"ese pedido")+
+            ", pero no coinciden correctamente proveedor, fecha o identidad. No se permite sustituirlo automáticamente.";
+        }else{
+          const oldLines=lineResult.data||[];
+          updateInfo={existing:sameNumber,oldLines,diff:diffImportedOrder(oldLines,p.lines)};
+        }
       }
     }
-    currentImport={...extracted,blocker};
-    showImportPreview(extracted,blocker);
-    importMessage(blocker?"Revisa el pedido existente: la importación está detenida.":
+    currentImport={...extracted,blocker,mode:updateInfo?"update":"new",updateInfo};
+    showImportPreview(extracted,blocker,updateInfo);
+    importMessage(blocker?"El archivo no puede importarse ni actualizarse sin revisión.":
+      updateInfo?"El número ya existe. Revisa las diferencias, escribe el motivo y confirma la actualización.":
       extracted.warnings.length
         ?"Vista previa lista. Revisa las advertencias y confirma solo si los datos corresponden al pedido."
         :"Vista previa lista. Comprueba los datos y confirma cuando estés conforme.",!!blocker);
@@ -2618,11 +2714,45 @@ async function saveNewOrderOfferRefs(importData) {
 }
 
 async function commitNewOrder(){
-  if(currentUserRole!=="admin"||!currentImport||currentImport.blocker||!importAcknowledged.checked)return;
+  if(currentUserRole!=="admin"||!canSubmitOrderImport())return;
   const record=currentImport;
   const payload=record.payload;
   const generation=importSelectionGeneration;
   const onlyOffers=Boolean(record.orderImported);
+  if(record.mode==="update"){
+    const previous=record.updateInfo.existing;
+    importSubmitButton.disabled=true;
+    importFile.disabled=true;
+    importUpdateReason.disabled=true;
+    importMessage("Actualizando el pedido "+(previous.order_reference||"")+" y registrando su versión anterior…");
+    try{
+      const {data,error}=await supabase.rpc("update_existing_prosoel_order",{
+        p_order:payload,p_expected_sha:previous.source_sha256,p_reason:importUpdateReason.value.trim()
+      });
+      if(generation!==importSelectionGeneration)return;
+      if(error)throw error;
+      if(data?.result!=="updated")throw new Error("No se confirmó la actualización; revisa el estado del pedido.");
+      importMessage("Pedido "+(previous.order_reference||"")+" actualizado correctamente · revisión "+
+        data.revision+" · "+data.lines+" materiales · "+data.added+" añadidos · "+
+        data.changed+" modificados · "+data.removed+" eliminados. El original está guardado en el historial.");
+      currentImport=null;
+      importFile.value="";
+      importConfirmPanel.classList.add("hidden");
+      importUpdateReasonWrap.classList.add("hidden");
+      importPreview.classList.add("hidden");
+      reviewLoaded=false;
+      await Promise.all([loadCounter(),loadSuppliers(),loadImportDashboard()]);
+    }catch(error){
+      console.error("No se pudo actualizar el pedido",error);
+      importMessage("No se actualizó el pedido: "+(error?.message||"error de validación")+
+        ". Comprueba el Excel y vuelve a revisar sus cambios.",true);
+    }finally{
+      importFile.disabled=false;
+      importUpdateReason.disabled=false;
+      if(currentImport)refreshImportConfirm();
+    }
+    return;
+  }
   importSubmitButton.disabled=true;
   importFile.disabled=true;
   importMessage(onlyOffers?"Guardando ofertas pendientes…":"Guardando pedido y todas sus líneas…");
@@ -2681,9 +2811,7 @@ async function commitNewOrder(){
 }
 
 importFile.addEventListener("change",inspectNewOrderFile);
-importAcknowledged.addEventListener("change",()=>{
-  importSubmitButton.disabled=!importAcknowledged.checked || !currentImport || !!currentImport.blocker;
-});
+importAcknowledged.addEventListener("change",refreshImportConfirm);
 importSubmitButton.addEventListener("click",commitNewOrder);
 
 cableSearchToggle.addEventListener("click", () => {
