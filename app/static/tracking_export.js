@@ -10,7 +10,7 @@ export function buildTrackingClaimGroups(visibleOrders, {isDelivered, interpretO
     const supplier = String(order.supplier || "SIN PROVEEDOR").trim() || "SIN PROVEEDOR";
     if (!groups.has(supplier)) groups.set(supplier, {supplier, rows: [], orders: new Set()});
     const group = groups.get(supplier);
-    group.orders.add(order.order_reference);
+    group.orders.add(String(order.source_id) + ":" + String(order.id));
     for (const line of pending) {
       const observation = interpretObservation(line.observations, line.requested_qty);
       const requested = line.requested_qty == null ? null : Number(line.requested_qty);
@@ -58,7 +58,7 @@ export function safeTrackingSheetNames(groups) {
 export async function downloadTrackingClaimsXlsx(groups, {from, to, generatedAt, supplier}) {
   if (!groups.length) throw new Error("No hay materiales pendientes entre los pedidos mostrados.");
   // Se carga únicamente al hacer clic. Los datos no salen del navegador: solo se descarga la biblioteca.
-  const XLSX = await import("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/+esm");
+  const XLSX = await import("https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs");
   const workbook = XLSX.utils.book_new();
   const names = safeTrackingSheetNames(groups);
   const heading = ["Pedido", "Fecha pedido", "Obra", "Referencia", "Material pendiente",
