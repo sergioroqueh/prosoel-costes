@@ -7,7 +7,7 @@ const js = read("app/static/tracking.js");
 const html = read("app/static/index.html");
 const exportSrc = read("app/static/tracking_export.js");
 const moduleUrl = "data:text/javascript;base64," + Buffer.from(exportSrc).toString("base64");
-const {buildTrackingClaimGroups, safeTrackingSheetNames} = await import(moduleUrl);
+const {buildTrackingClaimGroups, safeTrackingSheetNames, styleTrackingClaimsWorksheet} = await import(moduleUrl);
 const opts = {
   isDelivered:line => Boolean(line.source_green && line.source_si && line.drive_line_finalized),
   interpretObservation:(raw, requested) => {
@@ -82,9 +82,46 @@ test("Los nombres de pestaña Excel no colisionan ni exceden 31 caracteres",()=>
 });
 
 test("La exportación es XLSX local y no altera pedidos ni requiere nuevos permisos",()=>{
-  assert.match(exportSrc,/xlsx-0\.20\.3\/package\/xlsx\.mjs/);
+  assert.match(exportSrc,/xlsx-js-style@1\.2\.0\/dist\/xlsx\.min\.js/);
   assert.match(exportSrc,/bookType:"xlsx"/);
   assert.match(exportSrc,/URL\.createObjectURL\(blob\)/);
   assert.doesNotMatch(exportSrc,/\.from\(|\.insert\(|\.update\(|functions\.invoke|fetch\(/);
-  assert.match(html,/Exportar reclamación Excel/);
+  assert.match(html,/Exportar en Excel/);
+});
+
+
+test("El encabezado Pendiente mantiene el índice de columna G y el aviso de parciales",()=>{
+  assert.match(exportSrc,/"Cantidad solicitada", "Pendiente", "Estado \/ observaciones"/);
+  assert.doesNotMatch(exportSrc,/"Pendiente orientativo"/);
+  assert.match(exportSrc,/DATOS PARA REVISAR: las cantidades parciales son orientativas/);
+});
+
+test("Estilos corporativos PROSOEL visibles y alternos en las celdas del XLSX",()=>{
+  const ws={};
+  const rows=[
+    ["26/779","10/10/2026","GOMENDIO","CR50","Tubo Aiscan CR50",200,21,
+      "POSIBLE RESTO, NO CONFIRMADO",""],
+    ["26/779","10/10/2026","GOMENDIO","CR40","Tubo",80,"",
+      "Sin recepción confirmada",""]
+  ];
+  styleTrackingClaimsWorksheet(ws,rows);
+  assert.equal(ws.A1.s.fill.fgColor.rgb,"0B2342");
+  assert.equal(ws.A1.s.font.color.rgb,"FFFFFF");
+  assert.equal(ws.A6.s.fill.fgColor.rgb,"0B2342");
+  assert.equal(ws.A6.s.border.bottom.color.rgb,"E86C38");
+  assert.equal(ws.G7.s.fill.fgColor.rgb,"FFF7ED");
+  assert.equal(ws.G7.s.font.bold,true);
+  assert.equal(ws.H7.s.fill.fgColor.rgb,"FFF3DE");
+  assert.equal(ws.A7.s.border.left.color.rgb,"E86C38");
+  assert.equal(ws.B8.s.fill.fgColor.rgb,"F3F8FB");
+  assert.equal(ws.A10.s.fill.fgColor.rgb,"E9F2F7");
+  assert.equal(ws["!rows"].length,10);
+});
+
+test("El resto del flujo de exportación continúa descargando un XLSX local",()=>{
+  assert.match(exportSrc,/const XLSX = await loadStyledXlsx\(\)/);
+  assert.match(exportSrc,/XLSX\.utils\.aoa_to_sheet\(table\)/);
+  assert.match(exportSrc,/XLSX\.write\(workbook/);
+  assert.match(exportSrc,/styleTrackingClaimsWorksheet\(ws,group\.rows\)/);
+  assert.match(exportSrc,/ws\["!autofilter"\]/);
 });
