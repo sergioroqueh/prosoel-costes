@@ -2986,3 +2986,25 @@ main { margin-top: 25px; }
   line-height: 1.4;
 }
 .price-origin-offer { margin: .35rem 0; }
+
+
+/* Exportación de reclamaciones: compacta y reconocible junto a sincronización. */
+#trackingWorkspace .tracking-export{
+  background:#fff9ef;
+  color:#90500f;
+  border:1px solid #e6b66b;
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+}
+#trackingWorkspace .tracking-export:hover:not(:disabled){
+  background:#ffefd2;
+  border-color:#ca862b;
+}
+#trackingWorkspace .tracking-export-status:not(:empty){
+  margin-top:9px;
+  font-size:.81rem;
+  line-height:1.55;
+  color:#205670;
+  padding-left:3px;
+}
