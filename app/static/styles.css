@@ -3008,3 +3008,35 @@ main { margin-top: 25px; }
   color:#205670;
   padding-left:3px;
 }
+
+/* Revisiones controladas de pedidos existentes — 05/11/2026 */
+.import-revision-preview {
+  margin: 1rem 0;
+  padding: 1.05rem 1.25rem;
+  border: 1px solid rgba(220, 124, 43, .32);
+  border-left: 4px solid #df792f;
+  border-radius: 12px;
+  background: linear-gradient(115deg, rgba(246, 135, 39, .075), rgba(27, 90, 157, .045));
+}
+.import-revision-preview > strong { color: var(--ink, #173554); }
+.import-revision-preview p { margin: .55rem 0; line-height: 1.5; }
+.import-revision-preview ul {
+  margin: .7rem 0;
+  padding-left: 1.4rem;
+  max-height: 220px;
+  overflow: auto;
+}
+.import-revision-preview li { margin: .35rem 0; }
+.import-update-reason { width: 100%; margin-bottom: 1rem; }
+.import-update-reason label { display: block; margin-bottom: .4rem; font-weight: 700; }
+.import-update-reason textarea {
+  display: block; width: 100%; box-sizing: border-box; min-height: 75px;
+  padding: .75rem .9rem; font: inherit; border-radius: 10px;
+  border: 1px solid #a9b8c6; background: #fff; color: #1c344d;
+  resize: vertical;
+}
+.import-update-reason textarea:focus {
+  outline: 2px solid rgba(223, 121, 47, .34);
+  border-color: #d67830;
+}
+.import-update-reason .hint { margin: .4rem 0 0; }
