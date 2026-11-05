@@ -1,3 +1,5 @@
+import {buildTrackingClaimGroups, downloadTrackingClaimsXlsx} from "./tracking_export.js?v=20261105-v1";
+
 // Seguimiento de pedidos: lectura del snapshot privado y cierres manuales auditables.
 // Nunca introduce datos de Drive directamente en el repositorio publico.
 export function interpretTrackingObservation(raw, requested) {
@@ -52,6 +54,8 @@ export function initTracking({client,escapeHtml,canManageSources=()=>false}) {
   const refresh = document.getElementById("trackingRefresh");
   const manualRefresh = document.getElementById("trackingManualRefresh");
   const manualStatus = document.getElementById("trackingManualStatus");
+  const exportButton = document.getElementById("trackingExport");
+  const exportStatus = document.getElementById("trackingExportStatus");
   const alertDays = document.getElementById("trackingAlertDays");
   const sort = document.getElementById("trackingSort");
   const project = document.getElementById("trackingProject");
@@ -114,7 +118,8 @@ export function initTracking({client,escapeHtml,canManageSources=()=>false}) {
     if(!dateFrom.value || !dateTo.value || dateFrom.value>dateTo.value) {
       status.textContent="Selecciona un rango de fechas valido.";return;
     }
-    busy=true; refresh.disabled=true;manualRefresh.disabled=true; status.textContent="Consultando pedidos autorizados…";
+    busy=true; refresh.disabled=true;manualRefresh.disabled=true;exportButton.disabled=true;
+    exportStatus.textContent="";status.textContent="Consultando pedidos autorizados…";
     const request=++generation;
     try {
       const [src,cat,folderResults,settings,history,reviewResults,workRequests,refreshQueue]=await Promise.all([
@@ -182,8 +187,11 @@ export function initTracking({client,escapeHtml,canManageSources=()=>false}) {
       status.textContent=orders.length+" pedidos del período seleccionado.";
     } catch(e) {
       console.error("Seguimiento:",e);
+      loaded=false;
       status.textContent="No se pudieron recuperar los pedidos. Comprueba tu sesion y la conexion.";
-    } finally {busy=false;refresh.disabled=false;manualRefresh.disabled=false;}
+    } finally {busy=false;refresh.disabled=false;manualRefresh.disabled=false;
+      if(loaded)render(); else exportButton.disabled=true;
+    }
   }
   function updateSuppliers() {
     const old=supplier.value;
@@ -290,9 +298,35 @@ export function initTracking({client,escapeHtml,canManageSources=()=>false}) {
     list.innerHTML=headline+registerWork+requestsBlock+reviewHeader+'<div class="tracking-source-list">'+cards+'</div>';
     document.getElementById("trackingVisible").textContent=items.length+" libros identificados";
   }
+  // Una sola selección para las tarjetas y el Excel: mismos filtros, misma ordenación.
+  function visibleTrackingOrders(current) {
+    const q=search.value.trim().toLocaleLowerCase("es");
+    const visible=current.filter(o=>{
+      if(supplier.value && o.supplier!==supplier.value)return false;
+      if(project.value && o.source_id!==project.value)return false;
+      if(state.value==="open" && o._state!=="open")return false;
+      if(state.value==="due" && (o._state!=="open"||age(o.order_date)<Number(alertDays.value||7)))return false;
+      if(state.value==="closed" && o._state==="open")return false;
+      if(state.value==="review" && (o._state!=="open"||!o.lines.some(l=>!trackingLineDelivered(l) && (l.source_green && !l.source_si || interpretTrackingObservation(l.observations,l.requested_qty).kind==="review"))))return false;
+      return !q||[o.order_reference,folderName(o.source_id),o.supplier,o.responsible,...o.lines.flatMap(l=>[l.reference,l.description])].some(v=>String(v||"").toLocaleLowerCase("es").includes(q));
+    });
+    return sortTrackingOrders(visible,sort.value);
+  }
+  function currentTrackingOrders() {
+    return orders.filter(o=>!project.value || o.source_id===project.value)
+      .map(o=>({...o,_state:trackingEffectiveState(o,decisions.get(o.id))}));
+  }
+  function setExportAvailability(visible) {
+    const shown=visible.slice(0,300);
+    const pending=shown.filter(o=>o._state==="open")
+      .reduce((n,o)=>n+o.lines.filter(line=>!trackingLineDelivered(line)).length,0);
+    exportButton.disabled=busy||viewMode!=="queue"||!pending;
+    exportButton.title=!pending?"No hay materiales pendientes entre los pedidos mostrados":
+      "Descarga solo los pedidos filtrados y mostrados (máximo 300), separados por proveedor.";
+  }
   function render() {
     if(!loaded)return;
-    const current=orders.filter(o=>!project.value || o.source_id===project.value).map(o=>({...o,_state:trackingEffectiveState(o,decisions.get(o.id))}));
+    const current=currentTrackingOrders();
     const open=current.filter(o=>o._state==="open");
     const eligible=open.filter(o=>age(o.order_date)>=Number(alertDays.value||7));
     const review=open.filter(o=>o.lines.some(l=>!trackingLineDelivered(l) && (l.source_green && !l.source_si || interpretTrackingObservation(l.observations,l.requested_qty).kind==="review")));
@@ -308,19 +342,9 @@ export function initTracking({client,escapeHtml,canManageSources=()=>false}) {
     source.textContent=sources.length+" fuentes importadas · "+catalog.filter(c=>c.status==="approved"&&c.automatic_import_enabled).length+
       " en actualización automática · "+catalog.filter(c=>c.status==="candidate").length+" sin incorporar · última copia: "+last+
       (syncSettings?.automatic_sync_enabled?" · Sincronización horaria activa para fuentes autorizadas":" · Sincronización automática pendiente");
-    if(viewMode==="sources") {renderSources();return;}
-    const q=search.value.trim().toLocaleLowerCase("es");
-    const visible=current.filter(o=>{
-      if(supplier.value && o.supplier!==supplier.value)return false;
-      if(project.value && o.source_id!==project.value)return false;
-      if(state.value==="open" && o._state!=="open")return false;
-      if(state.value==="due" && (o._state!=="open"||age(o.order_date)<Number(alertDays.value||7)))return false;
-      if(state.value==="closed" && o._state==="open")return false;
-      if(state.value==="review" && (o._state!=="open"||!o.lines.some(l=>!trackingLineDelivered(l) && (l.source_green && !l.source_si || interpretTrackingObservation(l.observations,l.requested_qty).kind==="review"))))return false;
-      return !q||[o.order_reference,folderName(o.source_id),o.supplier,o.responsible,...o.lines.flatMap(l=>[l.reference,l.description])].some(v=>String(v||"").toLocaleLowerCase("es").includes(q));
-    });
-    // Ordenar SOLO las coincidencias del periodo, no volver a mezclar registros fuera del rango.
-    sortTrackingOrders(visible,sort.value);
+    if(viewMode==="sources") {exportButton.disabled=true;renderSources();return;}
+    const visible=visibleTrackingOrders(current);
+    setExportAvailability(visible);
     document.getElementById("trackingVisible").textContent=visible.length+" de "+current.length+" pedidos";
     if(!visible.length) {
       const selected=catalog.find(c=>c.file_id===project.value);
@@ -365,6 +389,31 @@ export function initTracking({client,escapeHtml,canManageSources=()=>false}) {
     const overflow=visible.length>300?'<p class="tracking-empty">Mostrando los 300 primeros. Acota el rango para ver más.</p>':"";
     list.innerHTML=shown.map(renderCard).join("")+overflow;
   }
+  exportButton.addEventListener("click",async()=>{
+    if(busy||!loaded||viewMode!=="queue")return;
+    const visible=visibleTrackingOrders(currentTrackingOrders());
+    // El botón exporta exactamente las tarjetas mostradas: nunca las 301+ ocultas.
+    const shown=visible.slice(0,300);
+    const groups=buildTrackingClaimGroups(shown,{
+      isDelivered:trackingLineDelivered,interpretObservation:interpretTrackingObservation,
+      workName:folderName,prettyDate:pretty
+    });
+    if(!groups.length){exportStatus.textContent="No hay materiales pendientes para exportar.";return;}
+    exportButton.disabled=true;
+    exportStatus.textContent="Preparando Excel de los pedidos filtrados…";
+    try{
+      const summary=await downloadTrackingClaimsXlsx(groups,{
+        from:pretty(dateFrom.value),to:pretty(dateTo.value),generatedAt:pretty(today()),supplier:supplier.value
+      });
+      exportStatus.textContent=summary.lineCount+" materiales de "+summary.orderCount+
+        " pedidos, separados en "+summary.supplierCount+" proveedor(es). "+
+        (visible.length>300?"Solo los primeros 300 pedidos mostrados. Acota los filtros para incluir otros. ":"")+
+        "Revisa las cantidades parciales antes de enviar por correo.";
+    }catch(error){
+      console.error("Excel reclamaciones:",error);
+      exportStatus.textContent="No se pudo generar el Excel. Comprueba la conexión e inténtalo de nuevo.";
+    }finally{setExportAvailability(visibleTrackingOrders(currentTrackingOrders()));}
+  });
   period.addEventListener("change",()=>{setPeriod(period.value);if(period.value!=="custom")load();});
   [dateFrom,dateTo].forEach(el=>el.addEventListener("change",()=>{period.value="custom";load();}));
   [supplier,state,alertDays,sort,project].forEach(el=>el.addEventListener("change",render));
@@ -513,5 +562,5 @@ export function initTracking({client,escapeHtml,canManageSources=()=>false}) {
     status.textContent="Decision registrada con auditoria. Drive permanece intacto.";
     await load();
   });
-  return {open(){if(!loaded)load();else render();},reset(){++generation;orders=[];decisions.clear();sources=[];catalog=[];folders=[];syncSettings=null;syncHistory=[];legacyReviews=[];newWorkRequests=[];manualQueue=[];loaded=false;viewMode="queue";manualStatus.textContent="";for(const b of viewButtons){const active=b.dataset.trackingView==="queue";b.classList.toggle("is-active",active);b.setAttribute("aria-pressed",String(active));}list.replaceChildren();stats.replaceChildren();source.textContent="";status.textContent="Selecciona un periodo para consultar pedidos.";setPeriod("30");period.value="30";}};
+  return {open(){if(!loaded)load();else render();},reset(){++generation;orders=[];decisions.clear();sources=[];catalog=[];folders=[];syncSettings=null;syncHistory=[];legacyReviews=[];newWorkRequests=[];manualQueue=[];loaded=false;viewMode="queue";manualStatus.textContent="";exportStatus.textContent="";exportButton.disabled=true;for(const b of viewButtons){const active=b.dataset.trackingView==="queue";b.classList.toggle("is-active",active);b.setAttribute("aria-pressed",String(active));}list.replaceChildren();stats.replaceChildren();source.textContent="";status.textContent="Selecciona un periodo para consultar pedidos.";setPeriod("30");period.value="30";}};
 }

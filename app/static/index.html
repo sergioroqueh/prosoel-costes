@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https://kusbndefngttaiytcrui.supabase.co wss://kusbndefngttaiytcrui.supabase.co; img-src 'self' data:; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdn.sheetjs.com; style-src 'self'; connect-src 'self' https://kusbndefngttaiytcrui.supabase.co wss://kusbndefngttaiytcrui.supabase.co; img-src 'self' data:; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <title>PROSOEL Costes</title>
   <meta name="theme-color" content="#134079">
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/prosoel-mark.svg?v=20261009-v17">
-  <link rel="stylesheet" href="./styles.css?v=20261103-official-israel-v1">
+  <link rel="stylesheet" href="./styles.css?v=20261105-tracking-export-v1">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -317,11 +317,13 @@
               <input id="trackingSearch" type="search" placeholder="Ej.: 26/829, GUARCONSA, A7-M8"></label>
             <span class="tracking-refresh-hint">«Actualizar vista» consulta Supabase. «Sincronizar Drive» solicita datos actuales.</span>
             <div class="tracking-filter-actions">
+              <button type="button" class="tracking-refresh tracking-export" id="trackingExport" disabled>Exportar reclamación Excel</button>
               <button type="button" class="tracking-refresh tracking-refresh-primary" id="trackingManualRefresh">Sincronizar Drive</button>
               <button type="button" class="tracking-refresh" id="trackingRefresh">Actualizar vista</button>
             </div>
           </div>
           <div id="trackingManualStatus" class="tracking-manual-status" role="status" aria-live="polite"></div>
+          <div id="trackingExportStatus" class="tracking-export-status" role="status" aria-live="polite"></div>
         </div>
         <div class="tracking-list-head"><div><h3>Pedidos del periodo</h3><span id="trackingVisible" class="muted"></span></div>
           <span class="tracking-disclaimer">Los pendientes son candidatos a revisar, no entregas faltantes confirmadas.</span>
@@ -542,6 +544,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261103-sync-status-es-v1"></script>
+  <script type="module" src="./app.js?v=20261105-tracking-export-v1"></script>
 </body>
 </html>
