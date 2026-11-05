@@ -8,7 +8,7 @@
   <title>PROSOEL Costes</title>
   <meta name="theme-color" content="#134079">
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/prosoel-mark.svg?v=20261009-v17">
-  <link rel="stylesheet" href="./styles.css?v=20261105-tracking-export-v1">
+  <link rel="stylesheet" href="./styles.css?v=20261105-order-revisions-v1">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -414,8 +414,8 @@
 
       <section id="importWorkspace" class="import-workspace hidden" role="tabpanel" aria-labelledby="importTab">
         <header class="import-intro">
-          <h2>Incorporar un pedido nuevo</h2>
-          <p>Selecciona el Excel original de HOJA PEDIDO. El navegador leerá el archivo localmente y mostrará todos los datos antes de enviarlos a Supabase. No se almacenará el fichero XLSX original.</p>
+          <h2>Importar o actualizar un pedido</h2>
+          <p>Sube un pedido nuevo o vuelve a seleccionar su Excel corregido. Si el número ya existe y coincide su identidad, podrás comparar las versiones y actualizarlo sin duplicar. El XLSX se procesa localmente; solo se guardan sus datos extraídos y el historial de cambios.</p>
         </header>
         <section class="enrichment-summary" aria-labelledby="enrichmentHeading">
           <div>
@@ -433,13 +433,18 @@
           <div id="importStatus" class="import-message" role="status" aria-live="polite">Selecciona un archivo para obtener su vista previa.</div>
           <div id="importPreview" class="import-preview hidden"></div>
           <div id="importConfirmPanel" class="import-confirm-panel hidden">
+            <div id="importUpdateReasonWrap" class="import-update-reason hidden">
+              <label for="importUpdateReason">Motivo de actualización (obligatorio)</label>
+              <textarea id="importUpdateReason" rows="2" maxlength="1000" placeholder="Ej.: Se añade material al pedido original 26/842."></textarea>
+              <p class="hint">Quedará registrado junto con la versión anterior. Mínimo 5 caracteres.</p>
+            </div>
             <label class="import-acknowledge"><input type="checkbox" id="importAcknowledged">
-              <span>He comprobado el número, año, proveedor, cantidades y precios, y autorizo incorporar este pedido al histórico.</span>
+              <span id="importAcknowledgedText">He comprobado el número, año, proveedor, cantidades y precios, y autorizo incorporar este pedido al histórico.</span>
             </label>
             <button id="importSubmitButton" type="button" disabled>Confirmar importación</button>
           </div>
         </div>
-        <p class="import-notice">Seguridad: si el mismo archivo ya existe, se omite. Si coincide el número pero los archivos son distintos, la importación se detiene para revisión. Solo los administradores pueden confirmar.</p>
+        <p class="import-notice">Seguridad: el archivo idéntico no se duplica. Una actualización exige coincidencia de número, proveedor y fecha, revisión de diferencias y motivo. La operación es atómica, conserva el identificador del pedido y registra su versión anterior. Las modificaciones de líneas con decisiones técnicas vinculadas pueden requerir revisión manual. Solo administradores.</p>
         <section class="import-audit-panel" aria-labelledby="auditHeading">
           <div class="import-audit-head">
             <div>
@@ -544,6 +549,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261105-decimal-v3"></script>
+  <script type="module" src="./app.js?v=20261105-order-revisions-v1"></script>
 </body>
 </html>
