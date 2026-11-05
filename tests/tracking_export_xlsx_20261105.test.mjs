@@ -7,7 +7,7 @@ const js = read("app/static/tracking.js");
 const html = read("app/static/index.html");
 const exportSrc = read("app/static/tracking_export.js");
 const moduleUrl = "data:text/javascript;base64," + Buffer.from(exportSrc).toString("base64");
-const {buildTrackingClaimGroups, safeTrackingSheetNames, styleTrackingClaimsWorksheet} = await import(moduleUrl);
+const {buildTrackingClaimGroups, safeTrackingSheetNames, styleTrackingClaimsWorksheet, trackingQuantityNumberFormat} = await import(moduleUrl);
 const opts = {
   isDelivered:line => Boolean(line.source_green && line.source_si && line.drive_line_finalized),
   interpretObservation:(raw, requested) => {
@@ -124,4 +124,22 @@ test("El resto del flujo de exportación continúa descargando un XLSX local",()
   assert.match(exportSrc,/XLSX\.write\(workbook/);
   assert.match(exportSrc,/styleTrackingClaimsWorksheet\(ws,group\.rows\)/);
   assert.match(exportSrc,/ws\["!autofilter"\]/);
+});
+
+test("Enteros sin coma final, cantidades decimales conservadas",()=>{
+  assert.equal(trackingQuantityNumberFormat(2),"#,##0");
+  assert.equal(trackingQuantityNumberFormat(0),"#,##0");
+  assert.equal(trackingQuantityNumberFormat(1000),"#,##0");
+  assert.equal(trackingQuantityNumberFormat(2.5),"#,##0.0");
+  assert.equal(trackingQuantityNumberFormat(2.75),"#,##0.00");
+  assert.equal(trackingQuantityNumberFormat(0.125),"#,##0.000");
+  const ws={};
+  styleTrackingClaimsWorksheet(ws,[
+    ["26/1","2026-11-05","Obra","REF","Material",2,2,"",""],
+    ["26/2","2026-11-05","Obra","REF2","Material",2.5,0.125,"",""]
+  ]);
+  assert.equal(ws.F7.s.numFmt,"#,##0");
+  assert.equal(ws.G7.s.numFmt,"#,##0");
+  assert.equal(ws.F8.s.numFmt,"#,##0.0");
+  assert.equal(ws.G8.s.numFmt,"#,##0.000");
 });

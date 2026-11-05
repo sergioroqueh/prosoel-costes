@@ -1,4 +1,4 @@
-import {buildTrackingClaimGroups, downloadTrackingClaimsXlsx} from "./tracking_export.js?v=20261105-brand-v2";
+import {buildTrackingClaimGroups, downloadTrackingClaimsXlsx} from "./tracking_export.js?v=20261105-decimal-v3";
 
 // Seguimiento de pedidos: lectura del snapshot privado y cierres manuales auditables.
 // Nunca introduce datos de Drive directamente en el repositorio publico.

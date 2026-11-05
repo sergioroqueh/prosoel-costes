@@ -76,6 +76,14 @@ function loadStyledXlsx() {
 }
 
 // Paleta PROSOEL: azul técnico, naranja corporativo y fondos suaves para lectura.
+// Formato Excel con decimales reales: evita que enteros como 2 se muestren "2,".
+export function trackingQuantityNumberFormat(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || Number.isInteger(n)) return "#,##0";
+  const fraction = n.toFixed(10).split(".")[1].replace(/0+$/, "");
+  return fraction ? "#,##0." + "0".repeat(fraction.length) : "#,##0";
+}
+
 export function styleTrackingClaimsWorksheet(ws, rows) {
   const C = {
     navy:"0B2342", blue:"144A65", teal:"1B5362", orange:"E86C38",
@@ -117,7 +125,7 @@ export function styleTrackingClaimsWorksheet(ws, rows) {
       cell.s.font = font(C.blue,10,c===0||c===3);
     }
     for (const c of [1,5,6]) cellAt(r,c).s.alignment.horizontal="center";
-    for (const c of [5,6]) cellAt(r,c).s.numFmt="#,##0.###";
+    for (const c of [5,6]) cellAt(r,c).s.numFmt=trackingQuantityNumberFormat(line[c]);
     // Se distingue la cantidad pendiente sin alterar los números calculados.
     if (line[6] !== "" && line[6] != null) {
       const pending = cellAt(r,6);
