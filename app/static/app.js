@@ -6,6 +6,7 @@ import { initTracking } from "./tracking.js?v=20261105-decimal-v3";
 import { initProjectLookup } from "./project_lookup.js?v=20261103-offers-v2";
 import { mountPriceTimeline, PRICE_SERIES_COLORS } from "./price_comparison_chart.js?v=20261030-v1";
 import { fetchSupplierOfferRefsMap, supplierOfferRefsHtml } from "./supplier_offer_references.js?v=20261103-v2";
+import { latestPricedPurchase, sortPurchasesNewestFirst } from "./purchase_ordering.js?v=20261106-last-net-date-v1";
 
 const supabase = createClient(
   SUPABASE_URL,
@@ -945,9 +946,7 @@ function priceSummary(rows) {
 }
 
 function renderMaterialDetail(detail, rows) {
-  const latest =
-    rows.find((row) => row.net_unit_price !== null && Number(row.net_unit_price) > 0) ||
-    rows[0];
+  const latest = latestPricedPurchase(rows);
 
   const html = [];
   html.push('<div class="detail-header">');
@@ -1044,9 +1043,7 @@ function renderMaterialDetail(detail, rows) {
 }
 
 function renderHistoricalDetail(result, rows) {
-  const latest =
-    rows.find((row) => row.net_unit_price !== null && Number(row.net_unit_price) > 0) ||
-    rows[0];
+  const latest = latestPricedPurchase(rows);
   const summary = priceSummary(rows);
 
   const html = [];
@@ -1146,9 +1143,7 @@ function renderReferenceComparison(container, reference, rows) {
   const groups = names.map((name) => {
     const selected = rows.filter((row) => (row.supplier || "Sin proveedor") === name);
     const priced = selected.filter(validComparisonPrice);
-    const sorted = priced.slice().sort((a,b) =>
-      String(b.order_date || "").localeCompare(String(a.order_date || ""))
-        || Number(b.order_id) - Number(a.order_id));
+    const sorted = sortPurchasesNewestFirst(priced);
     return { name, selected, priced, latest: sorted[0] || null,
       summary: priceSummary(priced),
       purchases: new Set(selected.map((row) => row.order_id)).size };
@@ -1257,12 +1252,7 @@ function historyTableHtml(rows) {
 
   // El orden de la tabla es siempre por fecha de compra (más reciente primero).
   // Trabajamos con una copia: no alteramos la respuesta ni los precios originales.
-  const orderedRows = [...rows].sort((a, b) =>
-    String(b.order_date || "").localeCompare(String(a.order_date || ""))
-      || Number(b.order_year || 0) - Number(a.order_year || 0)
-      || Number(b.order_number || 0) - Number(a.order_number || 0)
-      || Number(b.order_subnumber || 0) - Number(a.order_subnumber || 0)
-  );
+  const orderedRows = sortPurchasesNewestFirst(rows);
 
   orderedRows.forEach((row, index) => {
     html.push("<tr>");
@@ -1760,7 +1750,7 @@ function renderReviewCandidate(row, purchases, reviewEvents = [], researchEviden
   for(const supplier of suppliers.sort((a,b)=>a.localeCompare(b,"es"))) {
     const lines = activePurchases.filter((p)=>(p.supplier||"Sin proveedor")===supplier);
     const priced = lines.filter(validComparisonPrice);
-    const chronological = priced.slice().sort((a,b)=>String(b.order_date||"").localeCompare(String(a.order_date||""))||Number(b.order_id)-Number(a.order_id));
+    const chronological = sortPurchasesNewestFirst(priced);
     const summary = priceSummary(priced);
     html.push('<tr><td>' + escapeHtml(supplier) + '</td><td>' + new Set(lines.map((p)=>p.order_id)).size
       + '</td><td>' + money(chronological[0]?.net_unit_price)
