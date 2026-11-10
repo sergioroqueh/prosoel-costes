@@ -43,8 +43,6 @@ const cableSearchPanel = document.getElementById("cableSearchPanel");
 const cableFamily = document.getElementById("cableFamily");
 const cableCores = document.getElementById("cableCores");
 const cableSection = document.getElementById("cableSection");
-const cablePE = document.getElementById("cablePE");
-const cableColor = document.getElementById("cableColor");
 const cableSearchApply = document.getElementById("cableSearchApply");
 let guidedCableMode = false;
 function updateCableModeIndicator() {
@@ -56,8 +54,8 @@ function guidedCableParams(filters, offset) {
     p_type: cableFamily.value || null,
     p_cores: cableCores.value ? Number(cableCores.value) : null,
     p_section: cableSection.value ? Number(cableSection.value) : null,
-    p_pe: cablePE.value || null,
-    p_color: cableColor.value || null,
+    p_pe: null, // Sin filtro G/X: conservar todas las designaciones.
+    p_color: null, // Sin filtro de color: conservar todos los colores.
     p_supplier_id: filters.supplierId,
     p_year: filters.year,
     p_sort: filters.sort,
@@ -88,6 +86,7 @@ const trackingTab = document.getElementById("trackingTab");
 const trackingWorkspace = document.getElementById("trackingWorkspace");
 const orderLookupWorkspace = document.getElementById("orderLookupWorkspace");
 const reviewTab = document.getElementById("reviewTab");
+const workspaceTools = document.getElementById("workspaceTools");
 const costsWorkspace = document.getElementById("costsWorkspace");
 const reviewWorkspace = document.getElementById("reviewWorkspace");
 const reviewQuery = document.getElementById("reviewQuery");
@@ -162,6 +161,8 @@ let purchaseLinesInBulk = null;
 let purchaseCandidateInEditor = null;
 let purchaseEditIsSaving = false;
 let currentUserRole = "user";
+let isSergioAdmin = false;
+const SERGIO_ACCOUNT_EMAIL = "compras@prosoel.es";
 let trackingAllowed = false;
 // Los perfiles operativos tienen la misma vista reducida; RLS protege los datos.
 const LIMITED_ACCOUNT_EMAILS = new Set(["israel@prosoel.es", "ivivanco@prosoel.es"]);
@@ -442,6 +443,9 @@ function orderLabel(row) {
 
 function showLogin(message = "") {
   trackingAllowed = false;
+  isSergioAdmin = false;
+  workspaceTools.open = false;
+  workspaceTools.classList.add("hidden");
   trackingTab.classList.add("hidden");
   trackingWorkspace.classList.add("hidden");
   authView.hidden = false;
@@ -455,8 +459,10 @@ function showApp(user) {
   trackingAllowed = false;
   trackingTab.classList.add("hidden");
   isLimitedAccount = LIMITED_ACCOUNT_EMAILS.has(String(user?.email || "").trim().toLowerCase());
-  reviewTab.classList.toggle("hidden", isLimitedAccount);
-  if (isLimitedAccount) activateWorkspace("costs");
+  isSergioAdmin = false;
+  workspaceTools.open = false;
+  workspaceTools.classList.add("hidden");
+  activateWorkspace("costs");
   authView.hidden = true;
   appView.hidden = false;
   authView.classList.add("hidden");
@@ -479,6 +485,9 @@ async function verifyAccess(user) {
 
   currentUser.textContent = data.display_name || data.email;
   currentUserRole = data.role || "user";
+  isSergioAdmin = currentUserRole === "admin"
+    && String(data.email || "").trim().toLowerCase() === SERGIO_ACCOUNT_EMAIL;
+  workspaceTools.classList.toggle("hidden", !isSergioAdmin);
   // Gating visual despues de verificar app_users; el acceso real se protege con RLS.
   trackingAllowed = TRACKING_ACCOUNT_EMAILS.has(String(data.email || "").trim().toLowerCase());
   trackingTab.classList.toggle("hidden", !trackingAllowed);
@@ -1354,8 +1363,8 @@ const reviewRiskLabels = {
 };
 
 function activateWorkspace(which) {
-  // Los perfiles operativos no ven ni pueden abrir Normalización.
-  const reviewing = which === "review" && !isLimitedAccount;
+  // Solo Sergio (cuenta admin verificada) ve y puede abrir Normalización.
+  const reviewing = which === "review" && isSergioAdmin;
   const importing = which === "import" && currentUserRole === "admin";
   const lookingUpOrder = which === "orders";
   const trackingView = which === "tracking" && trackingAllowed;
@@ -1368,12 +1377,13 @@ function activateWorkspace(which) {
   costsTab.classList.toggle("is-active", costs);
   orderLookupTab.classList.toggle("is-active", lookingUpOrder);
   trackingTab.classList.toggle("is-active", trackingView);
-  reviewTab.classList.toggle("is-active", reviewing);
+  workspaceTools.classList.toggle("is-current", reviewing);
+  workspaceTools.open = false;
   importTab.classList.toggle("is-active", importing);
   costsTab.setAttribute("aria-selected", String(costs));
   orderLookupTab.setAttribute("aria-selected", String(lookingUpOrder));
   trackingTab.setAttribute("aria-selected", String(trackingView));
-  reviewTab.setAttribute("aria-selected", String(reviewing));
+  reviewTab.setAttribute("aria-pressed", String(reviewing));
   importTab.setAttribute("aria-selected", String(importing));
   if (reviewing && !reviewLoaded) runReviewSearch();
   if (importing && !importAuditLoaded) loadImportDashboard();
@@ -2817,7 +2827,7 @@ cableSearchApply.addEventListener("click", () => {
   updateCableModeIndicator();
   runSearch();
 });
-for (const control of [cableFamily, cableCores, cableSection, cablePE, cableColor]) {
+for (const control of [cableFamily, cableCores, cableSection]) {
   control.addEventListener("change", () => {
     if (guidedCableMode) runSearch();
   });
@@ -2852,7 +2862,7 @@ resetFiltersButton.addEventListener("click", () => {
   yearFilter.value = "";
   sortFilter.value = "recent";
   guidedCableMode = false;
-  for (const control of [cableFamily, cableCores, cableSection, cablePE, cableColor]) control.value = "";
+  for (const control of [cableFamily, cableCores, cableSection]) control.value = "";
   updateCableModeIndicator();
   if (searchInput.value.trim().length >= 2) runSearch();
   else {
