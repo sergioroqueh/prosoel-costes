@@ -73,7 +73,8 @@ export function readPedidosXlsx(buffer){
     const color=String(fillList[i]?.patternFill?.fgColor?.["@_rgb"]||"").toUpperCase();
     if(GREEN.has(color))greenFillIds.add(i);
   }
-  if(!greenFillIds.size)fail("green_fill_missing");
+  // A newly created work book may contain no green-formatted cells yet.
+  // getIsGreen then stays false, so no receipt is inferred without green + SI.
   const getIsGreen=c=>{
     if(!c)return false;
     const style=xfList[Number(c["@_s"]||0)];
