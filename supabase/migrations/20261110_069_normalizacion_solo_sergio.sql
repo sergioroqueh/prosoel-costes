@@ -40,6 +40,6 @@ AS $function$
    g.priority_score desc,g.reference_key asc
  limit greatest(1,least(coalesce(result_limit,30),50))
  offset greatest(0,least(coalesce(p_offset,0),10000));
-$function$
+$function$;
 revoke all on function public.normalization_review_queue_v3(text,text,text,text,boolean,text,integer,integer) from public,anon;
 grant execute on function public.normalization_review_queue_v3(text,text,text,text,boolean,text,integer,integer) to authenticated;
