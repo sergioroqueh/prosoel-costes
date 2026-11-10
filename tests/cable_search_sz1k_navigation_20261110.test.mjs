@@ -7,6 +7,7 @@ const html = read("app/static/index.html");
 const js = read("app/static/app.js");
 const css = read("app/static/styles.css");
 const sql = read("supabase/migrations/20261110_068_sz1k_busqueda_cables.sql");
+const reviewSql = read("supabase/migrations/20261110_069_normalizacion_solo_sergio.sql");
 
 test("La búsqueda de cables solo muestra tipo, conductores y sección", () => {
   for (const id of ["cableFamily", "cableCores", "cableSection"]) {
@@ -38,4 +39,6 @@ test("Normalización está en Herramientas y solo para Sergio admin", () => {
   assert.match(js, /const reviewing = which === "review" && isSergioAdmin/);
   assert.match(js, /workspaceTools\.classList\.toggle\("hidden", !isSergioAdmin\)/);
   assert.match(css, /\.workspace-tools-panel/);
+  assert.ok(reviewSql.includes("u.role = 'admin'"));
+  assert.ok(reviewSql.includes("lower(u.email) = 'compras@prosoel.es'"));
 });
