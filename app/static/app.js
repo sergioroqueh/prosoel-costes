@@ -1095,8 +1095,10 @@ function renderHistoricalDetail(result, rows) {
   if (result.reference) {
     html.push('<div class="compare-entry">');
     html.push('<div><strong>Comparativa por referencia de compra</strong><p>Consulta las compras registradas con este código en distintos proveedores.</p></div>');
+    html.push('<div class="compare-actions">');
     html.push('<button class="action-button" id="compareReferenceButton" type="button">Comparar proveedores y evolución</button>');
-    html.push('</div>');
+    if (isSergioAdmin) html.push('<button class="action-button unify-quick-button" id="unifyFromPrice" type="button">Unificar esta referencia</button>');
+    html.push('</div></div>');
     html.push('<div id="referenceComparison" aria-live="polite"></div>');
   }
 
@@ -1113,6 +1115,13 @@ function renderHistoricalDetail(result, rows) {
   if (compareButton) {
     const activeDetail = detailGeneration;
     compareButton.addEventListener("click", () => showReferenceComparison(result.reference, activeDetail));
+  }
+  const unifyButton=detailPanel.querySelector("#unifyFromPrice");
+  if(unifyButton && isSergioAdmin){
+    unifyButton.addEventListener("click",()=>{
+      activateWorkspace("review");
+      unifyReferences?.openReference(result.reference);
+    });
   }
 }
 
@@ -2883,7 +2892,7 @@ moreResultsButton.addEventListener("click", () => runSearch({ append: true }));
 const unifyReferences = initUnifyReferences({
   client:supabase,
   canEdit:()=>isSergioAdmin,
-  onSaved:()=>{ reviewLoaded=false; ++searchGeneration; },
+  onSaved:()=>{ reviewLoaded=false; ++searchGeneration; if(!reviewWorkspace.classList.contains("hidden")) runReviewSearch(); },
 });
 
 // Módulos originales de consulta, en solo lectura.
