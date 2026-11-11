@@ -166,6 +166,8 @@ export function compareSource(orders,existingOrders,existingLines){
   // When rows move, report a structural change rather than silently overwriting a manual closure.
   const indexed=new Map(existingOrders.map(o=>[o.order_reference,o]));
   const linesByOrder=new Map();
+  const lastExistingOrderRow=Math.max(0,...existingOrders.map(o=>Number(o.source_row)||0));
+  const lastExistingLineRow=Math.max(0,...existingLines.map(l=>Number(l.source_row)||0));
   for(const line of existingLines) {
     if(!linesByOrder.has(line.order_id))linesByOrder.set(line.order_id,[]);
     linesByOrder.get(line.order_id).push(line);
@@ -194,15 +196,26 @@ export function compareSource(orders,existingOrders,existingLines){
       const k=sig(l);if(!oldBySig.has(k))oldBySig.set(k,[]);
       oldBySig.get(k).push(l);
     }
+    const unmatched=[];
     for(const n of nowLines){
       const prev=oldBySig.get(sig(n))?.shift();
-      if(!prev){counters.changed_reference++;continue;}
+      if(!prev){unmatched.push(n);continue;}
       if(Number(prev.source_row)!==n.source_row)counters.row_moved++;
       if(Boolean(prev.drive_line_finalized)!==n.drive_line_finalized)counters.changed_status++;
       if(Number(prev.requested_qty)!==n.requested_qty)counters.changed_quantity++;
       if(String(prev.observations||"")!==n.observations)counters.changed_observations++;
       if(String(prev.albaran||"")!==n.albaran)counters.changed_albarans++;
     }
+    // Solo admitir líneas NUEVAS al final del último pedido ya importado.
+    // Una referencia antigua sustituida, una línea insertada entre filas
+    // o un pedido anterior ampliado siguen exigiendo revisión humana.
+    const remainingOriginal=[...oldBySig.values()].reduce((sum,items)=>sum+items.length,0);
+    const appendedSafely=unmatched.length>0 &&
+      Number(known.source_row)===lastExistingOrderRow &&
+      remainingOriginal===0 &&
+      nowLines.length===oldLines.length+unmatched.length &&
+      unmatched.every(line=>Number(line.source_row)>lastExistingLineRow);
+    if(unmatched.length&&!appendedSafely)counters.changed_reference+=unmatched.length;
   }
   for(const known of existingOrders)if(!seen.has(known.order_reference))counters.removed_orders++;
   return {counts:counters,examples,requires_review:
