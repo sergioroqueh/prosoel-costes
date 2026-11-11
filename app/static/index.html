@@ -325,6 +325,47 @@
       </section>
 
       <section id="reviewWorkspace" class="review-workspace hidden" role="region" aria-labelledby="reviewTab">
+        <details class="unify-tool" id="unifyTool" open>
+          <summary><span class="unify-title"><strong>Unificar referencias</strong><small>Buscar compras, elegir variantes y guardar una descripción única</small></span><span class="unify-step">Herramienta de Sergio</span></summary>
+          <div class="unify-tool-body">
+            <p class="unify-help">Una misma referencia puede aparecer con textos distintos. Selecciona solo compras del <strong>mismo producto</strong> y guarda su descripción definitiva, manteniendo precios y textos originales.</p>
+            <form id="unifySearchForm" class="unify-search-form">
+              <label for="unifyReference">Referencia del material
+                <input id="unifyReference" type="search" autocomplete="off" placeholder="Ej.: 069801L" maxlength="100" required>
+              </label>
+              <button type="submit">Buscar compras</button>
+            </form>
+            <div id="unifyStatus" class="unify-status" role="status" aria-live="polite">Introduce una referencia para empezar.</div>
+            <div id="unifySelection" class="hidden">
+              <div class="unify-selection-top">
+                <strong id="unifyFound"></strong>
+                <div class="unify-actions">
+                  <button id="unifySelectAll" type="button">Seleccionar todas</button>
+                  <button id="unifyClear" type="button">Limpiar selección</button>
+                </div>
+              </div>
+              <div id="unifyGroups" class="unify-groups"></div>
+              <div class="unify-editor">
+                <label for="unifyCanonical">Descripción definitiva para las compras seleccionadas
+                  <textarea id="unifyCanonical" rows="2" maxlength="350" placeholder="Escribe exactamente cómo quieres ver este material en las búsquedas…"></textarea>
+                </label>
+                <label class="unify-checkbox"><input id="unifyFuture" type="checkbox" checked>
+                  <span><strong>Guardar también reglas para futuros pedidos</strong><small>Se aplicarán cuando coincidan proveedor, referencia y descripción original. Las variantes nuevas quedan para revisión, evitando equivalencias incorrectas.</small></span>
+                </label>
+                <label for="unifyNote">Observación de la decisión (opcional)
+                  <input id="unifyNote" maxlength="500" placeholder="Ej.: misma ficha de fabricante y características">
+                </label>
+                <label class="unify-checkbox unify-confirm"><input id="unifyAcknowledge" type="checkbox">
+                  <span>He comprobado que los materiales seleccionados son técnicamente equivalentes.</span>
+                </label>
+                <div class="unify-save-bar">
+                  <span id="unifySelectedCount">0 compras seleccionadas</span>
+                  <button id="unifySave" type="button" disabled>Guardar unificación</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
         <header class="review-intro">
           <div>
             <h2>Normalización supervisada</h2>
@@ -540,6 +581,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261110-sz1k-menu-v1"></script>
+  <script type="module" src="./app.js?v=20261111-unify-v1"></script>
 </body>
 </html>
