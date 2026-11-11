@@ -67,14 +67,15 @@ export function initUnifyReferences({client,canEdit,onSaved=()=>{}}) {
     const counts=new Set(chosen.map(l=>String(l.supplier_id))).size;
     let partial=false;
     for(let i=0;i<groups.length;i++) {
-      const g=groups[i],included=g.lines.filter(l=>selected.has(String(l.line_id))).length;
+      const g=groups[i],eligible=g.lines.filter(selectable);
+      const included=eligible.filter(l=>selected.has(String(l.line_id))).length;
       const check=groupsNode.querySelector('[data-unify-group="'+i+'"]');
       if(check) {
-        check.checked=included===g.lines.length && included>0;
-        check.indeterminate=included>0 && included<g.lines.length;
-        check.disabled=g.lines.some(l=>!selectable(l));
+        check.checked=included===eligible.length && included>0;
+        check.indeterminate=included>0 && included<eligible.length;
+        check.disabled=eligible.length===0;
       }
-      if(included>0 && included<g.lines.length)partial=true;
+      if(included>0 && included<eligible.length)partial=true;
     }
     selectedCount.textContent=chosen.length+" compras seleccionadas · "+counts+" proveedores";
     const invalid=chosen.length>200 || (future.checked && partial);
@@ -93,7 +94,7 @@ export function initUnifyReferences({client,canEdit,onSaved=()=>{}}) {
     const eligible=rows.filter(selectable).length;
     $("unifyFound").textContent=rows.length+" líneas en "+groups.length+" variantes · "+eligible+" seleccionables";
     groupsNode.innerHTML=groups.map((g,i)=>{
-      const eligibleGroup=g.lines.every(selectable);
+      const eligibleGroup=g.lines.some(selectable);
       const priceList=g.lines.map(l=>Number(l.net_unit_price)).filter(v=>Number.isFinite(v)&&v>0);
       const min=priceList.length?Math.min(...priceList):null;
       const max=priceList.length?Math.max(...priceList):null;
