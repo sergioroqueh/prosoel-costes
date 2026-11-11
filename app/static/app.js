@@ -7,6 +7,7 @@ import { initProjectLookup } from "./project_lookup.js?v=20261103-offers-v2";
 import { mountPriceTimeline, PRICE_SERIES_COLORS } from "./price_comparison_chart.js?v=20261030-v1";
 import { fetchSupplierOfferRefsMap, supplierOfferRefsHtml } from "./supplier_offer_references.js?v=20261103-v2";
 import { latestPricedPurchase, sortPurchasesNewestFirst } from "./purchase_ordering.js?v=20261106-last-net-date-v1";
+import { initUnifyReferences } from "./unify_references.js?v=20261111-unify-v1";
 
 const supabase = createClient(
   SUPABASE_URL,
@@ -1094,8 +1095,10 @@ function renderHistoricalDetail(result, rows) {
   if (result.reference) {
     html.push('<div class="compare-entry">');
     html.push('<div><strong>Comparativa por referencia de compra</strong><p>Consulta las compras registradas con este código en distintos proveedores.</p></div>');
+    html.push('<div class="compare-actions">');
     html.push('<button class="action-button" id="compareReferenceButton" type="button">Comparar proveedores y evolución</button>');
-    html.push('</div>');
+    if (isSergioAdmin) html.push('<button class="action-button unify-quick-button" id="unifyFromPrice" type="button">Unificar esta referencia</button>');
+    html.push('</div></div>');
     html.push('<div id="referenceComparison" aria-live="polite"></div>');
   }
 
@@ -1112,6 +1115,13 @@ function renderHistoricalDetail(result, rows) {
   if (compareButton) {
     const activeDetail = detailGeneration;
     compareButton.addEventListener("click", () => showReferenceComparison(result.reference, activeDetail));
+  }
+  const unifyButton=detailPanel.querySelector("#unifyFromPrice");
+  if(unifyButton && isSergioAdmin){
+    unifyButton.addEventListener("click",()=>{
+      activateWorkspace("review");
+      unifyReferences?.openReference(result.reference);
+    });
   }
 }
 
@@ -2877,6 +2887,13 @@ resetFiltersButton.addEventListener("click", () => {
   }
 });
 moreResultsButton.addEventListener("click", () => runSearch({ append: true }));
+
+// Herramienta autoservicio visible únicamente en Normalización para Sergio.
+const unifyReferences = initUnifyReferences({
+  client:supabase,
+  canEdit:()=>isSergioAdmin,
+  onSaved:()=>{ reviewLoaded=false; ++searchGeneration; if(!reviewWorkspace.classList.contains("hidden")) runReviewSearch(); },
+});
 
 // Módulos originales de consulta, en solo lectura.
 const projectLookup = initProjectLookup({
