@@ -19,12 +19,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,9 +29,21 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Upload static site
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: app/static
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      # La subida del artefacto puede tardar unos segundos en ser visible
+      # para la API de GitHub Pages; separar jobs evita el fallo "Found 0".
+      - name: Wait for artifact indexing
+        run: sleep 12
 
       - name: Deploy to GitHub Pages
         id: deployment
