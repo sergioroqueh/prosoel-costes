@@ -3207,3 +3207,11 @@ main { margin-top: 25px; }
   .unify-group-top { flex-direction:column; }
   .unify-group-count { text-align:left; max-width:100%; }
 }
+
+.compare-actions { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.compare-actions .action-button { flex:0 1 auto; }
+.unify-quick-button {
+  border:1px solid #bcd2e4 !important; color:#1b5c8b !important;
+  background:#eef6fd !important;
+}
+.unify-quick-button:hover { background:#e3f0fa !important; }
