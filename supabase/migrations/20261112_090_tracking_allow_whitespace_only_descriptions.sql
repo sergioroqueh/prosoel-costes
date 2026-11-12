@@ -245,7 +245,7 @@ begin
     'observation_changes',changed_notes,'albaran_changes',changed_albarans,
     'total_orders',jsonb_array_length(p_orders),'total_lines',total_lines);
 end
-$function$
+$function$;
 
 
 revoke all on function public.tracking_apply_pilot_snapshot(text,jsonb,timestamptz,text,bigint)
