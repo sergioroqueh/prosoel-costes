@@ -2,7 +2,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./config.js";
 import { readProsoelXlsx } from "./order_import.js?v=20261103-offers-v2";
 import { initOrderLookup } from "./order_lookup.js?v=20261103-offers-v2";
-import { initTracking } from "./tracking.js?v=20261105-decimal-v3";
+import { initTracking } from "./tracking.js?v=20261112-safe-partial-v1";
 import { initProjectLookup } from "./project_lookup.js?v=20261103-offers-v2";
 import { mountPriceTimeline, PRICE_SERIES_COLORS } from "./price_comparison_chart.js?v=20261030-v1";
 import { fetchSupplierOfferRefsMap, supplierOfferRefsHtml } from "./supplier_offer_references.js?v=20261103-v2";

@@ -3215,3 +3215,17 @@ main { margin-top: 25px; }
   background:#eef6fd !important;
 }
 .unify-quick-button:hover { background:#e3f0fa !important; }
+
+/* Advertencia verificable por fuente cuando Drive necesita revisión estructural. */
+.tracking-sync-warning {
+  margin:12px 0 16px;
+  padding:12px 15px;
+  background:#fff7e9;
+  border:1px solid #e6c48f;
+  border-left:4px solid #b87320;
+  border-radius:9px;
+  color:#654218;
+  font-size:.9rem;
+  line-height:1.5;
+}
+.tracking-sync-warning strong { color:#744016; }

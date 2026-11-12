@@ -127,7 +127,7 @@ export function initTracking({client,escapeHtml,canManageSources=()=>false}) {
         client.from("tracking_drive_catalog").select("file_id,folder_id,source_title,status,reason,drive_modified_at,last_imported_at,automatic_import_enabled,validation_status,validation_error").order("source_title").limit(1000),
         client.from("tracking_drive_folders").select("folder_id,folder_label,classification").limit(1000),
         client.from("tracking_sync_settings").select("requested_interval_minutes,automatic_sync_enabled,auth_setup").eq("id",1).maybeSingle(),
-        client.from("tracking_sync_runs").select("state,finished_at,started_at,message,change_summary").order("started_at",{ascending:false}).limit(5),
+        client.from("tracking_sync_runs").select("source_id,state,finished_at,started_at,message,change_summary").order("started_at",{ascending:false}).limit(250),
         client.from("tracking_legacy_review").select("source_id,source_row,order_reference,order_date,reason,issues_json,review_status")
           .eq("review_status","pending").order("order_date",{ascending:false}).limit(100),
         client.from("tracking_new_work_requests").select("id,work_name,file_id,status,requested_at,review_note")
@@ -219,6 +219,22 @@ export function initTracking({client,escapeHtml,canManageSources=()=>false}) {
     }
     project.value=ids.includes(before)?before:"";
   }
+  function syncWarnings(onlySourceId="") {
+    // Usar el último resultado POR LIBRO, no sólo el último cron global.
+    const lastBySource=new Map();
+    for(const run of syncHistory) {
+      if(run.source_id && !lastBySource.has(run.source_id))lastBySource.set(run.source_id,run);
+    }
+    const troubled=[...lastBySource].filter(([id,run])=>
+      (!onlySourceId||onlySourceId===id) && (run.state==="partial"||run.state==="error"));
+    if(!troubled.length)return "";
+    const names=troubled.slice(0,5).map(([id,run])=>
+      folderName(id)+(run.state==="partial"?" (parcial)":" (error)"));
+    const suffix=troubled.length>5?" y "+(troubled.length-5)+" más":"";
+    return '<div class="tracking-sync-warning" role="status"><strong>Atención: '+troubled.length+
+      ' libro(s) con sincronización incompleta.</strong> Sus pendientes pueden no reflejar todos los cambios de Drive. '+
+      escapeHtml(names.join(" · ")+suffix)+'. Consulta Fuentes Drive para revisar las incidencias.</div>';
+  }
   function renderSources() {
     const counts={
       approved:catalog.filter(x=>x.status==="approved").length,
@@ -295,7 +311,7 @@ export function initTracking({client,escapeHtml,canManageSources=()=>false}) {
       newWorkRequests.slice(0,20).map(x=>'<div class="tracking-request-row"><strong>'+escapeHtml(x.work_name)+
       '</strong><span>'+escapeHtml(x.status==="pending"?"Pendiente de validar":x.status==="reviewed"?"Revisada":"No incorporada")+
       '</span></div>').join("")+'</div>':"";
-    list.innerHTML=headline+registerWork+requestsBlock+reviewHeader+'<div class="tracking-source-list">'+cards+'</div>';
+    list.innerHTML=headline+syncWarnings()+registerWork+requestsBlock+reviewHeader+'<div class="tracking-source-list">'+cards+'</div>';
     document.getElementById("trackingVisible").textContent=items.length+" libros identificados";
   }
   // Una sola selección para las tarjetas y el Excel: mismos filtros, misma ordenación.
@@ -387,7 +403,7 @@ export function initTracking({client,escapeHtml,canManageSources=()=>false}) {
     };
     const shown=visible.slice(0,300);
     const overflow=visible.length>300?'<p class="tracking-empty">Mostrando los 300 primeros. Acota el rango para ver más.</p>':"";
-    list.innerHTML=shown.map(renderCard).join("")+overflow;
+    list.innerHTML=syncWarnings(project.value)+shown.map(renderCard).join("")+overflow;
   }
   exportButton.addEventListener("click",async()=>{
     if(busy||!loaded||viewMode!=="queue")return;
