@@ -190,7 +190,7 @@ export function compareSource(orders,existingOrders,existingLines){
       else counters.missing_lines+=oldLines.length-nowLines.length;
     }
     // Compare by stable reference + description + occurrence index; never infer identity only by Excel row.
-    const sig=l=>String(l.reference||"").toUpperCase()+"|"+String(l.description||"").trim().toUpperCase();
+    const sig=l=>String(l.reference||"").toUpperCase()+"|"+String(l.description||"").trim().replace(/\s+/g," ").toUpperCase();
     const oldBySig=new Map();
     for(const l of oldLines){
       const k=sig(l);if(!oldBySig.has(k))oldBySig.set(k,[]);
