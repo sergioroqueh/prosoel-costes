@@ -99,7 +99,7 @@ async function runOnce(db,slot=0,forceCheck=false,preferredSourceId=null) {
  async function complete(state,message,summary={},counters={}) {
    const updates={state,message,finished_at:new Date().toISOString(),
       change_summary:{...summary,counts:counters},
-      updated_files:state==="success"&&Object.values(counters).some(v=>Number(v)>0)?1:0,
+      updated_files:(state==="success"||state==="partial")&&Object.values(counters).some(v=>Number(v)>0)?1:0,
       unchanged_files:state==="skipped"||state==="success"&&Object.values(counters).every(v=>Number(v)===0)?1:0,
       rejected_files:state==="partial"||state==="error"?1:0};
    await db.from("tracking_sync_runs").update(updates).eq("id",runId);
@@ -180,16 +180,47 @@ async function runOnce(db,slot=0,forceCheck=false,preferredSourceId=null) {
        .in("order_id",ids).order("id").range(low,high)));
    }
    const diff=compareSource(snapshot.orders,known,existingLines);
+   // Los cambios estructurales NO deben bloquear las recepciones verificadas.
+   // La RPC comprueba de nuevo en base de datos identidad de pedido y línea
+   // (fila, referencia, descripción y cantidad), y sólo acepta verde + SI.
+   // Mantiene el conflicto abierto y NO avanza la versión importada del libro.
+   async function partialReceipts(reason) {
+     const partial=await db.rpc("tracking_apply_verified_receipts",{
+       p_source_id:source.file_id,p_orders:snapshot.orders,p_run_id:runId
+     });
+     if(partial.error)throw new Error("partial_apply_rejected_"+
+       String(partial.error.message||"database").slice(0,120));
+     const result=partial.data||{};
+     const applied=Number(result.safe_receipts_applied)||0;
+     const message="Revisión estructural pendiente: "+applied+
+       " recepciones seguras aplicadas; verificar las demás diferencias.";
+     await complete("partial",message,
+       {...snapshot.summary,partial_reason:reason,partial_applied:applied},
+       {...diff.counts,safe_receipts_applied:applied,
+         unsafe_matches:Number(result.unmatched_or_conflicting)||0});
+     return {state:"needs_review",source:source.source_title,
+       safe_receipts_applied:applied,diff:diff.counts};
+   }
    if(diff.requires_review) {
-     await complete("partial","Excel modificado estructuralmente: revisión humana obligatoria.",
-       snapshot.summary,diff.counts);
-     return {state:"needs_review",source:source.source_title,diff:diff.counts};
+     return await partialReceipts("snapshot_structural_difference");
    }
    const saved=await db.rpc("tracking_apply_pilot_snapshot",{
      p_source_id:source.file_id,p_orders:snapshot.orders,p_modified_at:meta.modifiedTime,
      p_md5:meta.md5Checksum||"unavailable",p_run_id:runId
    });
-   if(saved.error)throw new Error("apply_rejected_"+String(saved.error.message||"database").slice(0,120));
+   if(saved.error) {
+     // El comparador de JS no ve todos los campos estructurales de la RPC.
+     // Evita que un único rechazo estructural bloquee recepciones seguras.
+     const code=String(saved.error.message||"");
+     const structural=new Set([
+       "existing_order_structure_changed","existing_line_identity_changed",
+       "existing_order_lines_missing","existing_order_line_missing",
+       "source_order_removed_or_renamed","non_appended_new_order",
+       "received_line_reopened_requires_review","order_completion_not_equal_to_lines"
+     ]);
+     if(structural.has(code))return await partialReceipts(code);
+     throw new Error("apply_rejected_"+code.slice(0,120));
+   }
    const updated=saved.data||{};
    await complete("success","Fuente comprobada y actualización atómica confirmada.",
      snapshot.summary,updated);
