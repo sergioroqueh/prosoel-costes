@@ -99,7 +99,8 @@ async function runOnce(db,slot=0,forceCheck=false,preferredSourceId=null) {
  async function complete(state,message,summary={},counters={}) {
    const updates={state,message,finished_at:new Date().toISOString(),
       change_summary:{...summary,counts:counters},
-      updated_files:(state==="success"||state==="partial")&&Object.values(counters).some(v=>Number(v)>0)?1:0,
+      updated_files:((state==="success"&&Object.values(counters).some(v=>Number(v)>0))||
+        (state==="partial"&&Number(counters.safe_receipts_applied)>0))?1:0,
       unchanged_files:state==="skipped"||state==="success"&&Object.values(counters).every(v=>Number(v)===0)?1:0,
       rejected_files:state==="partial"||state==="error"?1:0};
    await db.from("tracking_sync_runs").update(updates).eq("id",runId);
