@@ -25,6 +25,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Verify LGA calculator
+        run: node --test tests/lga_20261117.test.mjs
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
