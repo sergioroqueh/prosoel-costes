@@ -1,0 +1,37 @@
+/* LGA: isolated styles, corporate PROSOEL palette. */
+#lgaWorkspace{color:#173653}
+.lga-head,.lga-result-head,.lga-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.lga-head,.lga-result,.lga-table-card,.lga-notes,.lga-form fieldset{background:#fff;border:1px solid #cddded;border-radius:14px;padding:20px;margin:0 0 16px;box-shadow:0 5px 20px #12365708}
+.lga-head{border-top:3px solid #fa7948}
+.lga-head h2,.lga-result h3,.lga-table-card h3{margin:4px 0 8px;color:#123d70}
+.lga-head p,.lga-hint,.lga-note{font-size:.88rem;color:#536b83;margin:6px 0 12px;line-height:1.5}
+.lga-kicker{font-size:.72rem;font-weight:800;letter-spacing:.12em;color:#164475}
+.lga-private,.lga-status{border-radius:8px;padding:7px 11px;font-size:.8rem;font-weight:700;background:#eef4fa;border:1px solid #d0e0ef}
+.lga-form-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:16px;align-items:start}
+.lga-form fieldset{min-width:0}.lga-form legend{font-weight:800;color:#154170;padding:0 8px}
+.lga-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.lga-fields label{display:grid;gap:5px;font-size:.82rem;font-weight:650;color:#234666;min-width:0}
+.lga-fields input,.lga-fields select{width:100%;min-width:0;box-sizing:border-box;border:1px solid #c8d9eb;border-radius:8px;background:#fffbeb;color:#173653;padding:10px;font:inherit;font-weight:500}
+.lga-fields input:focus,.lga-fields select:focus{outline:2px solid #fa7948;outline-offset:1px}
+.lga-load-summary{display:grid;gap:8px;background:#f0f5fb;padding:12px;border-radius:8px}
+.lga-load-summary span{display:flex;justify-content:space-between;gap:8px;font-size:.86rem}
+.lga-actions{justify-content:flex-start;margin:0 0 20px}
+.lga-actions button{cursor:pointer;border:1px solid #bacde2;border-radius:9px;padding:10px 16px;font-weight:700;font:inherit}
+.lga-actions button[type=submit]{background:#134079;color:white;border-color:#134079}
+.lga-actions .secondary-button{color:#134079;background:white}
+.lga-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.lga-metrics>div{display:grid;gap:6px;border:1px solid #dce7f2;border-radius:9px;padding:12px;background:#f6f9fd;min-width:0}
+.lga-metrics>div:first-child{border-color:#fc9d78;background:#fff5ee}
+.lga-metrics span{font-size:.75rem;color:#536b83}.lga-metrics strong{font-size:1.12rem;color:#134079;overflow-wrap:anywhere}
+.lga-pass{color:#17623c;background:#e7f5eb}.lga-fail{color:#9e391f;background:#fff0e9}
+.lga-check{display:inline-block;padding:3px 8px;border-radius:6px;font-weight:700}
+.lga-alert{color:#9e391f}.lga-scroll{overflow-x:auto}
+.lga-scroll table{border-collapse:collapse;width:100%;font-size:.78rem;white-space:nowrap}
+.lga-scroll th,.lga-scroll td{text-align:right;padding:9px;border-bottom:1px solid #e1e9f3}
+.lga-scroll thead th{background:#eaf1f9;color:#173f6e}
+.lga-scroll th:first-child,.lga-scroll td:last-child{text-align:left}
+.lga-scroll tr.lga-selected{background:#fff2e8;font-weight:700}
+.lga-notes summary{cursor:pointer;font-weight:700;color:#134079}
+.lga-notes p{font-size:.86rem;line-height:1.6;color:#536b83}
+@media(max-width:850px){.lga-form-grid{grid-template-columns:1fr}.lga-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:460px){.lga-fields{grid-template-columns:1fr}.lga-head,.lga-result,.lga-table-card,.lga-form fieldset{padding:14px}}

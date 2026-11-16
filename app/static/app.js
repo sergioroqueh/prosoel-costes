@@ -9,6 +9,8 @@ import { fetchSupplierOfferRefsMap, supplierOfferRefsHtml } from "./supplier_off
 import { latestPricedPurchase, sortPurchasesNewestFirst } from "./purchase_ordering.js?v=20261106-last-net-date-v1";
 import { initUnifyReferences } from "./unify_references.js?v=20261111-unify-v1";
 
+import { initLga } from "./lga.js?v=20261117-v1";
+
 const supabase = createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY,
@@ -87,6 +89,8 @@ const trackingTab = document.getElementById("trackingTab");
 const trackingWorkspace = document.getElementById("trackingWorkspace");
 const orderLookupWorkspace = document.getElementById("orderLookupWorkspace");
 const reviewTab = document.getElementById("reviewTab");
+const lgaTab = document.getElementById("lgaTab");
+const lgaWorkspace = document.getElementById("lgaWorkspace");
 const workspaceTools = document.getElementById("workspaceTools");
 const costsWorkspace = document.getElementById("costsWorkspace");
 const reviewWorkspace = document.getElementById("reviewWorkspace");
@@ -445,6 +449,10 @@ function orderLabel(row) {
 function showLogin(message = "") {
   trackingAllowed = false;
   isSergioAdmin = false;
+  lga.close();
+  lgaWorkspace.classList.add("hidden");
+  lgaTab.classList.add("hidden");
+  lgaTab.setAttribute("aria-pressed","false");
   workspaceTools.open = false;
   workspaceTools.classList.add("hidden");
   trackingTab.classList.add("hidden");
@@ -461,6 +469,10 @@ function showApp(user) {
   trackingTab.classList.add("hidden");
   isLimitedAccount = LIMITED_ACCOUNT_EMAILS.has(String(user?.email || "").trim().toLowerCase());
   isSergioAdmin = false;
+  lga.close();
+  lgaWorkspace.classList.add("hidden");
+  lgaTab.classList.add("hidden");
+  lgaTab.setAttribute("aria-pressed","false");
   workspaceTools.open = false;
   workspaceTools.classList.add("hidden");
   activateWorkspace("costs");
@@ -489,6 +501,8 @@ async function verifyAccess(user) {
   isSergioAdmin = currentUserRole === "admin"
     && String(data.email || "").trim().toLowerCase() === SERGIO_ACCOUNT_EMAIL;
   workspaceTools.classList.toggle("hidden", !isSergioAdmin);
+  lgaTab.classList.toggle("hidden", !isSergioAdmin);
+  if (!isSergioAdmin) lga.close();
   // Gating visual despues de verificar app_users; el acceso real se protege con RLS.
   trackingAllowed = TRACKING_ACCOUNT_EMAILS.has(String(data.email || "").trim().toLowerCase());
   trackingTab.classList.toggle("hidden", !trackingAllowed);
@@ -1375,25 +1389,29 @@ const reviewRiskLabels = {
 function activateWorkspace(which) {
   // Solo Sergio (cuenta admin verificada) ve y puede abrir Normalización.
   const reviewing = which === "review" && isSergioAdmin;
+  const lgaView = which === "lga" && isSergioAdmin;
   const importing = which === "import" && currentUserRole === "admin";
   const lookingUpOrder = which === "orders";
   const trackingView = which === "tracking" && trackingAllowed;
-  const costs = !reviewing && !importing && !lookingUpOrder && !trackingView;
+  const costs = !reviewing && !importing && !lookingUpOrder && !trackingView && !lgaView;
   costsWorkspace.classList.toggle("hidden", !costs);
   orderLookupWorkspace.classList.toggle("hidden", !lookingUpOrder);
   trackingWorkspace.classList.toggle("hidden", !trackingView);
   reviewWorkspace.classList.toggle("hidden", !reviewing);
+  lgaWorkspace.classList.toggle("hidden", !lgaView);
   importWorkspace.classList.toggle("hidden", !importing);
   costsTab.classList.toggle("is-active", costs);
   orderLookupTab.classList.toggle("is-active", lookingUpOrder);
   trackingTab.classList.toggle("is-active", trackingView);
-  workspaceTools.classList.toggle("is-current", reviewing);
+  workspaceTools.classList.toggle("is-current", reviewing || lgaView);
   workspaceTools.open = false;
   importTab.classList.toggle("is-active", importing);
   costsTab.setAttribute("aria-selected", String(costs));
   orderLookupTab.setAttribute("aria-selected", String(lookingUpOrder));
   trackingTab.setAttribute("aria-selected", String(trackingView));
   reviewTab.setAttribute("aria-pressed", String(reviewing));
+  lgaTab.setAttribute("aria-pressed", String(lgaView));
+  if (lgaView) lga.open();
   importTab.setAttribute("aria-selected", String(importing));
   if (reviewing && !reviewLoaded) runReviewSearch();
   if (importing && !importAuditLoaded) loadImportDashboard();
@@ -2305,6 +2323,7 @@ costsTab.addEventListener("click", () => activateWorkspace("costs"));
 orderLookupTab.addEventListener("click", () => activateWorkspace("orders"));
 trackingTab.addEventListener("click", () => { if (trackingAllowed) activateWorkspace("tracking"); });
 reviewTab.addEventListener("click", () => activateWorkspace("review"));
+lgaTab.addEventListener("click", () => { if (isSergioAdmin) activateWorkspace("lga"); });
 importTab.addEventListener("click", () => activateWorkspace("import"));
 reviewMoreButton.addEventListener("click", () => runReviewSearch({ append: true }));
 reviewRisk.addEventListener("change", () => runReviewSearch());
@@ -2904,5 +2923,7 @@ const orderLookup = initOrderLookup({
 });
 
 const tracking = initTracking({client:supabase,escapeHtml,canManageSources:()=>trackingAllowed&&currentUserRole==="admin"});
+
+const lga = initLga({container:lgaWorkspace,canOpen:()=>isSergioAdmin});
 
 bootstrapSession();
