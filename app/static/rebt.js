@@ -16,13 +16,13 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
   let userId = null, loaded = false, selectedId = null, selectedAnswer = null, checked = false, saving = false;
   let records = new Map(), filter = "all", search = "", message = "";
   let loadPromise = null, authGeneration = 0;
-  let libraryScrollTop = 0, topicFilter = "all";
+  let libraryScrollTop = 0, topicFilter = "all", resetLibraryOnRender = false;
   const allowed = () => Boolean(userId && canOpen());
   const progress = (id) => records.get(id) || {lesson_id:id,completed_at:null,favorite:false,last_answered_correct:null};
   function reset() {
     authGeneration++; loadPromise=null;
     userId=null;loaded=false;selectedId=null;selectedAnswer=null;checked=false;saving=false;
-    records.clear();filter="all";search="";message="";topicFilter="all";libraryScrollTop=0;
+    records.clear();filter="all";search="";message="";topicFilter="all";libraryScrollTop=0;resetLibraryOnRender=false;
     container.replaceChildren();teaser.replaceChildren();teaser.classList.add("hidden");
   }
   function setUser(user) { reset(); if (!canOpen() || !user?.id) return; userId=user.id; renderTeaser(); void load(); }
@@ -59,11 +59,11 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
     else { records.set(id,next);loaded=true;message="Progreso guardado.";renderTeaser(); }
     render();
   }
-  function list() {
+  function list({ resetScroll=false }={}) {
     const host=container.querySelector("#rebtLibrary");
     if (!host) return;
     const q=search.trim().toLocaleLowerCase("es");
-    const oldScroll = host.scrollTop || libraryScrollTop;
+    const oldScroll = resetScroll ? 0 : (host.scrollTop || libraryScrollTop);
     const items=REBT_LESSONS.filter((l)=>{
       const p=progress(l.id);
       return (topicFilter==="all" || topicFilter===l.topic) && (filter==="all" || (filter==="completed"&&p.completed_at) ||
@@ -94,7 +94,8 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
     // Preservar desplazamiento de la biblioteca y la página: recrear el DOM
     // reiniciaba scrollTop al primer elemento al elegir una lección o guardar.
     const library = container.querySelector("#rebtLibrary");
-    if (library) libraryScrollTop = library.scrollTop;
+    if (resetLibraryOnRender) libraryScrollTop = 0;
+    else if (library) libraryScrollTop = library.scrollTop;
     const pageScroll = window.scrollY;
     const focusedSearch = document.activeElement?.id === "rebtSearch";
     const searchCaret = focusedSearch ? document.activeElement.selectionStart : null;
@@ -128,11 +129,11 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
       '<button id="rebtDone" type="button">'+(p.completed_at?'✓ Marcar pendiente':'Marcar aprendida')+'</button>'+
       '<button id="rebtToday" type="button">Lección de hoy</button></div><p class="rebt-message" role="status">'+escapeHtml(message)+'</p></article></div>';
     const input=container.querySelector("#rebtSearch");
-    input.addEventListener("input",()=>{search=input.value;libraryScrollTop=0;list();});
+    input.addEventListener("input",()=>{search=input.value;libraryScrollTop=0;list({resetScroll:true});});
     container.querySelector("#rebtTopic").addEventListener("change",(event)=>{
-      topicFilter=event.target.value;libraryScrollTop=0;render();
+      topicFilter=event.target.value;resetLibraryOnRender=true;render();
     });
-    container.querySelectorAll("[data-filter]").forEach((b)=>b.addEventListener("click",()=>{filter=b.dataset.filter;render();}));
+    container.querySelectorAll("[data-filter]").forEach((b)=>b.addEventListener("click",()=>{filter=b.dataset.filter;resetLibraryOnRender=true;render();}));
     container.querySelectorAll('[name="rebtAnswer"]').forEach((b)=>b.addEventListener("change",()=>{
       selectedAnswer=Number(b.value);container.querySelector("#rebtCheck").disabled=false;
     }));
@@ -143,6 +144,7 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
     list();
     const currentLibrary=container.querySelector("#rebtLibrary");
     currentLibrary.scrollTop=libraryScrollTop;
+    resetLibraryOnRender=false;
     if (focusedSearch) {
       input.focus({preventScroll:true});
       if (searchCaret !== null) input.setSelectionRange(searchCaret,searchCaret);
