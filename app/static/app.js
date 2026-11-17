@@ -512,9 +512,10 @@ async function verifyAccess(user) {
     && String(data.email || "").trim().toLowerCase() === SERGIO_ACCOUNT_EMAIL;
   workspaceTools.classList.toggle("hidden", !isSergioAdmin);
   lgaTab.classList.toggle("hidden", !isSergioAdmin);
+  if (!isSergioAdmin) lga.close();
   rebtTab.classList.toggle("hidden", !isSergioAdmin);
   if (isSergioAdmin) rebt.setUser(user);
-  else { lga.close(); rebt.reset(); }
+  else rebt.reset();
   // Gating visual despues de verificar app_users; el acceso real se protege con RLS.
   trackingAllowed = TRACKING_ACCOUNT_EMAILS.has(String(data.email || "").trim().toLowerCase());
   trackingTab.classList.toggle("hidden", !trackingAllowed);
