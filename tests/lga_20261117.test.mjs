@@ -54,6 +54,6 @@ test("Uso habitual destacado sin duplicar entradas; ajustes de protección plega
  const app=readFileSync(new URL("../app/static/app.js",import.meta.url),"utf8");
  const html=readFileSync(new URL("../app/static/index.html",import.meta.url),"utf8");
  assert.match(app,/\.\/lga\.js\?v=20261117-layout-v2/);
- assert.match(html,/\.\/app\.js\?v=20261117-(?:layout-v2|rebt-r1)/);
+ assert.match(html,/\.\/app\.js\?v=20261117-(?:layout-v2|rebt-r\d+)/);
  assert.match(html,/\.\/lga\.css\?v=20261117-layout-v2/);
 });
