@@ -21,6 +21,13 @@ export function createBoeIndex(corpus, units) {
       textFolded:normalizeTerm(block?.text||"")};
   });
 }
+function literalAccentRegex(normalized) {
+  const accent={a:"[aáàâä]",e:"[eéèêë]",i:"[iíìîï]",o:"[oóòôö]",u:"[uúùûü]",n:"[nñ]"};
+  const special=new Set(["\\","^","$",".","|","?","*","+", "(",")","[","]","{","}"]);
+  const literal=[...normalized].map(ch=>ch===" "?"\\s+":
+    accent[ch]||(special.has(ch)?"\\"+ch:ch)).join("");
+  return new RegExp(literal,"iu");
+}
 export function findBoeText(index, query, limit=81) {
   const needle=normalizeTerm(query);
   if(!needle) return [];
@@ -36,8 +43,12 @@ export function findBoeText(index, query, limit=81) {
       if(position===-1)break;
       count++;cursor=position+needle.length;
     }
-    const start=Math.max(0,offset-70), end=Math.min(row.text.length,offset+needle.length+110);
-    const snippet=offset<0?"":(start?"…":"")+row.text.slice(start,end).trim()+(end<row.text.length?"…":"");
+    // Posiciones originales: la normalización puede alterar longitudes.
+    const match=row.text.match(literalAccentRegex(needle));
+    const sourcePosition=match?.index ?? offset;
+    const exactLength=match?.[0]?.length ?? needle.length;
+    const start=Math.max(0,sourcePosition-70),end=Math.min(row.text.length,sourcePosition+exactLength+110);
+    const snippet=sourcePosition<0?"":(start?"…":"")+row.text.slice(start,end).trim()+(end<row.text.length?"…":"");
     found.push({id:row.id,code:row.code,title:row.title,count,fromTitle:inTitle,snippet});
   }
   found.sort((a,b)=>Number(b.fromTitle)-Number(a.fromTitle)||b.count-a.count||a.code.localeCompare(b.code,"es",{numeric:true}));
