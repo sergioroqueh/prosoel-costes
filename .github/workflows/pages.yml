@@ -9,6 +9,9 @@ on:
       - "scripts/build_rebt_reader.py"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
+  schedule:
+    # Regenerar semanalmente la copia consolidada desde el BOE; si falla, no publicar.
+    - cron: "17 6 * * 1"
 
 permissions:
   contents: read

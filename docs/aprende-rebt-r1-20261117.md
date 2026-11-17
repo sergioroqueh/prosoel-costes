@@ -33,3 +33,14 @@ Pruebas R4: CI de código, regresión de navegación y Chromium escritorio/móvi
 - Las 52 ITC tienen enlace al texto oficial; no se atribuye cobertura completa a fichas internas inexistentes. Es fase inicial del desglose por apartados, tablas y excepciones.
 - Orden secuencial y progreso persistente en tabla RLS existente, sin reanudar ciclo de tests automáticamente.
 - Fuente: https://www.boe.es/buscar/act.php?id=BOE-A-2002-18099; última actualización publicada en la versión consultada: 03/09/2025.
+
+## R6 · Lector integrado y búsqueda de texto del BOE (17/11/2026)
+
+- Fuente: API de legislación consolidada de la AEBOE, `/datosabiertos/api/legislacion-consolidada/id/BOE-A-2002-18099/texto`.
+- Extracción reproducible en `scripts/build_rebt_reader.py`: de cada bloque toma la versión vigente a fecha de ejecución y convierte párrafos, tablas, notas e imágenes PNG a HTML permitido (sin scripts ni atributos activos).
+- **81 bloques completos**: 29 artículos + 52 ITC. En la prueba del 17/11/2026: 781.393 caracteres y cinco figuras. El contenido publicado puede variar con actualizaciones oficiales.
+- Copia como `app/static/rebt_legal_text.json` **generada durante despliegue**, no se confía en datos escritos o sintetizados a mano. Si la API no está disponible o faltan bloques, el despliegue falla y la web anteriormente publicada no se sustituye.
+- Búsqueda global en el cuerpo real del texto; resultados con fragmentos y número de coincidencias. Búsqueda interna por artículo con resaltado, tamaño de letra, modo ancho y enlaces al bloque de origen en el BOE.
+- Permisos: solo interfaz Sergio (validación de admin en frontend). **El texto BOE estático es público**, como ya lo es la norma; el progreso sí sigue protegido mediante RLS, sin cambios en permisos ni pedidos.
+- Reimportación automática semanal (lunes) y manual por `workflow_dispatch`; se muestra la fecha de la copia. El texto **consolidado es informativo y carece de valor jurídico**; contrastar con el diario oficial para efectos jurídicos.
+- Tests con corpus sintético y adicionalmente navegador con corpus real del BOE, verificando tablas y resultados.
