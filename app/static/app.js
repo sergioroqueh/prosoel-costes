@@ -9,7 +9,7 @@ import { fetchSupplierOfferRefsMap, supplierOfferRefsHtml } from "./supplier_off
 import { latestPricedPurchase, sortPurchasesNewestFirst } from "./purchase_ordering.js?v=20261106-last-net-date-v1";
 import { initUnifyReferences } from "./unify_references.js?v=20261111-unify-v1";
 
-import { initLga } from "./lga.js?v=20261117-v1";
+import { initLga } from "./lga.js?v=20261117-layout-v2";
 
 const supabase = createClient(
   SUPABASE_URL,
