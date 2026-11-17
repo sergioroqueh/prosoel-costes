@@ -24,3 +24,28 @@ test("frontend integrado y progreso con RLS",()=>{
  assert.match(sql,/enable row level security/);
  assert.match(sql,/user_id=auth\.uid\(\)/);assert.match(sql,/compras@prosoel\.es/);
 });
+
+test("Recorrido normativo: 29 artículos y 52 ITC, identificadores únicos y BOE directo",()=>{
+ const manifest=read("app/static/rebt_normas.js").replace("export const REBT_COURSE =","const REBT_COURSE =").replace("export const REBT_SOURCE =","const REBT_SOURCE =");
+ const items=vm.runInNewContext(manifest+"\nREBT_COURSE;");
+ assert.equal(items.length,81);
+ assert.equal(items.filter(x=>x.type==="art").length,29);
+ assert.equal(items.filter(x=>x.type==="itc").length,52);
+ assert.equal(new Set(items.map(x=>x.id)).size,81);
+ assert.equal(items[0].code,"Artículo 1");
+ assert.equal(items[29].code,"ITC-BT-01");
+ for(const x of items){
+  assert.match(x.id,/^N-(ART|ITC)-\d\d$/);
+  assert.match(x.sourceUrl,/^https:\/\/www\.boe\.es\/buscar\/act\.php\?id=BOE-A-2002-18099#/);
+  if(x.readMode==="synopsis") assert.ok(x.summary&&x.points.length);
+  else assert.equal(x.readMode,"official");
+ }
+});
+test("R5 mantiene los repasos de 88 aparte de las fichas normativas",()=>{
+ const main=read("app/static/rebt.js"), old=read("app/static/rebt_legacy.js");
+ assert.match(main,/initRebtLegacy/);
+ assert.match(main,/id="rebt5Norm"/);
+ assert.match(main,/N-\(ART\|ITC\)/);
+ assert.match(old,/REBT_LESSONS\.filter/);
+ assert.match(main,/He consultado el texto completo/);
+});
