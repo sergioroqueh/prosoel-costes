@@ -1,0 +1,22 @@
+/* Aprende REBT · estilos aislados */
+.rebt-teaser{display:flex;justify-content:space-between;align-items:center;gap:16px;background:#edf4fb;border:1px solid #cedded;border-left:4px solid #ed7345;border-radius:12px;padding:15px;margin-bottom:18px}
+.rebt-teaser-copy{display:grid;gap:4px}.rebt-teaser-copy small{font-weight:800;color:#b45a34;letter-spacing:.08em}.rebt-teaser-copy strong{color:#154475}.rebt-teaser-copy span{font-size:.8rem;color:#617a92}
+.rebt-primary{border:0;border-radius:8px;background:#134079;color:white;font-weight:750;padding:11px 15px;cursor:pointer}.rebt-primary:disabled{opacity:.5;cursor:default}
+.rebt-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:20px;background:white;border:1px solid #dbe5ee;border-top:4px solid #ed7345;border-radius:12px}
+.rebt-head span{font-size:.7rem;letter-spacing:.11em;color:#b75d35;font-weight:800}.rebt-head h2{margin:5px 0;color:#164477}.rebt-head p{margin:0;color:#647b92}.rebt-head>strong{font-size:.8rem;background:#edf4fb;color:#164477;padding:8px;border-radius:8px;white-space:nowrap}
+.rebt-count{font-size:.9rem;color:#496681;margin:13px 0}.rebt-layout{display:grid;grid-template-columns:minmax(240px,.85fr) minmax(0,1.6fr);gap:17px;align-items:start}
+.rebt-library,.rebt-lesson{background:#fff;border:1px solid #d7e3ee;border-radius:12px;padding:19px;min-width:0}
+.rebt-library h3,.rebt-lesson h3{margin:0 0 14px;color:#184576}.rebt-lesson h3{font-size:1.5rem}
+.rebt-library input{width:100%;padding:10px;border:1px solid #bed1e2;border-radius:8px}
+.rebt-filters{display:flex;flex-wrap:wrap;gap:5px;margin:12px 0}.rebt-filters button{font-size:.78rem;padding:7px 9px;border-radius:7px;background:#f6f9fc;border:1px solid #d0dfed;color:#365c7e;cursor:pointer}.rebt-filters button.active{background:#134079;color:#fff}
+.rebt-list{max-height:65vh;overflow:auto;display:grid;gap:6px}.rebt-list-button{display:flex;justify-content:space-between;gap:8px;text-align:left;padding:11px;background:#fff;border:1px solid #dfebf3;border-radius:8px;color:#1b4165;cursor:pointer}.rebt-list-button.active{border-color:#ef875c;background:#fff6f0}
+.rebt-list-button strong{display:block;font-size:.85rem}.rebt-list-button small{display:block;margin-top:4px;color:#677f95;font-size:.72rem}
+.rebt-lesson>small{font-weight:750;color:#70869a}.rebt-summary{line-height:1.65;color:#294a69}
+.rebt-case{background:#fff4eb;border-left:3px solid #ed7345;border-radius:0 9px 9px 0;padding:15px;margin:18px 0}.rebt-case p{margin:8px 0 0;line-height:1.6}.rebt-case strong{color:#984520}
+.rebt-quiz{background:#f5f9fd;border:1px solid #d6e5f1;border-radius:10px;padding:16px;margin:18px 0}.rebt-quiz h4{margin:0;color:#1c4c7b}.rebt-quiz p{line-height:1.5}
+.rebt-answer{display:flex;gap:8px;align-items:center;background:white;border:1px solid #d3e0ea;border-radius:8px;padding:10px;margin-bottom:7px;cursor:pointer}.rebt-answer.right{border-color:#75ad8d;background:#edf8ef}.rebt-answer.wrong{border-color:#e99a7a;background:#fff1eb}
+.rebt-quiz p.correct{color:#287346}.rebt-quiz p.incorrect{color:#a05029}
+.rebt-links{display:grid;gap:7px;background:#f9fbfd;border:1px solid #e2ebf3;padding:14px;border-radius:10px}.rebt-links a{color:#14518c;font-weight:700}.rebt-links small{color:#62778a}
+.rebt-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.rebt-actions button{background:white;color:#164477;border:1px solid #c2d3e2;border-radius:8px;padding:10px;font-weight:700;cursor:pointer}.rebt-message{font-size:.81rem;min-height:1em;color:#a3522b}
+@media(max-width:900px){.rebt-layout{grid-template-columns:1fr}.rebt-lesson{order:0}.rebt-library{order:1}.rebt-list{max-height:220px}}
+@media(max-width:560px){.rebt-teaser{flex-direction:column;align-items:stretch}.rebt-primary{width:100%}.rebt-head,.rebt-library,.rebt-lesson{padding:14px}.rebt-lesson h3{font-size:1.28rem}}
