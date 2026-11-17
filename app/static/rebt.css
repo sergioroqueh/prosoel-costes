@@ -28,3 +28,80 @@
 .rebt-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.rebt-actions button{background:white;color:#164477;border:1px solid #c2d3e2;border-radius:8px;padding:10px;font-weight:700;cursor:pointer}.rebt-message{font-size:.81rem;min-height:1em;color:#a3522b}
 @media(max-width:900px){.rebt-layout{grid-template-columns:1fr}.rebt-lesson{order:0}.rebt-library{order:1}.rebt-list{max-height:220px}}
 @media(max-width:560px){.rebt-teaser{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;flex-wrap:nowrap;gap:7px}.rebt-teaser-copy{flex:1 1 auto;min-width:0;flex-wrap:nowrap;overflow:hidden;gap:5px}.rebt-teaser-copy small{flex:0 0 auto}.rebt-teaser-copy strong{max-width:none;min-width:0;flex:1 1 auto}.rebt-teaser-copy span{display:none}.rebt-teaser .rebt-primary{width:auto;flex:0 0 auto}.rebt-primary{width:100%}.rebt-head,.rebt-library,.rebt-lesson{padding:14px}.rebt-lesson h3{font-size:1.28rem}}
+
+
+/* R5 · lectura normativa secuencial. La biblioteca antigua conserva sus estilos. */
+.rebt5-app{max-width:1400px;margin:0 auto;color:#183b60}
+.rebt5-top{display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:1px solid #d7e3ef;padding:12px 5px 15px}
+.rebt5-top h2{font-size:1.55rem;line-height:1.25;margin:6px 0;color:#143e69}
+.rebt5-top p{font-size:.89rem;margin:0;color:#667c90}
+.rebt5-top small{font-size:.68rem;font-weight:800;letter-spacing:.11em;color:#a95436}
+.rebt5-owner{font-size:.74rem;font-weight:750;background:#f3f7fb;border-radius:7px;padding:7px 9px;color:#526e89;white-space:nowrap}
+.rebt5-switch{display:flex;flex-wrap:wrap;gap:7px;margin:15px 0}
+.rebt5-switch button{font:inherit;font-size:.83rem;font-weight:750;border:1px solid #cedcea;border-radius:9px;padding:10px 14px;background:#f9fbff;color:#365977;cursor:pointer}
+.rebt5-switch button.is-current{background:#174574;border-color:#174574;color:white}
+.rebt5-progress{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:13px 0 17px;color:#506982;font-size:.87rem}
+.rebt5-progress strong{color:#18477a}.rebt5-progress small{display:block;color:#7f92a2;margin-top:3px;font-size:.73rem}
+.rebt5-bar{flex:0 1 290px;height:8px;overflow:hidden;background:#e7eef4;border-radius:20px}
+.rebt5-bar span{display:block;height:100%;background:#e97a4b;border-radius:20px;transition:width .15s}
+.rebt5-layout{display:grid;grid-template-columns:minmax(230px,.8fr) minmax(0,1.8fr);align-items:start;gap:16px}
+.rebt5-contents,.rebt5-detail{background:white;border:1px solid #d8e5f0;border-radius:12px;min-width:0;padding:18px}
+.rebt5-contents{position:relative}
+.rebt5-toc-heading{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px}
+.rebt5-toc-heading strong{font-size:.94rem;color:#194671}
+.rebt5-toc-heading small{font-size:.72rem;color:#8293a2}
+#rebt5Search{display:block;width:100%;padding:10px 12px;border:1px solid #ccd9e6;border-radius:8px;background:white}
+.rebt5-filters{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.rebt5-filters button{padding:7px 9px;font-size:.75rem;border-radius:7px;border:1px solid #d4dfe9;background:#f8fafc;color:#41637e;cursor:pointer}
+.rebt5-filters button.is-current{background:#194671;color:white;border-color:#194671}
+.rebt5-toc{max-height:60vh;overflow:auto;overscroll-behavior:contain;overflow-anchor:none;display:grid;gap:5px}
+.rebt5-group-label{font-size:.68rem;letter-spacing:.08em;font-weight:800;color:#a65b3e;padding:13px 4px 4px}
+.rebt5-unit{width:100%;display:flex;align-items:center;justify-content:space-between;gap:9px;text-align:left;border:1px solid #e0e9f1;border-radius:8px;background:#fff;color:#2b4b6c;padding:10px;cursor:pointer}
+.rebt5-unit.selected{border-color:#ea8a60;background:#fff8f2}
+.rebt5-unit strong{display:block;font-size:.83rem}.rebt5-unit small{display:block;color:#688298;font-size:.75rem;margin-top:3px}
+.rebt5-mark{color:#cc753e;font-size:1.05rem;flex:0 0 auto}
+.rebt5-detail{padding:24px}
+.rebt5-detail h3{font-size:1.45rem;line-height:1.35;margin:7px 0;color:#194574}
+.rebt5-path{color:#b55e38;font-size:.72rem;letter-spacing:.06em;font-weight:850;text-transform:uppercase}
+.rebt5-source-date{font-size:.75rem;color:#7a90a1;margin:8px 0 18px}
+.rebt5-primary{padding:17px;border-radius:10px;background:#f3f8fc;border:1px solid #dbe8f2}
+.rebt5-primary>strong{color:#194d7c}.rebt5-primary p{font-size:.87rem;color:#59748a;margin:7px 0 11px}
+.rebt5-official-link{display:inline-block;color:#14528c!important;font-size:.9rem;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.rebt5-synthesis-note{font-size:.76rem;line-height:1.5;color:#8b5d42;margin:14px 0}
+.rebt5-reading{margin:16px 0;padding:4px 0;line-height:1.65;font-size:.93rem}
+.rebt5-reading h4{font-size:1.04rem;margin:4px 0 12px;color:#183f6a}
+.rebt5-reading p{color:#355570}
+.rebt5-reading ul{margin:10px 0 16px;padding-left:22px}
+.rebt5-reading li{margin:6px 0;color:#344f6b}
+.rebt5-source-mode{background:#fcfaf7;border-left:3px solid #da9b78;border-radius:0 10px 10px 0;padding:13px 16px}
+.rebt5-source-mode p{margin:8px 0}
+.rebt5-confirm{border-top:1px solid #e4ebf2;padding-top:15px;margin-top:20px}
+.rebt5-confirm label{display:flex;align-items:flex-start;gap:10px;font-size:.86rem;font-weight:700;color:#345773}
+.rebt5-confirm input{width:18px;height:18px;flex:0 0 auto;margin:2px 0 0}
+.rebt5-buttons{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}
+.rebt5-buttons button{padding:10px 12px;border:1px solid #bfd1e0;border-radius:8px;background:white;color:#1b4a77;font-size:.83rem;font-weight:750;cursor:pointer}
+.rebt5-buttons button.rebt5-main-action{background:#164778;color:white;border-color:#164778}
+.rebt5-buttons button:disabled{opacity:.55;cursor:default}
+.rebt5-confirm small{color:#658197}
+#rebt5Status{min-height:1em;font-size:.8rem;color:#496e8b}
+.rebt5-legacy{margin-top:10px}
+@media(max-width:900px){
+ .rebt5-layout{grid-template-columns:1fr}
+ .rebt5-detail{order:0;scroll-margin-top:16px}
+ .rebt5-contents{order:1}
+ .rebt5-toc{max-height:250px}
+}
+@media(max-width:580px){
+ .rebt5-top{align-items:flex-start}.rebt5-top h2{font-size:1.3rem}.rebt5-owner{font-size:.65rem}
+ .rebt5-progress{flex-wrap:wrap}.rebt5-bar{flex:1 0 100%}
+ .rebt5-switch{flex-wrap:nowrap}.rebt5-switch button{flex:1 1 50%;font-size:.76rem;padding:8px}
+ .rebt5-contents,.rebt5-detail{padding:14px}
+ .rebt5-detail h3{font-size:1.19rem}
+}
+
+.rebt5-verbatim{background:#fff;border-left:4px solid #2d689d;border-radius:0 9px 9px 0;padding:13px 17px 12px;margin:16px 0;border-top:1px solid #e0ebf4;border-bottom:1px solid #e0ebf4;border-right:1px solid #e0ebf4}
+.rebt5-verbatim strong{color:#19446d;font-size:.86rem}
+.rebt5-verbatim blockquote{margin:10px 0 9px;padding:0;font-size:.96rem;font-weight:450;line-height:1.65;color:#203e5a;white-space:pre-wrap}
+.rebt5-verbatim small{color:#697f94;font-size:.75rem}
+.rebt5-notes{background:#f9fbfe;border:1px solid #e0eaf2;border-radius:10px;padding:13px 16px;margin:15px 0}
+.rebt5-notes summary{font-weight:750;color:#345b7f;cursor:pointer}

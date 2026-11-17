@@ -13,7 +13,7 @@ const pageHtml = String.raw`<!doctype html><html lang="es"><head><meta charset="
 <div id="rebtDailyTeaser" class="rebt-teaser hidden"></div>
 <section id="rebtWorkspace" class="rebt-workspace hidden"></section></main>
 <script type="module">
-import { initRebt } from "/app/static/rebt.js";
+import { initRebtLegacy as initRebt } from "/app/static/rebt_legacy.js";
 const store = new Map();
 const client = {from(table) {
   if (table!=="rebt_lesson_progress") throw new Error("Unexpected table "+table);

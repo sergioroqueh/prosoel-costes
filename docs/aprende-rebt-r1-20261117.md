@@ -24,3 +24,12 @@ Fuentes: https://www.boe.es/buscar/act.php?id=BOE-A-2002-18099 y https://industr
 - Fuentes: RD 842/2002 en BOE consolidado y guías no vinculantes del Ministerio. Cada microlección se identifica por ITC; revisión editorial continua antes de ampliar.
 
 Pruebas R4: CI de código, regresión de navegación y Chromium escritorio/móvil. No cambiar permisos de Sergio ni tablas de pedidos.
+
+## R5 · Nuevo método: norma por norma
+
+- Índice del BOE con **29 artículos y 52 ITC**; se conserva el archivo de **88 repasos** y su progreso independiente.
+- La lectura oficial es la acción principal: siempre enlazamos a la fuente primaria vigente y exigimos confirmación de consulta íntegra antes de registrar avance.
+- 29 artículos tienen fichas breves de orientación verificadas; 17 unidades incluyen además un **extracto literal** contrastado con el BOE (no se presenta como texto completo). Las notas de comprensión son opcionales y separadas.
+- Las 52 ITC tienen enlace al texto oficial; no se atribuye cobertura completa a fichas internas inexistentes. Es fase inicial del desglose por apartados, tablas y excepciones.
+- Orden secuencial y progreso persistente en tabla RLS existente, sin reanudar ciclo de tests automáticamente.
+- Fuente: https://www.boe.es/buscar/act.php?id=BOE-A-2002-18099; última actualización publicada en la versión consultada: 03/09/2025.
