@@ -52,7 +52,9 @@ try {
     page.on("pageerror",error=>errors.push(error.message));
     await page.goto(url,{waitUntil:"networkidle"});
     assert.equal(await page.locator("#rebtDailyTeaser").isVisible(),true,name+" teaser visible");
-    await page.getByRole("button",{name:"Estudiar ahora"}).click();
+    const teaserSize=await page.locator("#rebtDailyTeaser").boundingBox();
+    assert.ok(teaserSize.height<=45,name+" tarjeta discreta");
+    await page.getByRole("button",{name:"Leer",exact:true}).click();
     await page.locator("#rebtWorkspace h2").waitFor();
     const href = await page.locator(".rebt-links a").first().getAttribute("href");
     assert.match(href, /#ib-10$/, name+" enlace directo al BOE");
@@ -68,10 +70,29 @@ try {
     await page.locator(".rebt-quiz p.correct, .rebt-quiz p.incorrect").waitFor();
     await page.getByRole("button",{name:"☆ Añadir a favoritos"}).click();
     await page.getByRole("button",{name:"Marcar aprendida"}).click();
-    assert.match(await page.locator(".rebt-count").textContent(),/1 de 20/,name+" progress");
+    assert.match(await page.locator(".rebt-count").textContent(),/1 de 88/,name+" progress");
     await page.screenshot({path:path.join(root,"tests/rebt-screenshots",name+".png"),fullPage:true});
+    // Caso regresión: lista profunda no debe volver a la primera al seleccionar otra lección.
+    await page.getByRole("button",{name:"Todas",exact:true}).click();
+    await page.locator("#rebtLibrary").evaluate((el)=>{el.scrollTop=650;});
+    const topBefore=await page.locator("#rebtLibrary").evaluate((el)=>el.scrollTop);
+    assert.ok(topBefore>0,name+" scrolling deep library");
+    await page.locator("#rebtLibrary [data-lesson]").nth(17).click();
+    await page.waitForTimeout(100);
+    const topAfter=await page.locator("#rebtLibrary").evaluate((el)=>el.scrollTop);
+    assert.ok(topAfter>=topBefore-15,name+" preserve scroll: before="+topBefore+" after="+topAfter);
+    // Acierto y guardado también deben mantener la posición del menú.
+    await page.locator('[name="rebtAnswer"]').first().check();
+    await page.getByRole("button",{name:"Comprobar respuesta"}).click();
+    await page.locator(".rebt-quiz p.correct, .rebt-quiz p.incorrect").waitFor();
+    const topQuiz=await page.locator("#rebtLibrary").evaluate((el)=>el.scrollTop);
+    assert.ok(topQuiz>=topBefore-15,name+" preserve scroll after answer");
     await page.getByRole("button",{name:"Favoritas"}).click();
     assert.equal(await page.locator("[data-lesson]").count(),1,name+" favorites");
+    await page.locator("#rebtTopic").selectOption({label:"Previsión de cargas"});
+    assert.equal(await page.locator("[data-lesson]").count(),1,name+" topic filter conjunction");
+    await page.locator("#rebtTopic").selectOption({label:"Alumbrado exterior"});
+    assert.equal(await page.locator("[data-lesson]").count(),0,name+" topic filter exclusion");
     assert.deepEqual(errors,[],name+" browser console");
     if (name==="mobile") {
       const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);

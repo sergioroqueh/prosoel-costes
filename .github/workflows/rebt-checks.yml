@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feat/aprende-rebt-sergio-20261117
+      - feat/rebt-catalogo-ux-r4-20261117
 permissions:
   contents: read
 jobs:
