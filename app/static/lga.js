@@ -91,12 +91,12 @@ export function initLga({container,canOpen}){
       fuseDetail.textContent=r.errors.length?"El valor de CGP se comprobará cuando los datos estén completos.":"Ib "+fmt(r.ib,2)+" A · In "+fuseView+" · If "+fmt(fusingCurrent,2)+" A"+(validFuse&&d.fuse<r.ib?" · ATENCIÓN: In es menor que Ib":"");
       fuseDetail.classList.toggle("lga-fuse-live-warning",!r.errors.length&&validFuse&&d.fuse<r.ib);
       if(r.errors.length){
-        const fuseWarning=Number.isFinite(d.fuse)&&d.fuse<r.ib?'<p class="lga-fuse-warning">El fusible gG indicado ('+fmt(d.fuse,0)+' A) es inferior a la intensidad prevista Ib ('+fmt(r.ib,2)+' A). Revisa la configuración y protección.</p>':"";
-      result.innerHTML='<div class="lga-alert"><strong>Completa o revisa los datos</strong><p>'+r.errors.join(" ")+'</p></div>';
+        result.innerHTML='<div class="lga-alert"><strong>Completa o revisa los datos</strong><p>'+r.errors.join(" ")+'</p></div>';
         load.replaceChildren();comparison.replaceChildren();return;
       }
       load.innerHTML='<span>Coef. simultaneidad <strong>'+fmt(r.simult,2)+'</strong></span><span>Potencia viviendas <strong>'+fmt(r.homesPower/1000,3)+' kW</strong></span><span>Potencia total <strong>'+fmt(r.total/1000,3)+' kW</strong></span>';
       const c=r.chosen;
+      const fuseWarning=Number.isFinite(d.fuse)&&d.fuse<r.ib?'<p class="lga-fuse-warning">El fusible gG indicado ('+fmt(d.fuse,0)+' A) es inferior a la intensidad prevista Ib ('+fmt(r.ib,2)+' A). Revisa la configuración y protección.</p>':"";
       const metrics=[
         ["Sección fase usada",c?fmt(c.section,0)+" mm² · "+d.material:"Sin sección apta"],
         ["Sección automática",r.auto?fmt(r.auto.section,0)+" mm²":"Ninguna"],
