@@ -246,6 +246,8 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
     if(isSummary) {
       content='<details class="rebt5-reading rebt5-notes"><summary>Notas de comprensión (opcional)</summary>'+
         '<p>'+html(item.summary)+'</p><ul>'+item.points.map(point=>'<li>'+html(point)+'</li>').join("")+'</ul></details>';
+    } else if(corpus?.blocks[item.id]) {
+      content="";
     } else {
       content='<section class="rebt5-reading rebt5-source-mode"><h4>Lectura del texto oficial</h4>'+
         '<p>Esta instrucción todavía no tiene una ficha interna revisada apartado por apartado. Para estudiarla, abre el texto íntegro del BOE y sigue sus apartados, tablas, notas y excepciones. No se muestra un resumen inventado.</p>'+
@@ -275,7 +277,7 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
       excerpt+
       reader+
       '<div class="rebt5-primary"><strong>Fuente oficial y contraste</strong><p>El texto consolidado es informativo; para actuaciones jurídicas y técnicas, contrasta siempre la publicación oficial y la fecha de aplicación.</p>'+
-      staticLink(item)+'</div>'+
+      staticLink(block?{...item,sourceUrl:block.url}:item)+'</div>'+
       (isSummary?'<p class="rebt5-synthesis-note">Las notas de comprensión no sustituyen apartados, tablas ni excepciones.</p>':"")+
       content+
       '<div class="rebt5-confirm"><label><input type="checkbox" id="rebt5ReadAck"'+(studied?' checked':'')+
