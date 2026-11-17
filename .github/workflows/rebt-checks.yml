@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - run: node --test tests/rebt_20261117.test.mjs tests/lga_20261117.test.mjs
+      - run: node --test tests/rebt_20261117.test.mjs tests/rebt_search_20261117.test.mjs tests/lga_20261117.test.mjs
   browser:
     runs-on: ubuntu-24.04
     steps:
@@ -33,7 +33,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: rebt-r5-browser-screenshots
+          name: rebt-r6-browser-screenshots
           path: |
             tests/rebt-screenshots/*.png
             tests/rebt-normas-screenshots/*.png
