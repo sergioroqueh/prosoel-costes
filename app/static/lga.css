@@ -35,3 +35,30 @@
 .lga-notes p{font-size:.86rem;line-height:1.6;color:#536b83}
 @media(max-width:850px){.lga-form-grid{grid-template-columns:1fr}.lga-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:460px){.lga-fields{grid-template-columns:1fr}.lga-head,.lga-result,.lga-table-card,.lga-form fieldset{padding:14px}}
+
+/* Vista de trabajo frecuente: cargas y dos entradas de línea; técnicos secundarios plegados. */
+.lga-priority-grid{grid-template-columns:minmax(0,1.6fr) minmax(260px,0.95fr)}
+.lga-priority-panel{border-top:3px solid #f37b49!important}
+.lga-priority-panel legend small{font-size:.65rem;letter-spacing:.08em;color:#bc623e;background:#fff1e9;padding:4px 7px;border-radius:5px;margin-left:8px}
+.lga-quick-panel .lga-quick-fields{grid-template-columns:1fr}
+.lga-quick-panel .lga-quick-fields label{font-size:.91rem;color:#103f73}
+.lga-quick-panel .lga-quick-fields input,.lga-quick-panel .lga-quick-fields select{font-size:1.14rem;font-weight:750;padding:13px;background:#fff8ef;border:1px solid #eca580}
+.lga-advanced{border:1px solid #cfdeed;border-radius:13px;margin:0 0 16px;background:#f8fafc;overflow:hidden}
+.lga-advanced>summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 19px;list-style:none}
+.lga-advanced>summary::-webkit-details-marker{display:none}
+.lga-advanced-heading{display:grid;gap:4px}.lga-advanced-heading strong{color:#1b4872;font-weight:800}
+.lga-advanced-heading small{font-size:.81rem;color:#647c94}
+.lga-advanced-chevron{transition:transform .16s ease;font-size:1rem;color:#134079}
+.lga-advanced[open] .lga-advanced-chevron{transform:rotate(180deg)}
+.lga-advanced[open]>summary{border-bottom:1px solid #d8e4ef;background:#eaf1f8}
+.lga-advanced-content{padding:18px}
+.lga-advanced-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,1fr);gap:18px;align-items:start}
+.lga-advanced h3{margin:0 0 15px;font-size:1rem;color:#244c77}
+.lga-protection{border:1px solid #dbe6f2;border-radius:11px;background:white;padding:16px}
+.lga-protection .lga-fields{grid-template-columns:1fr}
+.lga-fuse-explainer{font-size:.86rem;line-height:1.6;color:#486681}
+.lga-fuse-live{background:#eaf3fa;color:#17436c;font-weight:700;border-radius:8px;padding:11px;font-size:.85rem}
+.lga-fuse-live-warning,.lga-fuse-warning{background:#fff1e9;border:1px solid #edc1a8;color:#934126}
+.lga-fuse-warning{padding:12px;border-radius:8px;font-weight:650}
+@media(max-width:1000px){.lga-priority-grid,.lga-advanced-grid{grid-template-columns:1fr}}
+@media(max-width:460px){.lga-advanced-content{padding:12px}.lga-advanced>summary{padding:12px}}

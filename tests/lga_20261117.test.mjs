@@ -34,3 +34,26 @@ test("Acceso de Sergio y borrado al cerrar sesión; integración sin DB",()=>{
  assert.ok(app.includes('lgaTab.classList.toggle("hidden", !isSergioAdmin)'));
  assert.doesNotMatch(source,/localStorage|sessionStorage|fetch\(|\.rpc\(/);
 });
+
+test("Uso habitual destacado sin duplicar entradas; ajustes de protección plegados",()=>{
+ assert.match(source,/lga-priority-grid/);
+ assert.match(source,/lga-quick-fields/);
+ assert.match(source,/id="lgaAdvanced"/);
+ assert.match(source,/lgaTechSummary/);
+ assert.match(source,/lgaFuseDetail/);
+ assert.match(source,/fieldsB\.filter\(\(\[key\]\)=>key==="length"\|\|key==="material"\)/);
+ assert.match(source,/fieldsB\.filter\(\(\[key\]\)=>key!=="length"&&key!=="material"&&key!=="fuse"\)/);
+ assert.match(source,/fieldsB\.filter\(\(\[key\]\)=>key==="fuse"\)/);
+ assert.match(source,/1,6 × In ≤ 1,45 × Iz/);
+ assert.match(source,/fill\(\{\.\.\.EXAMPLE,homes:0,watts:0,services:0,shops:0,garage:0,ev:0,other:0,length:""\}\)/);
+ assert.match(source,/techSummary\.textContent=/);
+ assert.match(source,/lga-fuse-warning/);
+ const style=readFileSync(new URL("../app/static/lga.css",import.meta.url),"utf8");
+ assert.match(style,/\.lga-priority-panel/);
+ assert.match(style,/\.lga-advanced\[open\]/);
+ const app=readFileSync(new URL("../app/static/app.js",import.meta.url),"utf8");
+ const html=readFileSync(new URL("../app/static/index.html",import.meta.url),"utf8");
+ assert.match(app,/\.\/lga\.js\?v=20261117-layout-v2/);
+ assert.match(html,/\.\/app\.js\?v=20261117-layout-v2/);
+ assert.match(html,/\.\/lga\.css\?v=20261117-layout-v2/);
+});

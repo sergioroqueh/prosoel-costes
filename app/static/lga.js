@@ -63,12 +63,19 @@ export function initLga({container,canOpen}){
     if(form)return true;
     container.innerHTML='<header class="lga-head"><div><span class="lga-kicker">OFICINA TÉCNICA · HERRAMIENTAS</span><h2>Cálculo de sección de LGA</h2><p>CGP → centralización de contadores · REBT ITC-BT-10 / 14 / 22</p></div><span class="lga-private">Herramienta de Sergio</span></header>'
       +'<p class="lga-note">Verificación preliminar basada en PROSOEL JUST_2 (28/10/2026). Cable RZ1-K Cu / RZ1-Al, tres unipolares cargados. No sustituye la justificación del proyecto.</p>'
-      +'<form class="lga-form" novalidate><div class="lga-form-grid"><fieldset><legend>01 · Previsión de cargas</legend><div class="lga-fields">'+fieldsA.map(inputHtml).join("")+'</div><p class="lga-hint">Recarga VE: introducir manualmente según BT-52, evitando duplicar cargas.</p><div class="lga-load-summary" id="lga-load"></div></fieldset><fieldset><legend>02 · Datos de la LGA y protección</legend><div class="lga-fields">'+fieldsB.map(inputHtml).join("")+'</div><p class="lga-hint">Centralización única: 0,5 %; parcial: 1 %. Los factores k corrigen Iz, no IB. Protección evaluada: fusible gG.</p></fieldset></div>'
+      +'<form class="lga-form" novalidate>'
+      +'<div class="lga-form-grid lga-priority-grid">'
+      +'<fieldset class="lga-priority-panel"><legend>01 · Previsión de cargas <small>USO HABITUAL</small></legend><div class="lga-fields">'+fieldsA.map(inputHtml).join("")+'</div><p class="lga-hint">Recarga VE: introducir manualmente según BT-52, evitando duplicar cargas.</p><div class="lga-load-summary" id="lga-load"></div></fieldset>'
+      +'<fieldset class="lga-priority-panel lga-quick-panel"><legend>02 · Datos de la LGA <small>USO HABITUAL</small></legend><div class="lga-fields lga-quick-fields">'+fieldsB.filter(([key])=>key==="length"||key==="material").map(inputHtml).join("")+'</div><p class="lga-hint">La longitud influye directamente en la caída de tensión; el material cambia la resistencia y la intensidad admisible.</p></fieldset>'
+      +'</div>'
+      +'<details class="lga-advanced" id="lgaAdvanced"><summary><span class="lga-advanced-heading"><strong>Configuración y protección</strong><small id="lgaTechSummary">Centralización única · fusible gG 200 A · tubo en edificio</small></span><span class="lga-advanced-chevron" aria-hidden="true">▾</span></summary>'
+      +'<div class="lga-advanced-content"><div class="lga-advanced-grid"><div class="lga-advanced-settings"><h3>Otros parámetros técnicos</h3><div class="lga-fields">'+fieldsB.filter(([key])=>key!=="length"&&key!=="material"&&key!=="fuse").map(inputHtml).join("")+'</div><p class="lga-hint">Centralización única: caída máxima 0,5 %; parcial: 1 %. Los factores k corrigen Iz, no IB.</p></div>'
+      +'<div class="lga-protection"><h3>Fusible de CGP</h3><div class="lga-fields">'+fieldsB.filter(([key])=>key==="fuse").map(inputHtml).join("")+'</div><p class="lga-fuse-explainer">Es el calibre nominal In del fusible gG situado en la CGP. Condiciona qué secciones protegen correctamente la LGA: Ib ≤ In ≤ Iz y, para In ≥ 16 A, 1,6 × In ≤ 1,45 × Iz. No cambia directamente la intensidad de consumo ni la caída de tensión.</p><p class="lga-fuse-live" id="lgaFuseDetail"></p><p class="lga-hint">Indica el fusible real o proyectado; no seleccionar solo para hacer que una sección resulte apta. Sigue pendiente la comprobación de cortocircuito y de distribuidora.</p></div></div></div></details>'
       +'<div class="lga-actions"><button type="submit">Calcular LGA</button><button type="button" data-reset="new" class="secondary-button">Nuevo cálculo</button><button type="button" data-reset="example" class="secondary-button">Cargar ejemplo del Excel</button><span class="lga-hint">Cálculo local · sin almacenamiento de datos</span></div></form>'
       +'<div class="lga-result" id="lga-result" aria-live="polite"></div><div id="lga-comparison"></div>'
       +'<details class="lga-notes"><summary>Hipótesis, alcance y fuentes</summary><p>Tablas orientativas de la Guía BT-14 (40 °C ambiente en edificio, 25 °C enterrado). Temperatura de cálculo del conductor: 90 °C por defecto. Rθ: conductividad 56 Cu / 35 Al a 20 °C y α 0,00393 / 0,00403. Modelo trifásico con reactancia editable. No se aplica el factor 1,25 de BT-40.</p><p>Neutro aconsejado igual a fase; reducción solo con estudio de desequilibrio y armónicos. Tubo mínimo de tabla 1: comprobar ocupación y requisitos de distribuidora. No se verifica Icc, poder de corte, condición adiabática, energía pasante, selectividad, CGP, RVE, trazado real ni reparto entre varias LGA.</p><p><a href="https://www.boe.es/buscar/act.php?id=BOE-A-2002-18099" target="_blank" rel="noopener noreferrer">REBT</a> · <a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_14_sep03R1.pdf" target="_blank" rel="noopener noreferrer">Guía BT-14</a> · <a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_22_oct05R1.pdf" target="_blank" rel="noopener noreferrer">Guía BT-22</a></p></details>';
     form=container.querySelector("form");
-    const result=container.querySelector("#lga-result"), comparison=container.querySelector("#lga-comparison"), load=container.querySelector("#lga-load");
+    const result=container.querySelector("#lga-result"), comparison=container.querySelector("#lga-comparison"), load=container.querySelector("#lga-load"), techSummary=container.querySelector("#lgaTechSummary"), fuseDetail=container.querySelector("#lgaFuseDetail");
     function update(){
       if(!canOpen()){close();return;}
       const d={};
@@ -77,12 +84,19 @@ export function initLga({container,canOpen}){
         d[key]=numeric.includes(key)?(el.value.trim()===""?NaN:Number(el.value)):el.value;
       }
       const r=calculateLga(d);
+      const validFuse=Number.isFinite(d.fuse)&&d.fuse>=16;
+      const fuseView=validFuse?fmt(d.fuse,0)+" A":"sin definir";
+      techSummary.textContent="Centralización "+String(d.central||"—").toLowerCase()+" · fusible gG "+fuseView+" · "+String(d.mounting||"—").toLowerCase();
+      const fusingCurrent=validFuse?d.fuse*d.ifRatio:NaN;
+      fuseDetail.textContent=r.errors.length?"El valor de CGP se comprobará cuando los datos estén completos.":"Ib "+fmt(r.ib,2)+" A · In "+fuseView+" · If "+fmt(fusingCurrent,2)+" A"+(validFuse&&d.fuse<r.ib?" · ATENCIÓN: In es menor que Ib":"");
+      fuseDetail.classList.toggle("lga-fuse-live-warning",!r.errors.length&&validFuse&&d.fuse<r.ib);
       if(r.errors.length){
         result.innerHTML='<div class="lga-alert"><strong>Completa o revisa los datos</strong><p>'+r.errors.join(" ")+'</p></div>';
         load.replaceChildren();comparison.replaceChildren();return;
       }
       load.innerHTML='<span>Coef. simultaneidad <strong>'+fmt(r.simult,2)+'</strong></span><span>Potencia viviendas <strong>'+fmt(r.homesPower/1000,3)+' kW</strong></span><span>Potencia total <strong>'+fmt(r.total/1000,3)+' kW</strong></span>';
       const c=r.chosen;
+      const fuseWarning=Number.isFinite(d.fuse)&&d.fuse<r.ib?'<p class="lga-fuse-warning">El fusible gG indicado ('+fmt(d.fuse,0)+' A) es inferior a la intensidad prevista Ib ('+fmt(r.ib,2)+' A). Revisa la configuración y protección.</p>':"";
       const metrics=[
         ["Sección fase usada",c?fmt(c.section,0)+" mm² · "+d.material:"Sin sección apta"],
         ["Sección automática",r.auto?fmt(r.auto.section,0)+" mm²":"Ninguna"],
@@ -92,14 +106,14 @@ export function initLga({container,canOpen}){
         ["Factor kT · kG · kO",fmt(r.k,4)],["Neutro mínimo BT-14",c&&c.neutral?fmt(c.neutral,0)+" mm²":"—"],
         ["Neutro recomendado",c&&c.base?fmt(c.section,0)+" mm²":"—"],["Tubo mínimo BT-14",c&&c.tube?"Ø "+fmt(c.tube,0)+" mm":"—"],
         ["Prechequeo fusible CGP",c&&c.fuseOk?"OK":"REVISAR"]];
-      result.innerHTML='<div class="lga-result-head"><h3>03 · Resultados de dimensionamiento</h3><span class="lga-status '+(r.ok?'lga-pass':'lga-fail')+'">'+(r.ok?'PRE-CHEQUEO OK*':'REVISAR')+'</span></div><div class="lga-metrics">'+metrics.map(m=>'<div><span>'+m[0]+'</span><strong>'+m[1]+'</strong></div>').join("")+'</div><p class="lga-hint">'+(r.ok?'* Pendiente de verificaciones de proyecto.':c?c.diagnosis:"Ninguna sección comercial de la tabla supera las tres comprobaciones. No extrapolar.")+'</p>';
+      result.innerHTML='<div class="lga-result-head"><h3>03 · Resultados de dimensionamiento</h3><span class="lga-status '+(r.ok?'lga-pass':'lga-fail')+'">'+(r.ok?'PRE-CHEQUEO OK*':'REVISAR')+'</span></div><div class="lga-metrics">'+metrics.map(m=>'<div><span>'+m[0]+'</span><strong>'+m[1]+'</strong></div>').join("")+'</div><p class="lga-hint">'+(r.ok?'* Pendiente de verificaciones de proyecto.':c?c.diagnosis:"Ninguna sección comercial de la tabla supera las tres comprobaciones. No extrapolar.")+'</p>'+fuseWarning;
       comparison.innerHTML='<div class="lga-table-card"><h3>04 · Comparativa de secciones comerciales</h3><div class="lga-scroll"><table><thead><tr>'+["Fase mm²","Iz base A","Iz corr. A","Rθ Ω/km","CDT V","CDT %","Térmica","CDT","Fusible gG","N mín mm²","Ø tubo mm","Margen A","Diagnóstico"].map(h=>'<th scope="col">'+h+'</th>').join("")+'</tr></thead><tbody>'+r.rows.map(t=>'<tr class="'+(c?.section===t.section?'lga-selected':'')+'"><th scope="row">'+t.section+(c?.section===t.section?' · usada':'')+'</th>'+[fmt(t.base,2),fmt(t.iz,2),fmt(t.resistance,4),fmt(t.dropV,3),fmt(t.drop,3),check(t.thermal),check(t.voltageOk),check(t.fuseOk),t.neutral||"—",t.tube||"—",fmt(t.margin,2),t.diagnosis].map(v=>'<td>'+v+'</td>').join("")+'</tr>').join("")+'</tbody></table></div></div>';
     }
     function fill(values){if(!canOpen()){close();return;}for(const [key] of [...fieldsA,...fieldsB])form.elements.namedItem(key).value=values[key]??"";update();}
     form.addEventListener("submit",e=>{e.preventDefault();update();});
     form.addEventListener("input",update);
     form.addEventListener("change",update);
-    form.querySelector('[data-reset="new"]').addEventListener("click",()=>fill({...EXAMPLE,homes:0,watts:0,length:"",fuse:63}));
+    form.querySelector('[data-reset="new"]').addEventListener("click",()=>fill({...EXAMPLE,homes:0,watts:0,services:0,shops:0,garage:0,ev:0,other:0,length:""}));
     form.querySelector('[data-reset="example"]').addEventListener("click",()=>fill(EXAMPLE));
     fill(EXAMPLE);return true;
   }
