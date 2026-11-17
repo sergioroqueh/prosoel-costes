@@ -5,9 +5,10 @@ import vm from "node:vm";
 const read = (p) => readFileSync(new URL("../"+p,import.meta.url),"utf8");
 const code=read("app/static/rebt_lessons.js").replace("export const REBT_LESSONS =","const REBT_LESSONS =");
 const lessons=vm.runInNewContext(code+"\nREBT_LESSONS;");
-test("20 lecciones únicas y citadas",()=>{
- assert.equal(lessons.length,20);
- assert.equal(new Set(lessons.map(l=>l.id)).size,20);
+test("88 lecciones únicas y citadas",()=>{
+ assert.equal(lessons.length,88);
+ assert.ok(new Set(lessons.map(l=>l.code)).size>=40);
+ assert.equal(new Set(lessons.map(l=>l.id)).size,lessons.length);
  for(const l of lessons){
   assert.match(l.code,/^ITC-BT-\d{2}$/);
   assert.ok(l.summary&&l.application&&l.question&&l.explanation);

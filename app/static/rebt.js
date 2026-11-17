@@ -1,4 +1,4 @@
-import { REBT_LESSONS } from "./rebt_lessons.js?v=20261117-r1";
+import { REBT_LESSONS } from "./rebt_lessons.js?v=20261117-r4";
 const BOE = "https://www.boe.es/buscar/act.php?id=BOE-A-2002-18099";
 const GUIDE = "https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Paginas/guia-tecnica-aplicacion.aspx";
 const escapeHtml = (v) => String(v ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
@@ -16,12 +16,13 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
   let userId = null, loaded = false, selectedId = null, selectedAnswer = null, checked = false, saving = false;
   let records = new Map(), filter = "all", search = "", message = "";
   let loadPromise = null, authGeneration = 0;
+  let libraryScrollTop = 0, topicFilter = "all", resetLibraryOnRender = false;
   const allowed = () => Boolean(userId && canOpen());
   const progress = (id) => records.get(id) || {lesson_id:id,completed_at:null,favorite:false,last_answered_correct:null};
   function reset() {
     authGeneration++; loadPromise=null;
     userId=null;loaded=false;selectedId=null;selectedAnswer=null;checked=false;saving=false;
-    records.clear();filter="all";search="";message="";
+    records.clear();filter="all";search="";message="";topicFilter="all";libraryScrollTop=0;resetLibraryOnRender=false;
     container.replaceChildren();teaser.replaceChildren();teaser.classList.add("hidden");
   }
   function setUser(user) { reset(); if (!canOpen() || !user?.id) return; userId=user.id; renderTeaser(); void load(); }
@@ -29,8 +30,8 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
     if (!allowed()) { teaser.classList.add("hidden"); return; }
     const lesson=dailyRebtLesson(), done=Boolean(progress(lesson.id).completed_at);
     teaser.classList.remove("hidden");
-    teaser.innerHTML='<div class="rebt-teaser-copy"><small>APRENDE REBT · 2 MIN AL DÍA</small><strong>'+escapeHtml(lesson.title)+
-      '</strong><span>'+escapeHtml(lesson.code)+(done?' · ✓ Aprendida':' · Lección de hoy')+'</span></div><button type="button" class="rebt-primary">Estudiar ahora</button>';
+    teaser.innerHTML='<div class="rebt-teaser-copy"><small>REBT diario</small><strong>'+escapeHtml(lesson.title)+
+      '</strong><span>'+escapeHtml(lesson.code)+(done?' · ✓ Aprendida':'')+'</span></div><button type="button" class="rebt-primary">Leer</button>';
     teaser.querySelector("button").addEventListener("click",()=>{if(allowed())onNavigate();});
   }
   async function load() {
@@ -58,13 +59,14 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
     else { records.set(id,next);loaded=true;message="Progreso guardado.";renderTeaser(); }
     render();
   }
-  function list() {
+  function list({ resetScroll=false }={}) {
     const host=container.querySelector("#rebtLibrary");
     if (!host) return;
     const q=search.trim().toLocaleLowerCase("es");
+    const oldScroll = resetScroll ? 0 : (host.scrollTop || libraryScrollTop);
     const items=REBT_LESSONS.filter((l)=>{
       const p=progress(l.id);
-      return (filter==="all" || (filter==="completed"&&p.completed_at) ||
+      return (topicFilter==="all" || topicFilter===l.topic) && (filter==="all" || (filter==="completed"&&p.completed_at) ||
         (filter==="pending"&&!p.completed_at) || (filter==="favorite"&&p.favorite)) &&
         (!q || [l.title,l.topic,l.code,l.summary].join(" ").toLocaleLowerCase("es").includes(q));
     });
@@ -74,13 +76,29 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
         escapeHtml(l.title)+'</strong><small>'+escapeHtml(l.code)+' · '+escapeHtml(l.topic)+'</small></span><span>'+
         (p.favorite?'★ ':'')+(p.completed_at?'✓':'→')+'</span></button>';
     }).join("") : '<p class="rebt-empty">No hay resultados.</p>';
+    host.scrollTop = oldScroll;
+    libraryScrollTop = host.scrollTop;
+    host.addEventListener("scroll",()=>{libraryScrollTop=host.scrollTop;},{passive:true,once:true});
     host.querySelectorAll("[data-lesson]").forEach((b)=>b.addEventListener("click",()=>{
       if (!allowed()) return;
-      selectedId=b.dataset.lesson;selectedAnswer=null;checked=false;message="";render();
+      libraryScrollTop=host.scrollTop;
+      selectedId=b.dataset.lesson;selectedAnswer=null;checked=false;message="";
+      render();
+      if (window.matchMedia("(max-width:900px)").matches) {
+        requestAnimationFrame(()=>container.querySelector(".rebt-lesson")?.scrollIntoView({behavior:"smooth",block:"start"}));
+      }
     }));
   }
   function render() {
     if (!allowed()) { container.replaceChildren(); return; }
+    // Preservar desplazamiento de la biblioteca y la página: recrear el DOM
+    // reiniciaba scrollTop al primer elemento al elegir una lección o guardar.
+    const library = container.querySelector("#rebtLibrary");
+    if (resetLibraryOnRender) libraryScrollTop = 0;
+    else if (library) libraryScrollTop = library.scrollTop;
+    const pageScroll = window.scrollY;
+    const focusedSearch = document.activeElement?.id === "rebtSearch";
+    const searchCaret = focusedSearch ? document.activeElement.selectionStart : null;
     const lesson=REBT_LESSONS.find((l)=>l.id===selectedId)||dailyRebtLesson();
     selectedId=lesson.id;
     const p=progress(lesson.id), count=[...records.values()].filter((r)=>r.completed_at).length;
@@ -90,8 +108,11 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
         (selectedAnswer===i?' checked':'')+(checked?' disabled':'')+'> '+escapeHtml(text)+'</label>';
     }).join("");
     container.innerHTML='<header class="rebt-head"><div><span>HERRAMIENTAS · FORMACIÓN</span><h2>Aprende REBT</h2><p>Microlecciones aplicadas a presupuestos eléctricos.</p></div><strong>Solo Sergio</strong></header>'+
-      '<div class="rebt-count">'+count+' de '+REBT_LESSONS.length+' lecciones completadas · Contenido piloto</div>'+
+      '<div class="rebt-count">'+count+' de '+REBT_LESSONS.length+' lecciones completadas</div>'+
       '<div class="rebt-layout"><aside class="rebt-library"><h3>Biblioteca</h3><input id="rebtSearch" type="search" placeholder="Buscar ITC o tema" value="'+escapeHtml(search)+'">'+
+      '<label class="rebt-topic-label" for="rebtTopic">Tema <select id="rebtTopic">'+
+      ['<option value="all">Todos los temas</option>',...Array.from(new Set(REBT_LESSONS.map((l)=>l.topic))).sort((a,b)=>a.localeCompare(b,"es")).map((name)=>
+      '<option value="'+escapeHtml(name)+'"'+(topicFilter===name?' selected':'')+'>'+escapeHtml(name)+'</option>')].join("")+'</select></label>'+
       '<div class="rebt-filters">'+[["all","Todas"],["pending","Pendientes"],["favorite","Favoritas"],["completed","Completadas"]].map(([key,name])=>
         '<button type="button" data-filter="'+key+'"'+(filter===key?' class="active"':'')+'>'+name+'</button>').join("")+
       '</div><div id="rebtLibrary" class="rebt-list"></div></aside><article class="rebt-lesson"><small>'+escapeHtml(lesson.code)+' · '+escapeHtml(lesson.topic)+' · 2 min</small>'+
@@ -108,8 +129,11 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
       '<button id="rebtDone" type="button">'+(p.completed_at?'✓ Marcar pendiente':'Marcar aprendida')+'</button>'+
       '<button id="rebtToday" type="button">Lección de hoy</button></div><p class="rebt-message" role="status">'+escapeHtml(message)+'</p></article></div>';
     const input=container.querySelector("#rebtSearch");
-    input.addEventListener("input",()=>{search=input.value;list();});
-    container.querySelectorAll("[data-filter]").forEach((b)=>b.addEventListener("click",()=>{filter=b.dataset.filter;render();}));
+    input.addEventListener("input",()=>{search=input.value;libraryScrollTop=0;list({resetScroll:true});});
+    container.querySelector("#rebtTopic").addEventListener("change",(event)=>{
+      topicFilter=event.target.value;resetLibraryOnRender=true;render();
+    });
+    container.querySelectorAll("[data-filter]").forEach((b)=>b.addEventListener("click",()=>{filter=b.dataset.filter;resetLibraryOnRender=true;render();}));
     container.querySelectorAll('[name="rebtAnswer"]').forEach((b)=>b.addEventListener("change",()=>{
       selectedAnswer=Number(b.value);container.querySelector("#rebtCheck").disabled=false;
     }));
@@ -118,6 +142,14 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
     container.querySelector("#rebtDone").addEventListener("click",()=>save(lesson.id,{completed_at:p.completed_at?null:new Date().toISOString()}));
     container.querySelector("#rebtToday").addEventListener("click",()=>{selectedId=dailyRebtLesson().id;selectedAnswer=null;checked=false;render();});
     list();
+    const currentLibrary=container.querySelector("#rebtLibrary");
+    currentLibrary.scrollTop=libraryScrollTop;
+    resetLibraryOnRender=false;
+    if (focusedSearch) {
+      input.focus({preventScroll:true});
+      if (searchCaret !== null) input.setSelectionRange(searchCaret,searchCaret);
+    }
+    if (!focusedSearch && Math.abs(window.scrollY-pageScroll)>2) window.scrollTo(0,pageScroll);
   }
   async function open(){if(!allowed()){reset();return false;}if(!selectedId)selectedId=dailyRebtLesson().id;await load();if(!allowed())return false;render();return true;}
   return {setUser,renderTeaser,open,reset};
