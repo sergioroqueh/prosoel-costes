@@ -33,6 +33,8 @@ test("Recorrido normativo: 29 artículos y 52 ITC, identificadores únicos y BOE
  assert.equal(items.filter(x=>x.type==="itc").length,52);
  assert.equal(new Set(items.map(x=>x.id)).size,81);
  assert.equal(items[0].code,"Artículo 1");
+ assert.ok(items.filter(x=>x.sourceExcerpt).length>=15);
+ assert.match(items[0].sourceExcerpt,/condiciones técnicas y garantías/);
  assert.equal(items[29].code,"ITC-BT-01");
  for(const x of items){
   assert.match(x.id,/^N-(ART|ITC)-\d\d$/);

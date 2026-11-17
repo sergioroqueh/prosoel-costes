@@ -98,3 +98,10 @@
  .rebt5-contents,.rebt5-detail{padding:14px}
  .rebt5-detail h3{font-size:1.19rem}
 }
+
+.rebt5-verbatim{background:#fff;border-left:4px solid #2d689d;border-radius:0 9px 9px 0;padding:13px 17px 12px;margin:16px 0;border-top:1px solid #e0ebf4;border-bottom:1px solid #e0ebf4;border-right:1px solid #e0ebf4}
+.rebt5-verbatim strong{color:#19446d;font-size:.86rem}
+.rebt5-verbatim blockquote{margin:10px 0 9px;padding:0;font-size:.96rem;font-weight:450;line-height:1.65;color:#203e5a;white-space:pre-wrap}
+.rebt5-verbatim small{color:#697f94;font-size:.75rem}
+.rebt5-notes{background:#f9fbfe;border:1px solid #e0eaf2;border-radius:10px;padding:13px 16px;margin:15px 0}
+.rebt5-notes summary{font-weight:750;color:#345b7f;cursor:pointer}

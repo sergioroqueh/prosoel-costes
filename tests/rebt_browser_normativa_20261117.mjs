@@ -61,6 +61,7 @@ try {
     assert.match(await page.locator("#rebt5Detail h3").innerText(),/Artículo 1/);
     assert.match(await page.locator(".rebt5-progress").innerText(),/0 \/ 81/);
     assert.match(await page.locator(".rebt5-official-link").getAttribute("href"),/#a1$/);
+    assert.match(await page.locator(".rebt5-verbatim blockquote").innerText(),/condiciones técnicas y garantías/);
     assert.equal(await page.getByRole("button",{name:"Registrar lectura"}).isDisabled(),true);
     await page.locator("#rebt5ReadAck").check();
     await page.getByRole("button",{name:"Registrar lectura"}).click();

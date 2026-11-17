@@ -164,17 +164,21 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
     const isSummary=item.readMode==="synopsis";
     let content;
     if(isSummary) {
-      content='<section class="rebt5-reading"><h4>Lo que establece este artículo</h4>'+
-        '<p>'+html(item.summary)+'</p><ul>'+item.points.map(point=>'<li>'+html(point)+'</li>').join("")+'</ul></section>';
+      content='<details class="rebt5-reading rebt5-notes"><summary>Notas de comprensión (opcional)</summary>'+
+        '<p>'+html(item.summary)+'</p><ul>'+item.points.map(point=>'<li>'+html(point)+'</li>').join("")+'</ul></details>';
     } else {
       content='<section class="rebt5-reading rebt5-source-mode"><h4>Lectura del texto oficial</h4>'+
         '<p>Esta instrucción todavía no tiene una ficha interna revisada apartado por apartado. Para estudiarla, abre el texto íntegro del BOE y sigue sus apartados, tablas, notas y excepciones. No se muestra un resumen inventado.</p>'+
         '</section>';
     }
+    const excerpt=item.sourceExcerpt?
+      '<div class="rebt5-verbatim"><strong>Texto reglamentario · extracto literal</strong><blockquote>'+html(item.sourceExcerpt)+
+      '</blockquote><small>Es un fragmento; no reemplaza la lectura del artículo o ITC completos.</small></div>':"";
     detailHost.innerHTML='<div class="rebt5-path">'+html(item.section)+'</div>'+
       '<h3>'+html(item.code)+' · '+html(item.title)+'</h3>'+
       '<p class="rebt5-source-date">RD 842/2002 · BOE, texto consolidado; última actualización publicada: 03/09/2025</p>'+
-      '<div class="rebt5-primary"><strong>Primero, lee la norma</strong><p>Consulta el texto oficial completo antes de dar esta unidad por estudiada.</p>'+
+      excerpt+
+      '<div class="rebt5-primary"><strong>Texto oficial íntegro</strong><p>Consulta en el BOE todos los apartados, tablas, condiciones y excepciones antes de marcar esta unidad como estudiada.</p>'+
       staticLink(item)+'</div>'+
       (isSummary?'<p class="rebt5-synthesis-note">Síntesis orientada y contrastada con el BOE: NO es una transcripción literal ni reemplaza apartados, tablas o excepciones.</p>':"")+
       content+

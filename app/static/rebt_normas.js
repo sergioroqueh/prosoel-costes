@@ -18,7 +18,8 @@ export const REBT_COURSE = [
       "Funcionamiento normal y prevención de perturbaciones.",
       "Fiabilidad técnica y eficiencia económica."
     ],
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "El presente Reglamento tiene por objeto establecer las condiciones técnicas y garantías que deben reunir las instalaciones eléctricas conectadas a una fuente de suministro en los límites de baja tensión, con la finalidad de: a) Preservar la seguridad de las personas y los bienes. b) Asegurar el normal funcionamiento de dichas instalaciones y prevenir las perturbaciones en otras instalaciones y servicios. c) Contribuir a la fiabilidad técnica y a la eficiencia económica de las instalaciones."
   },
   {
     "id": "N-ART-02",
@@ -35,7 +36,8 @@ export const REBT_COURSE = [
       "Modificaciones, reparaciones y ampliaciones: examinar el alcance y las condiciones de seguridad.",
       "Las modificaciones de importancia se relacionan, entre otros supuestos, con más del 50 % de la potencia instalada."
     ],
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "1. El presente Reglamento se aplicará a las instalaciones que distribuyan la energía eléctrica, a las generadoras de electricidad para consumo propio y a las receptoras, en los siguientes límites de tensiones nominales: a) Corriente alterna: igual o inferior a 1.000 voltios. b) Corriente continua: igual o inferior a 1.500 voltios."
   },
   {
     "id": "N-ART-03",
@@ -51,7 +53,8 @@ export const REBT_COURSE = [
       "La definición comprende producción, conversión, transformación, transmisión, distribución y utilización.",
       "No restringir el concepto a cuadros o circuitos interiores."
     ],
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "Se entiende por instalación eléctrica todo conjunto de aparatos y de circuitos asociados en previsión de un fin particular: producción, conversión, transformación, transmisión, distribución o utilización de la energía eléctrica."
   },
   {
     "id": "N-ART-04",
@@ -69,7 +72,8 @@ export const REBT_COURSE = [
       "Tensión especial: CA > 500 y ≤ 1.000 V; CC > 750 y ≤ 1.500 V.",
       "En redes trifásicas de cuatro conductores son usuales 230 V fase-neutro y 400 V entre fases."
     ],
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "4. La frecuencia empleada en la red será de 50 Hz."
   },
   {
     "id": "N-ART-05",
@@ -85,7 +89,8 @@ export const REBT_COURSE = [
       "Revisar la posibilidad de perturbaciones.",
       "No confundir esta obligación con la mera elección de secciones de cable."
     ],
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "Las instalaciones de baja tensión que pudieran producir perturbaciones sobre las telecomunicaciones, las redes de distribución de energía o los receptores, deberán estar dotadas de los adecuados dispositivos protectores, según se establece en las disposiciones vigentes relativas a esta materia."
   },
   {
     "id": "N-ART-06",
@@ -103,7 +108,8 @@ export const REBT_COURSE = [
       "Tensión y potencia o intensidad asignadas.",
       "Otras indicaciones específicas del fabricante cuando correspondan."
     ],
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "1. Los materiales y equipos utilizados en las instalaciones deberán ser utilizados en la forma y para la finalidad que fueron fabricados."
   },
   {
     "id": "N-ART-07",
@@ -119,7 +125,8 @@ export const REBT_COURSE = [
       "No aplicar automáticamente solo el REBT a equipos de tensión superior.",
       "Revisar la normativa de los elementos afectados."
     ],
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "Si en una instalación eléctrica de baja tensión se encuentran integrados circuitos o elementos sometidos a tensiones superiores a los límites definidos en este Reglamento, en ausencia de indicación específica en éste, se deberá cumplir con lo establecido en los reglamentos que regulen las instalaciones a dichas tensiones."
   },
   {
     "id": "N-ART-08",
@@ -135,7 +142,8 @@ export const REBT_COURSE = [
       "Distinguir redes unidas y no unidas directamente a tierra.",
       "Las intensidades admisibles dependen también de las protecciones y de las condiciones de red."
     ],
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "2. Las intensidades de la corriente eléctrica admisibles en los conductores se regularán en función de las condiciones técnicas de las redes de distribución y de los sistemas de protección empleados en las mismas."
   },
   {
     "id": "N-ART-09",
@@ -151,7 +159,8 @@ export const REBT_COURSE = [
       "Incluye vías de circulación y comunicación y espacios entre edificios que deban iluminarse.",
       "Considerar condiciones ambientales y el acceso de personas a los elementos."
     ],
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "Se considerarán instalaciones de alumbrado exterior las que tienen por finalidad la iluminación de las vías de circulación o comunicación y las de los espacios comprendidos entre edificaciones que, por sus características o seguridad general, deben permanecer iluminados, en forma permanente o circunstancial, sean o no de dominio público."
   },
   {
     "id": "N-ART-10",
@@ -169,7 +178,8 @@ export const REBT_COURSE = [
       "Duplicado: capaz de mantener un servicio mayor del 50 %.",
       "Los dispositivos de conmutación deben impedir el acoplamiento indebido, salvo los supuestos reglamentarios."
     ],
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "1. A efectos del presente Reglamento, los suministros se clasifican en normales y complementarios."
   },
   {
     "id": "N-ART-11",
@@ -302,7 +312,8 @@ export const REBT_COURSE = [
       "Inspección inicial por organismo de control únicamente cuando corresponda.",
       "Certificación final y justificación de variaciones respecto a la documentación."
     ],
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "a) Deberá elaborarse, previamente a la ejecución, una documentación técnica que defina las características de la instalación y que, en función de sus características, según determine la correspondiente ITC, revestirá la forma de proyecto o memoria técnica."
   },
   {
     "id": "N-ART-19",
@@ -319,7 +330,8 @@ export const REBT_COURSE = [
       "El esquema unifilar y croquis del trazado forman parte de la información mínima.",
       "Las modificaciones pueden requerir completar la documentación."
     ],
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "Como anexo al certificado de instalación que se entregue al titular de cualquier instalación eléctrica, la empresa instaladora deberá confeccionar unas instrucciones para el correcto uso y mantenimiento de la misma."
   },
   {
     "id": "N-ART-20",
@@ -335,7 +347,8 @@ export const REBT_COURSE = [
       "El mantenimiento es una obligación del titular.",
       "Las modificaciones corresponden a empresa instaladora habilitada."
     ],
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "Los titulares de las instalaciones deberán mantener en buen estado de funcionamiento sus instalaciones, utilizándolas de acuerdo con sus características y absteniéndose de intervenir en las mismas para modificarlas. Si son necesarias modificaciones, éstas deberán ser efectuadas por una empresa instaladora."
   },
   {
     "id": "N-ART-21",
@@ -383,7 +396,8 @@ export const REBT_COURSE = [
       "Los mínimos reglamentarios son obligatorios.",
       "La técnica equivalente exige justificación y aprobación administrativa, no decisión unilateral."
     ],
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "2. Las prescripciones establecidas en el presente Reglamento tendrán la condición de mínimos obligatorios, en el sentido de lo indicado por el artículo 12.5 de la Ley 21/1992, de Industria."
   },
   {
     "id": "N-ART-24",
@@ -400,7 +414,8 @@ export const REBT_COURSE = [
       "La solicitud requiere motivos y medidas alternativas.",
       "El silencio administrativo tiene sentido desestimatorio."
     ],
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "El citado órgano competente podrá desestimar la solicitud, requerir la modificación de las medidas alternativas o conceder la autorización de excepción, que será siempre expresa, entendiéndose el silencio administrativo como desestimatorio."
   },
   {
     "id": "N-ART-25",
@@ -481,7 +496,8 @@ export const REBT_COURSE = [
       "La guía complementa la interpretación, no reemplaza las obligaciones reglamentarias.",
       "Separar fuente obligatoria y orientación técnica."
     ],
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "El centro directivo competente en materia de Seguridad Industrial del Ministerio de Ciencia y Tecnología elaborará y mantendrá actualizada una Guía técnica, de carácter no vinculante, para la aplicación práctica de las previsiones del presente Reglamento y sus instrucciones técnicas complementarias, la cual podrá establecer aclaraciones a conceptos de carácter general incluidos en este Reglamento."
   },
   {
     "id": "N-ITC-01",
@@ -635,7 +651,8 @@ export const REBT_COURSE = [
     "sourceUrl": "https://www.boe.es/buscar/act.php?id=BOE-A-2002-18099#ib-14",
     "sourceRef": "ITC-BT-14",
     "readMode": "official",
-    "reviewedOn": "2026-11-17"
+    "reviewedOn": "2026-11-17",
+    "sourceExcerpt": "El trazado de la línea general de alimentación será lo más corto y rectilíneo posible, discurriendo por zonas de uso común."
   },
   {
     "id": "N-ITC-15",
