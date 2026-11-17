@@ -19,16 +19,22 @@ jobs:
           node-version: "22"
       - run: node --test tests/rebt_20261117.test.mjs tests/rebt_search_20261117.test.mjs tests/lga_20261117.test.mjs
   browser:
+    needs: legal-corpus
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - uses: actions/download-artifact@v4
+        with:
+          name: boe-rebt-corpus-r6
+          path: app/static
       - run: npm install --no-save --package-lock=false playwright@1.56.1
       - run: npx playwright install --with-deps chromium
       - run: node tests/rebt_browser_20261117.mjs
       - run: node tests/rebt_browser_normativa_20261117.mjs
+      - run: node tests/rebt_browser_realtext_20261117.mjs
       - name: Guardar capturas de navegador
         if: always()
         uses: actions/upload-artifact@v4
@@ -37,6 +43,7 @@ jobs:
           path: |
             tests/rebt-screenshots/*.png
             tests/rebt-normas-screenshots/*.png
+            tests/rebt-real-screenshots/*.png
           if-no-files-found: ignore
 
   legal-corpus:
