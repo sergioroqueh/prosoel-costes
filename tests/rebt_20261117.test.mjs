@@ -49,5 +49,5 @@ test("R5 mantiene los repasos de 88 aparte de las fichas normativas",()=>{
  assert.match(main,/id="rebt5Norm"/);
  assert.match(main,/N-\(ART\|ITC\)/);
  assert.match(old,/REBT_LESSONS\.filter/);
- assert.match(main,/He consultado el texto completo/);
+ assert.match(main,/He leído el texto completo de esta unidad/);
 });
