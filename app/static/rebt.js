@@ -231,6 +231,9 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
     if(!allowed())return false;
     mount();renderView();await loadProgress();
     if(!allowed())return false;
+    // Congelar la unidad abierta: completar una lectura no debe cambiar el panel
+    // automáticamente antes de pulsar "Ir al siguiente apartado".
+    if(!selectedId)selectedId=nextPending().id;
     renderView();return true;
   }
   return {reset,setUser,open,renderTeaser:showTeaser};
