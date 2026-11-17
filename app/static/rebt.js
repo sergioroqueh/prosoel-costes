@@ -22,7 +22,7 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
     records.clear();filter="all";search="";message="";
     container.replaceChildren();teaser.replaceChildren();teaser.classList.add("hidden");
   }
-  function setUser(user) { reset(); if (!canOpen() || !user?.id) return; userId=user.id; renderTeaser(); }
+  function setUser(user) { reset(); if (!canOpen() || !user?.id) return; userId=user.id; renderTeaser(); void load(); }
   function renderTeaser() {
     if (!allowed()) { teaser.classList.add("hidden"); return; }
     const lesson=dailyRebtLesson(), done=Boolean(progress(lesson.id).completed_at);
@@ -95,9 +95,9 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
       (checked?'<p class="'+(selectedAnswer===lesson.correct?'correct':'incorrect')+'">'+
         (selectedAnswer===lesson.correct?'✓ Correcto. ':'Revisar: ')+escapeHtml(lesson.explanation)+'</p>':'')+
       '<button class="rebt-primary" id="rebtCheck" type="button"'+(selectedAnswer===null||checked||saving?' disabled':'')+'>Comprobar respuesta</button></section>'+
-      '<div class="rebt-links"><strong>Fuente: '+escapeHtml(lesson.code)+'</strong><a href="'+BOE+'" target="_blank" rel="noopener noreferrer">REBT consolidado · BOE</a>'+
+      '<div class="rebt-links"><strong>Fuente: '+escapeHtml(lesson.code)+'</strong><a href="'+BOE+"#ib-"+Number(lesson.code.slice(-2))+'" target="_blank" rel="noopener noreferrer">Abrir '+escapeHtml(lesson.code)+' en el BOE</a>'+
       '<a href="'+GUIDE+'" target="_blank" rel="noopener noreferrer">Guías del Ministerio (no vinculantes)</a>'+
-      '<small>Lectura divulgativa. Comprobar siempre la norma vigente y las condiciones del proyecto. Revisado: '+lesson.reviewedOn+'</small></div>'+
+      '<small>Lectura divulgativa. El texto consolidado del BOE es informativo: para justificaciones formales, consultar la publicación oficial. Comprobar vigencia y condiciones del proyecto. Revisado: '+lesson.reviewedOn+'</small></div>'+
       '<div class="rebt-actions"><button id="rebtFav" type="button">'+(p.favorite?'★ Favorita':'☆ Añadir a favoritos')+'</button>'+
       '<button id="rebtDone" type="button">'+(p.completed_at?'✓ Marcar pendiente':'Marcar aprendida')+'</button>'+
       '<button id="rebtToday" type="button">Lección de hoy</button></div><p class="rebt-message" role="status">'+escapeHtml(message)+'</p></article></div>';

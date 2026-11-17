@@ -18,5 +18,5 @@
 .rebt-quiz p.correct{color:#287346}.rebt-quiz p.incorrect{color:#a05029}
 .rebt-links{display:grid;gap:7px;background:#f9fbfd;border:1px solid #e2ebf3;padding:14px;border-radius:10px}.rebt-links a{color:#14518c;font-weight:700}.rebt-links small{color:#62778a}
 .rebt-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.rebt-actions button{background:white;color:#164477;border:1px solid #c2d3e2;border-radius:8px;padding:10px;font-weight:700;cursor:pointer}.rebt-message{font-size:.81rem;min-height:1em;color:#a3522b}
-@media(max-width:900px){.rebt-layout{grid-template-columns:1fr}.rebt-list{max-height:220px}}
+@media(max-width:900px){.rebt-layout{grid-template-columns:1fr}.rebt-lesson{order:0}.rebt-library{order:1}.rebt-list{max-height:220px}}
 @media(max-width:560px){.rebt-teaser{flex-direction:column;align-items:stretch}.rebt-primary{width:100%}.rebt-head,.rebt-library,.rebt-lesson{padding:14px}.rebt-lesson h3{font-size:1.28rem}}

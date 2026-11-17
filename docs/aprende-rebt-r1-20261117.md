@@ -10,6 +10,6 @@ Piloto privado para la cuenta Sergio (`compras@prosoel.es`, admin activo).
 - Las guías del Ministerio son no vinculantes.
 - No se toca ningún pedido, material ni histórico de compras.
 
-**NO PUBLICAR TODAVÍA:** aplicar primero la migración `supabase/migrations/20261117_093_rebt_sergio_progress.sql` en el Supabase correcto, validar read/write con Sergio, rechazos RLS con Israel e Ignacio, móvil, sesión y persistencia. Después valorar merge a main.
+**R2:** migración aplicada al Supabase de PROSOEL; pruebas SQL de acceso Sergio/denegación Israel-Ignacio en transacciones revertidas y CI Playwright en escritorio/móvil superadas. **R3:** enlace directo a la ITC, lección antes de biblioteca en móvil y progreso de portada cargado al inicio. Pendiente validación manual con inicio de sesión real tras despliegue.
 
 Fuentes: https://www.boe.es/buscar/act.php?id=BOE-A-2002-18099 y https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Paginas/guia-tecnica-aplicacion.aspx

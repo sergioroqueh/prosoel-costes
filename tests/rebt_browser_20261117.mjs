@@ -54,6 +54,15 @@ try {
     assert.equal(await page.locator("#rebtDailyTeaser").isVisible(),true,name+" teaser visible");
     await page.getByRole("button",{name:"Estudiar ahora"}).click();
     await page.locator("#rebtWorkspace h2").waitFor();
+    const href = await page.locator(".rebt-links a").first().getAttribute("href");
+    assert.match(href, /#ib-10$/, name+" enlace directo al BOE");
+    if (name==="mobile") {
+      const positions=await page.evaluate(()=>({
+        lesson:document.querySelector(".rebt-lesson").getBoundingClientRect().top,
+        library:document.querySelector(".rebt-library").getBoundingClientRect().top
+      }));
+      assert.ok(positions.lesson<positions.library,"Móvil: mostrar primero la lección, no la biblioteca");
+    }
     await page.locator('[name="rebtAnswer"]').first().check();
     await page.getByRole("button",{name:"Comprobar respuesta"}).click();
     await page.locator(".rebt-quiz p.correct, .rebt-quiz p.incorrect").waitFor();
