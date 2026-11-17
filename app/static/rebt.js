@@ -273,7 +273,8 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
          'El texto interno no está disponible. '+html(corpusError||"Consulta mientras tanto la publicación oficial."))+'</div>';
     detailHost.innerHTML='<div class="rebt5-path">'+html(item.section)+'</div>'+
       '<h3>'+html(item.code)+' · '+html(item.title)+'</h3>'+
-      '<p class="rebt5-source-date">RD 842/2002 · BOE, texto consolidado; última actualización publicada: 03/09/2025</p>'+
+      '<p class="rebt5-source-date">RD 842/2002 · BOE consolidado informativo · '+
+        (corpus?'copia consultada el '+html((corpus.snapshotDate||"").slice(0,10)):'acceso disponible al texto vigente en BOE')+'</p>'+
       excerpt+
       reader+
       '<div class="rebt5-primary"><strong>Fuente oficial y contraste</strong><p>El texto consolidado es informativo; para actuaciones jurídicas y técnicas, contrasta siempre la publicación oficial y la fecha de aplicación.</p>'+
