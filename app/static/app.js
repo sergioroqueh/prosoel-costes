@@ -10,7 +10,7 @@ import { latestPricedPurchase, sortPurchasesNewestFirst } from "./purchase_order
 import { initUnifyReferences } from "./unify_references.js?v=20261111-unify-v1";
 
 import { initLga } from "./lga.js?v=20261117-layout-v2";
-import { initRebt } from "./rebt.js?v=20261117-r5";
+import { initRebt } from "./rebt.js?v=20261117-r6";
 
 const supabase = createClient(
   SUPABASE_URL,

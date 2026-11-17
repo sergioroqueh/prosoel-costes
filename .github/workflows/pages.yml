@@ -6,8 +6,12 @@ on:
       - main
     paths:
       - "app/static/**"
+      - "scripts/build_rebt_reader.py"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
+  schedule:
+    # Regenerar semanalmente la copia consolidada desde el BOE; si falla, no publicar.
+    - cron: "17 6 * * 1"
 
 permissions:
   contents: read
@@ -27,6 +31,20 @@ jobs:
 
       - name: Verify LGA calculator
         run: node --test tests/lga_20261117.test.mjs
+
+      - name: Generar lector REBT desde la API oficial del BOE
+        run: python3 scripts/build_rebt_reader.py
+
+      - name: Verificar integridad de la copia oficial
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('app/static/rebt_legal_text.json').read_text(encoding='utf-8'))
+          assert data['source']=='BOE-A-2002-18099'
+          assert data['readableBlocks']==81 and data['characters']>100_000
+          print('BOE consolidado: 81 bloques y', data['characters'], 'caracteres.')
+          PY
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

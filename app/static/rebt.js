@@ -1,4 +1,5 @@
 import { REBT_COURSE, REBT_SOURCE } from "./rebt_normas.js?v=20261117-r5";
+import { getBoeCorpus, createBoeIndex, findBoeText, highlightInElement, escapeText } from "./rebt_reader.js?v=20261117-r6";
 import { initRebtLegacy } from "./rebt_legacy.js?v=20261117-r5";
 
 const html = (v) => String(v ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");
@@ -20,6 +21,8 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
   });
   let userId=null, authGeneration=0, progress=new Map(), progressLoaded=false;
   let progressPromise=null, selectedId=null, mode="normativa", filter="all", query="", isSaving=false, notice="", mounted=false;
+  let corpus=null, boeIndex=null, corpusLoading=false, corpusPromise=null, corpusError="";
+  let inDocQuery="", readerFontSize=16, readerWide=false, readerMarkIndex=0;
   const allowed=()=>Boolean(userId&&canOpen());
   const completed=(id)=>Boolean(progress.get(id)?.completed_at);
   const nextPending=()=>REBT_COURSE.find((item)=>!completed(item.id))||REBT_COURSE[0];
@@ -32,6 +35,8 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
     userId=null;
     progress.clear();progressLoaded=false;progressPromise=null;
     selectedId=null;mode="normativa";filter="all";query="";isSaving=false;notice="";mounted=false;
+    corpus=null;boeIndex=null;corpusLoading=false;corpusPromise=null;corpusError="";
+    inDocQuery="";readerFontSize=16;readerWide=false;readerMarkIndex=0;
     container.replaceChildren();teaser.replaceChildren();teaser.classList.add("hidden");
     normHost=null;listHost=null;detailHost=null;countHost=null;titleHost=null;searchHost=null;statusHost=null;
   }
@@ -75,6 +80,29 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
     })();
     try{await progressPromise;}finally{if(generation===authGeneration)progressPromise=null;}
   }
+  async function loadCorpus(){
+    if(!allowed()||corpus||corpusPromise)return corpusPromise;
+    const generation=authGeneration;
+    corpusLoading=true;corpusError="";
+    corpusPromise=(async()=>{
+      try{
+        const loaded=await getBoeCorpus();
+        if(!allowed()||generation!==authGeneration)return;
+        corpus=loaded;
+        boeIndex=createBoeIndex(loaded,REBT_COURSE);
+        corpusError="";
+      }catch(error){
+        if(!allowed()||generation!==authGeneration)return;
+        corpusError=error.message||"No se ha podido cargar el texto del BOE";
+      }finally{
+        if(allowed()&&generation===authGeneration){
+          corpusLoading=false;
+          if(mounted&&mode==="normativa")renderView();
+        }
+      }
+    })();
+    try{await corpusPromise;}finally{if(generation===authGeneration)corpusPromise=null;}
+  }
   function mount() {
     if(mounted)return;
     container.innerHTML='<div class="rebt5-app">'+
@@ -91,7 +119,8 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
     normHost.innerHTML='<div class="rebt5-progress" id="rebt5Progress"></div>'+
       '<div class="rebt5-layout"><aside class="rebt5-contents" aria-label="Índice del REBT">'+
       '<div class="rebt5-toc-heading"><strong>Índice del reglamento</strong><small>29 artículos · 52 ITC</small></div>'+
-      '<input id="rebt5Search" type="search" placeholder="Buscar artículo, ITC o materia..." aria-label="Buscar en el índice">'+
+      '<input id="rebt5Search" type="search" placeholder="Buscar dentro del reglamento..." aria-label="Buscar en todo el texto reglamentario">'+
+      '<p id="rebt6SearchSummary" class="rebt6-search-info" role="status"></p>'+
       '<div class="rebt5-filters"><button type="button" data-status="all">Todas</button>'+
       '<button type="button" data-status="pending">Pendientes</button>'+
       '<button type="button" data-status="completed">Leídas</button></div>'+
@@ -102,6 +131,7 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
     countHost=normHost.querySelector("#rebt5Progress");
     searchHost=normHost.querySelector("#rebt5Search");
     searchHost.addEventListener("input",()=>{query=searchHost.value;renderList({reset:true});});
+    normHost.classList.toggle("rebt6-wide",readerWide);
     normHost.querySelectorAll("[data-status]").forEach(btn=>btn.addEventListener("click",()=>{
       filter=btn.dataset.status;renderList({reset:true});
     }));
@@ -137,59 +167,150 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
     if(!listHost)return;
     const scroll=reset?0:listHost.scrollTop;
     normHost.querySelectorAll("[data-status]").forEach(btn=>btn.classList.toggle("is-current",btn.dataset.status===filter));
-    const q=query.trim().toLocaleLowerCase("es");
+    const q=query.trim();
+    const searchResults=q&&boeIndex?findBoeText(boeIndex,q):[];
+    const matched=new Map(searchResults.map(x=>[x.id,x]));
     const items=REBT_COURSE.filter(item=>(filter==="all" || (filter==="completed"&&completed(item.id)) || (filter==="pending"&&!completed(item.id))) &&
-      (!q || [item.code,item.title,item.section,...(item.points||[])].join(" ").toLocaleLowerCase("es").includes(q)));
+      (!q || (boeIndex?matched.has(item.id):
+        [item.code,item.title,item.section,...(item.points||[])].join(" ").toLocaleLowerCase("es").includes(q.toLocaleLowerCase("es")))));
+    const searchSummary=normHost.querySelector("#rebt6SearchSummary");
+    if(searchSummary){
+      searchSummary.textContent=q?
+        (corpusLoading?"Cargando el texto completo para buscar…":
+         !corpus?"Solo búsqueda en títulos; "+(corpusError||"copia BOE no disponible") :
+         items.length+" apartados encontrados dentro del reglamento"):
+        (corpus?"Texto íntegro del BOE disponible para búsqueda · 81 bloques":
+         corpusLoading?"Preparando índice oficial…":"Texto íntegro aún no disponible");
+    }
     let previousType="";
     listHost.innerHTML=items.map(item=>{
       const heading=item.type!==previousType?'<div class="rebt5-group-label">'+(item.type==="art"?"REGLAMENTO · ARTÍCULOS":"INSTRUCCIONES TÉCNICAS")+'</div>':"";
       previousType=item.type;
+      const match=matched.get(item.id);
+      const matchedText=match?.count?'<small class="rebt6-match-count">'+match.count+' coincidencia'+(match.count!==1?'s':'')+' en el texto</small>':"";
+      const preview=match?.snippet?'<span class="rebt6-result-preview">'+html(match.snippet)+'</span>':"";
       return heading+'<button type="button" data-unit="'+item.id+'" class="rebt5-unit'+(selected().id===item.id?' selected':'')+'"><span>'+
-        '<strong>'+html(item.code)+'</strong><small>'+html(item.title)+'</small></span><span class="rebt5-mark">'+(completed(item.id)?"✓":"·")+'</span></button>';
+        '<strong>'+html(item.code)+'</strong><small>'+html(item.title)+'</small>'+matchedText+preview+'</span><span class="rebt5-mark">'+(completed(item.id)?"✓":"·")+'</span></button>';
     }).join("")||'<p class="rebt5-empty">No hay apartados con estos filtros.</p>';
     listHost.scrollTop=scroll;
     listHost.querySelectorAll("[data-unit]").forEach(btn=>btn.addEventListener("click",()=>{
       selectedId=btn.dataset.unit;
+      inDocQuery=query.trim();
+      readerMarkIndex=0;
       listHost.querySelectorAll("[data-unit]").forEach(other=>other.classList.toggle("selected",other===btn));
       renderDetail();
+      if(inDocQuery)navigateMark(0);
       if(window.matchMedia("(max-width:900px)").matches){
         requestAnimationFrame(()=>detailHost.scrollIntoView({block:"start",behavior:"smooth"}));
       }
     }));
   }
+  function marks(){return [...detailHost.querySelectorAll(".rebt6-document mark.rebt6-highlight")];}
+  function navigateMark(delta=0){
+    const found=marks();
+    if(!found.length)return;
+    readerMarkIndex=((readerMarkIndex+delta)%found.length+found.length)%found.length;
+    found.forEach((mark,index)=>mark.classList.toggle("rebt6-current",index===readerMarkIndex));
+    const viewer=detailHost.querySelector(".rebt6-document");
+    const mark=found[readerMarkIndex];
+    if(viewer&&mark){
+      const y=mark.getBoundingClientRect().top-viewer.getBoundingClientRect().top;
+      viewer.scrollTop+=y-70;
+    }
+    const status=detailHost.querySelector("#rebt6Hits");
+    if(status)status.textContent=(readerMarkIndex+1)+" / "+found.length+" resaltadas";
+  }
+  function paintReader({jump=false}={}){
+    const body=detailHost.querySelector(".rebt6-document");
+    if(!body)return;
+    const block=corpus?.blocks[selected().id];
+    if(!block)return;
+    const y=body.scrollTop;
+    body.innerHTML=block.html;
+    const total=highlightInElement(body,inDocQuery,120);
+    const status=detailHost.querySelector("#rebt6Hits");
+    if(status)status.textContent=inDocQuery?(total?total+" coincidencias resaltadas":"Sin coincidencias en esta norma"):"";
+    if(jump&&total)navigateMark(0);
+    else body.scrollTop=y;
+  }
   function renderDetail() {
     if(!detailHost||!allowed())return;
     const item=selected();
+    const oldViewer=detailHost.querySelector(".rebt6-document");
+    const sameUnit=detailHost.dataset.unit===item.id;
+    const oldScroll=sameUnit?oldViewer?.scrollTop||0:0;
+    detailHost.dataset.unit=item.id;
     const studied=completed(item.id);
     const isSummary=item.readMode==="synopsis";
     let content;
     if(isSummary) {
       content='<details class="rebt5-reading rebt5-notes"><summary>Notas de comprensión (opcional)</summary>'+
         '<p>'+html(item.summary)+'</p><ul>'+item.points.map(point=>'<li>'+html(point)+'</li>').join("")+'</ul></details>';
+    } else if(corpus?.blocks[item.id]) {
+      content="";
     } else {
       content='<section class="rebt5-reading rebt5-source-mode"><h4>Lectura del texto oficial</h4>'+
         '<p>Esta instrucción todavía no tiene una ficha interna revisada apartado por apartado. Para estudiarla, abre el texto íntegro del BOE y sigue sus apartados, tablas, notas y excepciones. No se muestra un resumen inventado.</p>'+
         '</section>';
     }
-    const excerpt=item.sourceExcerpt?
+    const excerpt=item.sourceExcerpt&&!corpus?.blocks[item.id]?
       '<div class="rebt5-verbatim"><strong>Texto reglamentario · extracto literal</strong><blockquote>'+html(item.sourceExcerpt)+
       '</blockquote><small>Es un fragmento; no reemplaza la lectura del artículo o ITC completos.</small></div>':"";
+    const block=corpus?.blocks[item.id];
+    const reader=block?
+      '<section class="rebt6-reader-panel"><div class="rebt6-toolbar"><strong>Texto consolidado · '+html(item.code)+'</strong>'+
+        '<div class="rebt6-reader-controls"><button type="button" id="rebt6Minus" aria-label="Reducir letra">A−</button>'+
+        '<button type="button" id="rebt6Plus" aria-label="Ampliar letra">A+</button>'+
+        '<button type="button" id="rebt6Wide">'+(readerWide?'Reducir lector':'Ampliar lector')+'</button></div></div>'+
+        '<div class="rebt6-findbar"><input type="search" id="rebt6InDoc" placeholder="Buscar en este '+html(item.code)+'" value="'+html(inDocQuery)+'" aria-label="Buscar dentro de esta unidad">'+
+        '<button type="button" id="rebt6PrevMatch" aria-label="Coincidencia anterior">↑</button>'+
+        '<button type="button" id="rebt6NextMatch" aria-label="Coincidencia siguiente">↓</button>'+
+        '<span id="rebt6Hits" aria-live="polite"></span></div>'+
+        '<div class="rebt6-document" role="region" tabindex="0" aria-label="Texto íntegro consolidado de '+html(item.code)+'" style="--rebt6-font-size:'+readerFontSize+'px"></div>'+
+        '<div class="rebt6-reader-foot">Copia informativa del BOE · generada '+html((corpus.snapshotDate||"").slice(0,10))+
+        '. Puede contener tablas y figuras. Para efectos jurídicos prevalece la publicación oficial.</div></section>':
+      '<div class="rebt6-unavailable">'+(corpusLoading?'Cargando el lector íntegro del BOE…':
+         'El texto interno no está disponible. '+html(corpusError||"Consulta mientras tanto la publicación oficial."))+'</div>';
     detailHost.innerHTML='<div class="rebt5-path">'+html(item.section)+'</div>'+
       '<h3>'+html(item.code)+' · '+html(item.title)+'</h3>'+
-      '<p class="rebt5-source-date">RD 842/2002 · BOE, texto consolidado; última actualización publicada: 03/09/2025</p>'+
+      '<p class="rebt5-source-date">RD 842/2002 · BOE consolidado informativo · '+
+        (corpus?'copia consultada el '+html((corpus.snapshotDate||"").slice(0,10)):'acceso disponible al texto vigente en BOE')+'</p>'+
       excerpt+
-      '<div class="rebt5-primary"><strong>Texto oficial íntegro</strong><p>Consulta en el BOE todos los apartados, tablas, condiciones y excepciones antes de marcar esta unidad como estudiada.</p>'+
-      staticLink(item)+'</div>'+
-      (isSummary?'<p class="rebt5-synthesis-note">Síntesis orientada y contrastada con el BOE: NO es una transcripción literal ni reemplaza apartados, tablas o excepciones.</p>':"")+
+      reader+
+      '<div class="rebt5-primary"><strong>Fuente oficial y contraste</strong><p>El texto consolidado es informativo; para actuaciones jurídicas y técnicas, contrasta siempre la publicación oficial y la fecha de aplicación.</p>'+
+      staticLink(block?{...item,sourceUrl:block.url}:item)+'</div>'+
+      (isSummary?'<p class="rebt5-synthesis-note">Las notas de comprensión no sustituyen apartados, tablas ni excepciones.</p>':"")+
       content+
       '<div class="rebt5-confirm"><label><input type="checkbox" id="rebt5ReadAck"'+(studied?' checked':'')+
-        '> He consultado el texto completo de esta unidad en el BOE</label>'+
+        '> He leído el texto completo de esta unidad'+(block?' en el lector integrado':' en el BOE')+'</label>'+
       '<div class="rebt5-buttons"><button type="button" id="rebt5Save" class="rebt5-main-action"'+(studied?' disabled':'')+
         '>'+(studied?'✓ Marcada como leída':'Registrar lectura')+'</button>'+
       '<button type="button" id="rebt5Next">Ir al siguiente apartado</button>'+
       (studied?'<button type="button" id="rebt5Undo">Marcar como pendiente</button>':'')+'</div>'+
       (studied?'<small>Estudiada el '+asDay(progress.get(item.id)?.completed_at)+'</small>':"")+
       '<p id="rebt5Status" role="status">'+html(notice)+'</p></div>';
+    if(block){
+      const viewer=detailHost.querySelector(".rebt6-document");
+      paintReader();
+      if(sameUnit)viewer.scrollTop=oldScroll;
+      detailHost.querySelector("#rebt6Minus").addEventListener("click",()=>{
+        readerFontSize=Math.max(13,readerFontSize-1);
+        viewer.style.setProperty("--rebt6-font-size",readerFontSize+"px");
+      });
+      detailHost.querySelector("#rebt6Plus").addEventListener("click",()=>{
+        readerFontSize=Math.min(24,readerFontSize+1);
+        viewer.style.setProperty("--rebt6-font-size",readerFontSize+"px");
+      });
+      detailHost.querySelector("#rebt6Wide").addEventListener("click",()=>{
+        readerWide=!readerWide;normHost.classList.toggle("rebt6-wide",readerWide);
+        detailHost.querySelector("#rebt6Wide").textContent=readerWide?"Reducir lector":"Ampliar lector";
+      });
+      detailHost.querySelector("#rebt6InDoc").addEventListener("input",(event)=>{
+        inDocQuery=event.target.value;readerMarkIndex=0;paintReader({jump:true});
+      });
+      detailHost.querySelector("#rebt6PrevMatch").addEventListener("click",()=>navigateMark(-1));
+      detailHost.querySelector("#rebt6NextMatch").addEventListener("click",()=>navigateMark(1));
+    }
     const acknowledge=detailHost.querySelector("#rebt5ReadAck");
     const saveButton=detailHost.querySelector("#rebt5Save");
     saveButton.disabled=studied||!acknowledge.checked||isSaving;
@@ -201,7 +322,7 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
       const candidate=REBT_COURSE.slice(currentIndex+1).find(unit=>!completed(unit.id))||
         REBT_COURSE.find(unit=>!completed(unit.id))||
         REBT_COURSE[(currentIndex+1)%REBT_COURSE.length];
-      selectedId=candidate.id;notice="";renderList();renderDetail();
+      selectedId=candidate.id;inDocQuery="";readerMarkIndex=0;notice="";renderList();renderDetail();
       if(window.matchMedia("(max-width:900px)").matches)requestAnimationFrame(()=>detailHost.scrollIntoView({block:"start",behavior:"smooth"}));
     });
   }
@@ -229,7 +350,7 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
   }
   async function open() {
     if(!allowed())return false;
-    mount();renderView();await loadProgress();
+    mount();renderView();await Promise.all([loadProgress(),loadCorpus()]);
     if(!allowed())return false;
     // Congelar la unidad abierta: completar una lectura no debe cambiar el panel
     // automáticamente antes de pulsar "Ir al siguiente apartado".

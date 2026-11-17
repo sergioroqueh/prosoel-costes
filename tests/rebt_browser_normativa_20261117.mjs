@@ -31,9 +31,35 @@ widget.setUser({id:"11111111-1111-4111-8111-111111111111"});
 window.rebtSmoke={widget,store};
 </script></body></html>`;
 
+
+const fakeBlocks={};
+for(let n=1;n<=29;n++){
+ const id="N-ART-"+String(n).padStart(2,"0");
+ const text=n===1?"El presente Reglamento establece condiciones técnicas y garantías para la seguridad de personas y bienes.":"Artículo "+n+" sobre requisitos e instalaciones de baja tensión.";
+ fakeBlocks[id]={id,blockId:n===1?"a1":"a"+n,text,
+   html:'<p class="articulo">Artículo '+n+'.</p><p>'+text+'</p>',
+   url:"https://www.boe.es/buscar/act.php?id=BOE-A-2002-18099#a"+n};
+}
+for(let n=1;n<=52;n++){
+ const id="N-ITC-"+String(n).padStart(2,"0");
+ const text=n===14?"El trazado de la línea general de alimentación será lo más corto y rectilíneo posible. Sección del conductor por canalización y método de instalación.":
+   "Instrucción técnica complementaria ITC-BT-"+String(n).padStart(2,"0")+"; condiciones de la instalación eléctrica.";
+ const body=n===14?'<p>El trazado de la línea general de alimentación será lo más corto y rectilíneo posible.</p><table><tr><th>Sección mm²</th><th>Conductor</th></tr><tr><td>25</td><td>Cu</td></tr></table><p>Sección del conductor por canalización y método de instalación.</p>':
+   "<p>"+text+"</p>";
+ fakeBlocks[id]={id,blockId:"ib-"+n,text,html:body,
+   url:"https://www.boe.es/buscar/act.php?id=BOE-A-2002-18099#ib-"+n};
+}
+const fakeCorpus={source:"BOE-A-2002-18099",readableBlocks:81,
+  sourceUrl:"https://www.boe.es/buscar/act.php?id=BOE-A-2002-18099",
+  snapshotDate:"2026-11-17T00:00:00Z",blocks:fakeBlocks};
+
 const server = createServer(async (req, res) => {
   try {
     if (req.url === "/") {res.writeHead(200,{"Content-Type":"text/html; charset=utf-8"});res.end(pageHtml);return;}
+    if (req.url.startsWith("/rebt_legal_text.json")) {
+      res.writeHead(200,{"Content-Type":"application/json; charset=utf-8"});
+      res.end(JSON.stringify(fakeCorpus));return;
+    }
     const loc = path.resolve(root, "."+decodeURIComponent(new URL(req.url,"http://local").pathname));
     if (!loc.startsWith(root+path.sep)) {res.writeHead(403);res.end();return;}
     const data = await readFile(loc);
@@ -61,7 +87,10 @@ try {
     assert.match(await page.locator("#rebt5Detail h3").innerText(),/Artículo 1/);
     assert.match(await page.locator(".rebt5-progress").innerText(),/0 \/ 81/);
     assert.match(await page.locator(".rebt5-official-link").getAttribute("href"),/#a1$/);
-    assert.match(await page.locator(".rebt5-verbatim blockquote").innerText(),/condiciones técnicas y garantías/);
+    await page.locator(".rebt6-document p").first().waitFor();
+    assert.match(await page.locator(".rebt6-document").innerText(),/condiciones técnicas y garantías/);
+    assert.ok(await page.locator(".rebt6-document").isVisible(),name+" lector incrustado");
+    assert.match(await page.locator("#rebt6Hits").innerText(),/^$/);
     assert.equal(await page.getByRole("button",{name:"Registrar lectura"}).isDisabled(),true);
     await page.locator("#rebt5ReadAck").check();
     await page.getByRole("button",{name:"Registrar lectura"}).click();
@@ -74,8 +103,20 @@ try {
     assert.equal(await page.locator("#rebt5Toc [data-unit]").count(),1,name+" búsqueda");
     await page.locator("#rebt5Toc [data-unit]").first().click();
     assert.match(await page.locator("#rebt5Detail h3").innerText(),/ITC-BT-14/);
-    assert.match(await page.locator(".rebt5-source-mode").innerText(),/todavía no tiene una ficha interna revisada/);
+    assert.match(await page.locator(".rebt6-document").innerText(),/línea general de alimentación/);
+    assert.equal(await page.locator(".rebt6-document table").count(),1,name+" tabla legal conservada");
+    await page.locator("#rebt6InDoc").fill("trazado");
+    assert.ok(await page.locator(".rebt6-document mark.rebt6-highlight").count()>0,name+" resaltado interno");
+    await page.getByRole("button",{name:"Ampliar letra"}).click();
+    assert.match(await page.locator(".rebt6-document").getAttribute("style"),/17px/);
+    await page.getByRole("button",{name:"Ampliar lector"}).click();
+    assert.equal(await page.locator("#rebt5Norm").evaluate(el=>el.classList.contains("rebt6-wide")),true,name+" lector ancho");
+    await page.getByRole("button",{name:"Reducir lector"}).click();
+    await page.locator("#rebt6InDoc").fill("");
     assert.match(await page.locator(".rebt5-official-link").getAttribute("href"),/#ib-14$/);
+    await page.locator("#rebt5Search").fill("seccion");
+    assert.equal(await page.locator("#rebt5Toc [data-unit]").count(),1,name+" búsqueda texto completo sin tildes");
+    assert.match(await page.locator(".rebt6-match-count").innerText(),/coincidencia/);
     await page.locator("#rebt5Search").fill("");
     await page.locator("#rebt5Toc").evaluate(el=>{el.scrollTop=500;});
     const before=await page.locator("#rebt5Toc").evaluate(el=>el.scrollTop);

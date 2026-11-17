@@ -6,6 +6,7 @@ on:
       - feat/aprende-rebt-sergio-20261117
       - feat/rebt-catalogo-ux-r4-20261117
       - feat/rebt-lectura-normativa-r5-20261117
+      - feat/rebt-lector-buscador-r6-20261117
 permissions:
   contents: read
 jobs:
@@ -16,24 +17,58 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - run: node --test tests/rebt_20261117.test.mjs tests/lga_20261117.test.mjs
+      - run: node --test tests/rebt_20261117.test.mjs tests/rebt_search_20261117.test.mjs tests/lga_20261117.test.mjs
   browser:
+    needs: legal-corpus
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - uses: actions/download-artifact@v4
+        with:
+          name: boe-rebt-corpus-r6
+          path: app/static
       - run: npm install --no-save --package-lock=false playwright@1.56.1
       - run: npx playwright install --with-deps chromium
       - run: node tests/rebt_browser_20261117.mjs
       - run: node tests/rebt_browser_normativa_20261117.mjs
+      - run: node tests/rebt_browser_realtext_20261117.mjs
       - name: Guardar capturas de navegador
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: rebt-r5-browser-screenshots
+          name: rebt-r6-browser-screenshots
           path: |
             tests/rebt-screenshots/*.png
             tests/rebt-normas-screenshots/*.png
+            tests/rebt-real-screenshots/*.png
           if-no-files-found: ignore
+
+  legal-corpus:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Obtener texto íntegro REBT desde BOE
+        run: python scripts/build_rebt_reader.py
+      - name: Comprobar cobertura de lectura y búsqueda
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('app/static/rebt_legal_text.json',encoding='utf-8'))
+          assert x['readableBlocks']==81
+          assert len(x['blocks']['N-ITC-14']['text'])>200
+          assert len(x['blocks']['N-ART-01']['text'])>100
+          print('PASS índice y contenido BOE: 81 bloques',x['characters'],'caracteres')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: boe-rebt-corpus-r6
+          path: |
+            app/static/rebt_legal_text.json
+            app/static/rebt_figures/*.png
+          retention-days: 7
