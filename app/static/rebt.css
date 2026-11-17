@@ -105,3 +105,48 @@
 .rebt5-verbatim small{color:#697f94;font-size:.75rem}
 .rebt5-notes{background:#f9fbfe;border:1px solid #e0eaf2;border-radius:10px;padding:13px 16px;margin:15px 0}
 .rebt5-notes summary{font-weight:750;color:#345b7f;cursor:pointer}
+
+
+/* R6: lector y búsqueda sobre el texto consolidado del BOE */
+.rebt5-app{max-width:1600px}
+.rebt5-layout{grid-template-columns:minmax(255px,.72fr) minmax(0,2fr)}
+.rebt6-search-info{font-size:.73rem;line-height:1.4;color:#58758c;margin:7px 0 9px;min-height:1em}
+.rebt6-match-count{display:block;color:#24725b!important;font-weight:750;font-size:.7rem!important}
+.rebt6-result-preview{display:block;font-size:.7rem;line-height:1.45;color:#647d90;margin-top:5px;font-weight:400;max-height:3.05em;overflow:hidden}
+.rebt6-reader-panel{border:1px solid #cbdae7;border-radius:12px;overflow:hidden;margin:14px 0 18px;background:#fff}
+.rebt6-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;background:#eaf2fa;padding:11px 12px;border-bottom:1px solid #d3e2f1}
+.rebt6-toolbar>strong{font-size:.89rem;color:#214e79}
+.rebt6-reader-controls{display:flex;align-items:center;gap:5px}
+.rebt6-reader-controls button,.rebt6-findbar button{border:1px solid #bbcfe0;border-radius:7px;padding:6px 9px;color:#285576;background:white;font-size:.81rem;font-weight:700;cursor:pointer}
+.rebt6-findbar{display:flex;align-items:center;gap:6px;padding:9px 12px;border-bottom:1px solid #e0e9f1}
+.rebt6-findbar input{min-width:0;flex:1 1 auto;padding:8px 11px;border-radius:8px;border:1px solid #cfdae5;font-size:.83rem;background:#fff;color:#244765}
+.rebt6-findbar span{font-size:.7rem;color:#617d96;min-width:65px;text-align:right}
+.rebt6-document{height:min(66vh,680px);min-height:320px;overflow:auto;overscroll-behavior:contain;overflow-anchor:none;padding:25px 28px;font-size:var(--rebt6-font-size,16px);line-height:1.75;color:#18334f;background:#fff}
+.rebt6-document p{font-size:inherit;line-height:inherit;margin:.7em 0;color:inherit}
+.rebt6-document p.articulo,.rebt6-document p.titulo{font-weight:800;font-size:1.08em;color:#173f69;margin-top:1.45em}
+.rebt6-document p.centro,.rebt6-document p.centrado{text-align:center}
+.rebt6-document blockquote{border-left:3px solid #d4e3f0;margin:14px 0;padding:6px 13px;color:#4c6680}
+.rebt6-document img{max-width:100%;height:auto;display:inline-block;vertical-align:middle}
+.rebt6-document table{display:block;overflow-x:auto;max-width:100%;border-collapse:collapse;font-size:.9em;margin:16px auto;border-spacing:0;scrollbar-width:thin}
+.rebt6-document td,.rebt6-document th{border:1px solid #cdd9e4;padding:6px 9px;vertical-align:top;min-width:45px;white-space:normal}
+.rebt6-document th{background:#f0f5f9;font-weight:750}
+.rebt6-document ul,.rebt6-document ol{padding-left:24px}
+.rebt6-document a{color:#225c91;text-decoration:underline;text-underline-offset:2px}
+.rebt6-document mark.rebt6-highlight{background:#ffdf79;color:#21303d;outline:1px solid #e3ac29;border-radius:2px}
+.rebt6-document mark.rebt6-current{background:#fbb65a;outline:2px solid #bd6b2d}
+.rebt6-reader-foot{font-size:.72rem;color:#71859a;line-height:1.5;background:#f6f9fc;border-top:1px solid #e0e9f1;padding:10px 12px}
+.rebt6-unavailable{padding:15px;background:#fff8f0;border:1px dashed #e9c7b0;color:#85533e;font-size:.84rem;line-height:1.55;border-radius:9px;margin:14px 0}
+.rebt6-wide .rebt5-contents{display:none}
+.rebt6-wide .rebt5-layout{grid-template-columns:1fr}
+.rebt6-wide .rebt6-document{height:min(73vh,850px)}
+@media(max-width:900px){
+ .rebt5-layout{grid-template-columns:1fr}
+ .rebt6-document{height:54vh;padding:18px 16px;min-height:280px}
+ .rebt6-wide .rebt5-contents{display:block}
+}
+@media(max-width:520px){
+ .rebt6-toolbar{align-items:flex-start}
+ .rebt6-document{padding:13px 12px;height:53vh}
+ .rebt6-findbar{gap:4px;padding:8px}
+ .rebt6-findbar span{min-width:42px}
+}
