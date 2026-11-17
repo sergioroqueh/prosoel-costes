@@ -15,9 +15,11 @@ export function dailyRebtLesson(date = madridDate()) {
 export function initRebt({container,teaser,client,canOpen,onNavigate}) {
   let userId = null, loaded = false, selectedId = null, selectedAnswer = null, checked = false, saving = false;
   let records = new Map(), filter = "all", search = "", message = "";
+  let loadPromise = null, authGeneration = 0;
   const allowed = () => Boolean(userId && canOpen());
   const progress = (id) => records.get(id) || {lesson_id:id,completed_at:null,favorite:false,last_answered_correct:null};
   function reset() {
+    authGeneration++; loadPromise=null;
     userId=null;loaded=false;selectedId=null;selectedAnswer=null;checked=false;saving=false;
     records.clear();filter="all";search="";message="";
     container.replaceChildren();teaser.replaceChildren();teaser.classList.add("hidden");
@@ -33,13 +35,17 @@ export function initRebt({container,teaser,client,canOpen,onNavigate}) {
   }
   async function load() {
     if (loaded || !allowed()) return;
-    const actor=userId;
-    const {data,error}=await client.from("rebt_lesson_progress")
-      .select("lesson_id,completed_at,favorite,last_answered_correct").eq("user_id",actor);
-    if (!allowed() || actor!==userId) return;
-    if (error) { message="Progreso no sincronizado: comprobar migración REBT en Supabase."; return; }
-    records=new Map((data||[]).map((row)=>[row.lesson_id,row]));loaded=true;message="";
-    renderTeaser();
+    if (loadPromise) return loadPromise;
+    const actor=userId, generation=authGeneration;
+    loadPromise=(async () => {
+      const {data,error}=await client.from("rebt_lesson_progress")
+        .select("lesson_id,completed_at,favorite,last_answered_correct").eq("user_id",actor);
+      if (!allowed() || actor!==userId || generation!==authGeneration) return;
+      if (error) { message="Progreso no sincronizado: comprobar migración REBT en Supabase."; return; }
+      records=new Map((data||[]).map((row)=>[row.lesson_id,row]));loaded=true;message="";
+      renderTeaser();
+    })();
+    try { await loadPromise; } finally { if (generation===authGeneration) loadPromise=null; }
   }
   async function save(id,change) {
     if (!allowed() || saving) return;
