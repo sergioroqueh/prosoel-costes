@@ -10,6 +10,7 @@
   <link rel="icon" type="image/svg+xml" sizes="any" href="./assets/prosoel-mark.svg?v=20261009-v17">
   <link rel="stylesheet" href="./styles.css?v=20261112-partial-warning-v1">
   <link rel="stylesheet" href="./lga.css?v=20261117-layout-v2">
+  <link rel="stylesheet" href="./rebt.css?v=20261117-r1">
 </head>
 <body>
   <section class="auth-shell" id="authView">
@@ -110,10 +111,12 @@
           <button type="button" class="workspace-tool-option" id="reviewTab"
                   aria-pressed="false" aria-controls="reviewWorkspace">Normalización</button>
           <button type="button" class="workspace-tool-option hidden" id="lgaTab" aria-pressed="false" aria-controls="lgaWorkspace">Cálculo de LGA</button>
+          <button type="button" class="workspace-tool-option hidden" id="rebtTab" aria-pressed="false" aria-controls="rebtWorkspace">Aprende REBT</button>
         </div>
       </details>
       </div>
       <div id="costsWorkspace" role="tabpanel" aria-labelledby="costsTab">
+      <div id="rebtDailyTeaser" class="rebt-teaser hidden" role="note"></div>
       <section class="search-panel">
         <div class="search-intro">
           <div>
@@ -447,6 +450,7 @@
       </section>
 
       <section id="lgaWorkspace" class="lga-workspace hidden" role="region" aria-labelledby="lgaTab"></section>
+      <section id="rebtWorkspace" class="rebt-workspace hidden" role="region" aria-labelledby="rebtTab"></section>
 
       <section id="importWorkspace" class="import-workspace hidden" role="tabpanel" aria-labelledby="importTab">
         <header class="import-intro">
@@ -585,6 +589,6 @@
     </button>
   </template>
 
-  <script type="module" src="./app.js?v=20261117-layout-v2"></script>
+  <script type="module" src="./app.js?v=20261117-rebt-r1"></script>
 </body>
 </html>
